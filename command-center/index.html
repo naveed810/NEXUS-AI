@@ -1,0 +1,1738 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <meta
+        name="description"
+        content="NEXUS AI — Intelligent Work Studio"
+    >
+
+    <title>NEXUS AI — Intelligent Work Studio</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<!-- =========================================================
+     BACKGROUND
+========================================================= -->
+
+<div class="background">
+    <div class="aurora aurora-1"></div>
+    <div class="aurora aurora-2"></div>
+    <div class="grid"></div>
+</div>
+
+
+<!-- =========================================================
+     ONBOARDING
+========================================================= -->
+
+<section id="onboarding" class="onboarding">
+
+    <div class="onboarding-card">
+
+        <div class="brand center-brand">
+            <div class="logo-mark">
+                <i></i>
+                <i></i>
+                <i></i>
+            </div>
+
+            <div>
+                <strong>NEXUS</strong>
+                <small>AI</small>
+            </div>
+        </div>
+
+
+        <div class="steps">
+            <span class="step-dot active"></span>
+            <span class="step-line"></span>
+            <span class="step-dot"></span>
+            <span class="step-line"></span>
+            <span class="step-dot"></span>
+        </div>
+
+
+        <!-- STEP 1 -->
+
+        <div
+            class="onboarding-step active"
+            id="step-1"
+        >
+
+            <div class="hero-logo">
+                <div class="logo-symbol">
+                    <i></i>
+                    <i></i>
+                    <i></i>
+                </div>
+            </div>
+
+            <span class="eyebrow">
+                INTELLIGENT WORK STUDIO
+            </span>
+
+            <h1>
+                Your work.<br>
+                <span>Intelligently connected.</span>
+            </h1>
+
+            <p>
+                Bring AI assistants, intelligent agents,
+                workflows and insights together in one
+                powerful workspace.
+            </p>
+
+            <button
+                id="get-started"
+                class="primary-btn big-btn"
+                type="button"
+            >
+                Get Started
+                <span>→</span>
+            </button>
+
+            <div class="secure-note">
+                <span class="green-dot"></span>
+                Demo workspace • No account required
+            </div>
+
+        </div>
+
+
+        <!-- STEP 2 -->
+
+        <div
+            class="onboarding-step"
+            id="step-2"
+        >
+
+            <span class="eyebrow">
+                PERSONALIZE
+            </span>
+
+            <h2>
+                Tell us about<br>
+                <span>yourself.</span>
+            </h2>
+
+            <p>
+                Your information is stored locally in this
+                browser for this demo.
+            </p>
+
+
+            <form id="profile-form">
+
+                <label>
+                    Your name
+
+                    <div class="input-box">
+                        <span>◎</span>
+
+                        <input
+                            id="name-input"
+                            type="text"
+                            placeholder="Enter your name"
+                            maxlength="40"
+                            autocomplete="name"
+                            required
+                        >
+                    </div>
+                </label>
+
+
+                <label>
+                    Email address
+
+                    <div class="input-box">
+                        <span>✉</span>
+
+                        <input
+                            id="email-input"
+                            type="email"
+                            placeholder="you@example.com"
+                            autocomplete="email"
+                            required
+                        >
+                    </div>
+                </label>
+
+
+                <div
+                    id="form-error"
+                    class="form-error"
+                ></div>
+
+
+                <button
+                    class="primary-btn full-btn"
+                    type="submit"
+                >
+                    Continue
+                    <span>→</span>
+                </button>
+
+            </form>
+
+
+            <button
+                id="back-step-1"
+                class="back-btn"
+                type="button"
+            >
+                ← Back
+            </button>
+
+        </div>
+
+
+        <!-- STEP 3 -->
+
+        <div
+            class="onboarding-step"
+            id="step-3"
+        >
+
+            <span class="eyebrow">
+                PERSONALIZATION
+            </span>
+
+            <h2>
+                What will you<br>
+                <span>use NEXUS for?</span>
+            </h2>
+
+            <p>
+                Select everything that interests you.
+            </p>
+
+
+            <div class="interest-grid">
+
+                <button
+                    class="interest-card"
+                    data-interest="AI Agents"
+                    type="button"
+                >
+                    <span>✦</span>
+                    <strong>AI Agents</strong>
+                    <small>Delegate intelligent tasks</small>
+                </button>
+
+                <button
+                    class="interest-card"
+                    data-interest="Analytics"
+                    type="button"
+                >
+                    <span>◈</span>
+                    <strong>Analytics</strong>
+                    <small>Understand your data</small>
+                </button>
+
+                <button
+                    class="interest-card"
+                    data-interest="Research"
+                    type="button"
+                >
+                    <span>⌕</span>
+                    <strong>Research</strong>
+                    <small>Explore information</small>
+                </button>
+
+                <button
+                    class="interest-card"
+                    data-interest="Automation"
+                    type="button"
+                >
+                    <span>⚡</span>
+                    <strong>Automation</strong>
+                    <small>Automate repetitive work</small>
+                </button>
+
+                <button
+                    class="interest-card"
+                    data-interest="Development"
+                    type="button"
+                >
+                    <span>&lt;/&gt;</span>
+                    <strong>Development</strong>
+                    <small>Build with AI</small>
+                </button>
+
+                <button
+                    class="interest-card"
+                    data-interest="Content"
+                    type="button"
+                >
+                    <span>✎</span>
+                    <strong>Content</strong>
+                    <small>Create faster</small>
+                </button>
+
+            </div>
+
+
+            <button
+                id="launch-btn"
+                class="primary-btn full-btn"
+                type="button"
+            >
+                Launch NEXUS AI
+                <span>→</span>
+            </button>
+
+
+            <button
+                id="back-step-2"
+                class="back-btn"
+                type="button"
+            >
+                ← Back
+            </button>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================================================
+     INITIALIZATION
+========================================================= -->
+
+<section
+    id="initializing"
+    class="initializing hidden"
+>
+
+    <div class="initializing-box">
+
+        <div class="orbit">
+            <div class="orbit-ring"></div>
+
+            <div class="orbit-center">
+                ✦
+            </div>
+        </div>
+
+        <span class="eyebrow">
+            NEXUS AI
+        </span>
+
+        <h2>
+            Building your<br>
+            <span>intelligent workspace</span>
+        </h2>
+
+        <div class="loading-list">
+
+            <div data-load="1">
+                <span>✓</span>
+                Creating profile
+            </div>
+
+            <div data-load="2">
+                <span>✓</span>
+                Preparing workspace
+            </div>
+
+            <div data-load="3">
+                <span>✓</span>
+                Loading AI agents
+            </div>
+
+            <div data-load="4">
+                <span>✓</span>
+                Configuring insights
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================================================
+     APPLICATION
+========================================================= -->
+
+<div id="app" class="app hidden">
+
+
+    <!-- MOBILE OVERLAY -->
+
+    <div
+        id="sidebar-overlay"
+        class="sidebar-overlay"
+    ></div>
+
+
+    <!-- =====================================================
+         SIDEBAR
+    ====================================================== -->
+
+    <aside id="sidebar" class="sidebar">
+
+        <div>
+
+            <div class="brand app-brand">
+
+                <div class="logo-mark">
+                    <i></i>
+                    <i></i>
+                    <i></i>
+                </div>
+
+                <div>
+                    <strong>NEXUS</strong>
+                    <small>AI</small>
+                </div>
+
+            </div>
+
+
+            <!-- WORKSPACE -->
+
+            <button
+                id="workspace-button"
+                class="workspace-button"
+                type="button"
+            >
+
+                <div class="workspace-icon">
+                    N
+                </div>
+
+                <div class="workspace-text">
+                    <strong>Personal Workspace</strong>
+                    <small>Free workspace</small>
+                </div>
+
+                <span>⌄</span>
+
+            </button>
+
+
+            <!-- NAVIGATION -->
+
+            <nav class="navigation">
+
+                <div class="nav-heading">
+                    WORKSPACE
+                </div>
+
+
+                <button
+                    class="nav-item active"
+                    data-page="command"
+                    type="button"
+                >
+                    <span>⌂</span>
+                    Command Center
+                </button>
+
+
+                <button
+                    class="nav-item"
+                    data-page="agents"
+                    type="button"
+                >
+                    <span>✦</span>
+                    AI Agents
+                    <b>4</b>
+                </button>
+
+
+                <button
+                    class="nav-item"
+                    data-page="workflows"
+                    type="button"
+                >
+                    <span>⌘</span>
+                    Workflows
+                </button>
+
+
+                <button
+                    class="nav-item"
+                    data-page="insights"
+                    type="button"
+                >
+                    <span>◈</span>
+                    AI Insights
+                </button>
+
+
+                <div class="nav-heading manage">
+                    MANAGE
+                </div>
+
+
+                <button
+                    class="nav-item"
+                    data-page="activity"
+                    type="button"
+                >
+                    <span>◴</span>
+                    Activity
+                </button>
+
+
+                <button
+                    class="nav-item"
+                    data-page="integrations"
+                    type="button"
+                >
+                    <span>⊞</span>
+                    Integrations
+                </button>
+
+
+                <button
+                    class="nav-item"
+                    data-page="settings"
+                    type="button"
+                >
+                    <span>⚙</span>
+                    Settings
+                </button>
+
+            </nav>
+
+        </div>
+
+
+        <!-- SIDEBAR BOTTOM -->
+
+        <div class="sidebar-bottom">
+
+            <button
+                id="help-button"
+                class="help-card"
+                type="button"
+            >
+                <span>?</span>
+
+                <div>
+                    <strong>Need help?</strong>
+                    <small>Explore the NEXUS guide</small>
+                </div>
+
+                <b>→</b>
+            </button>
+
+
+            <button
+                id="profile-button"
+                class="profile-button"
+                type="button"
+            >
+
+                <div
+                    id="sidebar-avatar"
+                    class="avatar"
+                >
+                    U
+                </div>
+
+                <div class="profile-info">
+
+                    <strong id="sidebar-name">
+                        User
+                    </strong>
+
+                    <small id="sidebar-email">
+                        user@example.com
+                    </small>
+
+                </div>
+
+                <span>•••</span>
+
+            </button>
+
+        </div>
+
+    </aside>
+
+
+    <!-- =====================================================
+         MAIN
+    ====================================================== -->
+
+    <main class="main">
+
+        <!-- TOPBAR -->
+
+        <header class="topbar">
+
+            <div class="top-left">
+
+                <button
+                    id="mobile-menu"
+                    class="icon-btn mobile-only"
+                    type="button"
+                >
+                    ☰
+                </button>
+
+                <div class="breadcrumb">
+                    <span>Workspace</span>
+                    <b>/</b>
+                    <strong id="breadcrumb-name">
+                        Command Center
+                    </strong>
+                </div>
+
+            </div>
+
+
+            <div class="top-actions">
+
+                <button
+                    id="search-button"
+                    class="search-button"
+                    type="button"
+                >
+                    <span>⌕</span>
+                    <span>Search</span>
+                    <kbd>Ctrl</kbd>
+                    <kbd>K</kbd>
+                </button>
+
+
+                <button
+                    id="theme-button"
+                    class="icon-btn"
+                    type="button"
+                    title="Toggle theme"
+                >
+                    ◐
+                </button>
+
+
+                <button
+                    id="notification-button"
+                    class="icon-btn notification-btn"
+                    type="button"
+                    title="Notifications"
+                >
+                    ♢
+                    <i></i>
+                </button>
+
+            </div>
+
+        </header>
+
+
+        <!-- PAGE CONTENT -->
+
+        <div id="page-content" class="page-content">
+
+            <!-- COMMAND CENTER -->
+
+            <section
+                class="page command-page active-page"
+                data-content="command"
+            >
+
+                <div class="hero">
+
+                    <div>
+
+                        <div class="status-label">
+                            <span></span>
+                            NEXUS AI WORKSPACE
+                        </div>
+
+                        <h1>
+                            <span id="greeting">
+                                Good evening
+                            </span>,
+                            <strong id="dashboard-name">
+                                User
+                            </strong>.
+                        </h1>
+
+                        <p>
+                            Everything you need to think,
+                            build, automate and understand —
+                            connected in one intelligent workspace.
+                        </p>
+
+                    </div>
+
+
+                    <div class="hero-buttons">
+
+                        <button
+                            id="refresh-button"
+                            class="secondary-btn"
+                            type="button"
+                        >
+                            ↻ Refresh
+                        </button>
+
+                        <button
+                            id="new-task-button"
+                            class="primary-btn"
+                            type="button"
+                        >
+                            + New Task
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+                <!-- AI COMMAND -->
+
+                <section class="ai-box">
+
+                    <div class="ai-header">
+
+                        <div class="ai-title">
+
+                            <div class="ai-icon">
+                                ✦
+                            </div>
+
+                            <div>
+                                <strong>Ask NEXUS</strong>
+                                <small>AI Command Interface</small>
+                            </div>
+
+                        </div>
+
+                        <span class="ready">
+                            <i></i>
+                            Ready
+                        </span>
+
+                    </div>
+
+
+                    <div class="prompt-box">
+
+                        <textarea
+                            id="prompt"
+                            rows="1"
+                            placeholder="Ask NEXUS anything..."
+                        ></textarea>
+
+                        <button
+                            id="send-button"
+                            type="button"
+                        >
+                            ↑
+                        </button>
+
+                    </div>
+
+
+                    <div class="suggestions">
+
+                        <button
+                            data-prompt="Summarize my workspace activity"
+                            type="button"
+                        >
+                            ✦ Summarize activity
+                        </button>
+
+                        <button
+                            data-prompt="What should I focus on today?"
+                            type="button"
+                        >
+                            ◈ What should I focus on?
+                        </button>
+
+                        <button
+                            data-prompt="Show my active agents"
+                            type="button"
+                        >
+                            ⌁ Show active agents
+                        </button>
+
+                    </div>
+
+                </section>
+
+
+                <!-- AI RESPONSE -->
+
+                <section
+                    id="ai-response"
+                    class="response-card hidden"
+                >
+
+                    <div class="response-title">
+                        <span>✦</span>
+
+                        <div>
+                            <strong>NEXUS AI</strong>
+                            <small>Response</small>
+                        </div>
+
+                        <button
+                            id="close-response"
+                            type="button"
+                        >
+                            ×
+                        </button>
+                    </div>
+
+                    <div id="response-text"></div>
+
+                </section>
+
+
+                <!-- QUICK ACTIONS -->
+
+                <div class="section-title">
+
+                    <div>
+                        <small>SHORTCUTS</small>
+                        <h2>Quick Actions</h2>
+                    </div>
+
+                    <button
+                        id="view-all-actions"
+                        type="button"
+                    >
+                        View all →
+                    </button>
+
+                </div>
+
+
+                <div class="quick-grid">
+
+                    <button
+                        class="quick-card"
+                        data-action="agent"
+                        type="button"
+                    >
+                        <span class="quick-icon purple">
+                            ✦
+                        </span>
+
+                        <div>
+                            <strong>Create AI Agent</strong>
+                            <small>Build a specialized assistant</small>
+                        </div>
+
+                        <b>→</b>
+                    </button>
+
+
+                    <button
+                        class="quick-card"
+                        data-action="workflow"
+                        type="button"
+                    >
+                        <span class="quick-icon blue">
+                            ⌘
+                        </span>
+
+                        <div>
+                            <strong>Build Workflow</strong>
+                            <small>Automate repetitive work</small>
+                        </div>
+
+                        <b>→</b>
+                    </button>
+
+
+                    <button
+                        class="quick-card"
+                        data-action="insights"
+                        type="button"
+                    >
+                        <span class="quick-icon cyan">
+                            ◈
+                        </span>
+
+                        <div>
+                            <strong>Explore Insights</strong>
+                            <small>Discover workspace patterns</small>
+                        </div>
+
+                        <b>→</b>
+                    </button>
+
+
+                    <button
+                        class="quick-card"
+                        data-action="research"
+                        type="button"
+                    >
+                        <span class="quick-icon pink">
+                            ⌕
+                        </span>
+
+                        <div>
+                            <strong>Start Research</strong>
+                            <small>Investigate a new topic</small>
+                        </div>
+
+                        <b>→</b>
+                    </button>
+
+                </div>
+
+
+                <!-- DASHBOARD GRID -->
+
+                <div class="two-column">
+
+                    <!-- AGENTS -->
+
+                    <section class="panel">
+
+                        <div class="panel-head">
+
+                            <div>
+                                <small>AI AGENTS</small>
+                                <h2>Active Agents</h2>
+                            </div>
+
+                            <span class="success-badge">
+                                4 active
+                            </span>
+
+                        </div>
+
+
+                        <div class="agent-list">
+
+                            <div class="agent">
+                                <span class="agent-icon purple">⌕</span>
+
+                                <div>
+                                    <strong>Research Agent</strong>
+                                    <small>Analyzing 12 sources</small>
+                                </div>
+
+                                <em>● Running</em>
+                            </div>
+
+
+                            <div class="agent">
+                                <span class="agent-icon cyan">◈</span>
+
+                                <div>
+                                    <strong>Data Analyst</strong>
+                                    <small>Processing dataset</small>
+                                </div>
+
+                                <em>● Running</em>
+                            </div>
+
+
+                            <div class="agent">
+                                <span class="agent-icon blue">&lt;/&gt;</span>
+
+                                <div>
+                                    <strong>Coding Agent</strong>
+                                    <small>Waiting for instruction</small>
+                                </div>
+
+                                <em class="idle">● Idle</em>
+                            </div>
+
+
+                            <div class="agent">
+                                <span class="agent-icon yellow">⚡</span>
+
+                                <div>
+                                    <strong>Automation Agent</strong>
+                                    <small>3 workflows scheduled</small>
+                                </div>
+
+                                <em>● Running</em>
+                            </div>
+
+                        </div>
+
+
+                        <button
+                            class="panel-link"
+                            data-page-link="agents"
+                            type="button"
+                        >
+                            Manage all agents →
+                        </button>
+
+                    </section>
+
+
+                    <!-- HEALTH -->
+
+                    <section class="panel">
+
+                        <div class="panel-head">
+
+                            <div>
+                                <small>SYSTEM</small>
+                                <h2>Workspace Health</h2>
+                            </div>
+
+                            <span class="success-badge">
+                                Excellent
+                            </span>
+
+                        </div>
+
+
+                        <div class="health">
+
+                            <div class="health-ring">
+                                <svg viewBox="0 0 120 120">
+                                    <circle
+                                        cx="60"
+                                        cy="60"
+                                        r="48"
+                                    ></circle>
+
+                                    <circle
+                                        class="health-progress"
+                                        cx="60"
+                                        cy="60"
+                                        r="48"
+                                    ></circle>
+                                </svg>
+
+                                <strong>94</strong>
+                                <small>/100</small>
+                            </div>
+
+
+                            <div>
+                                <strong>
+                                    Everything is running smoothly.
+                                </strong>
+
+                                <p>
+                                    No critical issues were detected
+                                    in your workspace.
+                                </p>
+                            </div>
+
+                        </div>
+
+
+                        <div class="metrics">
+
+                            <div>
+                                <span>Agents</span>
+                                <strong>4 / 5</strong>
+                            </div>
+
+                            <div>
+                                <span>Workflows</span>
+                                <strong>8 active</strong>
+                            </div>
+
+                            <div>
+                                <span>Integrations</span>
+                                <strong>6 connected</strong>
+                            </div>
+
+                        </div>
+
+                    </section>
+
+                </div>
+
+
+                <!-- BOTTOM -->
+
+                <div class="two-column bottom">
+
+                    <section class="panel">
+
+                        <div class="panel-head">
+
+                            <div>
+                                <small>ACTIVITY</small>
+                                <h2>Workspace Activity</h2>
+                            </div>
+
+                            <select id="activity-period">
+                                <option>Last 7 days</option>
+                                <option>Last 30 days</option>
+                                <option>Last 90 days</option>
+                            </select>
+
+                        </div>
+
+
+                        <div class="chart">
+
+                            <div class="chart-bars">
+                                <span style="height:40%"></span>
+                                <span style="height:55%"></span>
+                                <span style="height:47%"></span>
+                                <span style="height:75%"></span>
+                                <span style="height:62%"></span>
+                                <span style="height:85%"></span>
+                                <span style="height:72%"></span>
+                            </div>
+
+                            <div class="chart-labels">
+                                <span>Mon</span>
+                                <span>Tue</span>
+                                <span>Wed</span>
+                                <span>Thu</span>
+                                <span>Fri</span>
+                                <span>Sat</span>
+                                <span>Sun</span>
+                            </div>
+
+                        </div>
+
+                    </section>
+
+
+                    <section class="panel insight">
+
+                        <div class="panel-head">
+                            <div>
+                                <small>INTELLIGENCE</small>
+                                <h2>AI Insight</h2>
+                            </div>
+
+                            <span class="live">LIVE</span>
+                        </div>
+
+
+                        <div class="insight-body">
+
+                            <span class="big-insight-icon">
+                                ✦
+                            </span>
+
+                            <h3>
+                                Your workspace is becoming
+                                more productive.
+                            </h3>
+
+                            <p>
+                                NEXUS detected a
+                                <strong>24% increase</strong>
+                                in activity compared with
+                                the previous week.
+                            </p>
+
+                            <button
+                                data-page-link="insights"
+                                type="button"
+                            >
+                                Explore insights →
+                            </button>
+
+                        </div>
+
+                    </section>
+
+                </div>
+
+            </section>
+
+
+            <!-- OTHER PAGES -->
+
+            <section
+                class="page module-page"
+                data-content="agents"
+            >
+                <div class="module-header">
+                    <small>AI AGENTS</small>
+                    <h1>Agent Hub</h1>
+                    <p>
+                        Create, monitor and manage your
+                        intelligent AI agents.
+                    </p>
+                </div>
+
+                <div class="module-cards">
+
+                    <div class="module-card">
+                        <span>✦</span>
+                        <h3>Research Agent</h3>
+                        <p>Analyzing information and sources.</p>
+                        <b class="running">● Running</b>
+                    </div>
+
+                    <div class="module-card">
+                        <span>◈</span>
+                        <h3>Data Analyst</h3>
+                        <p>Processing workspace datasets.</p>
+                        <b class="running">● Running</b>
+                    </div>
+
+                    <div class="module-card">
+                        <span>&lt;/&gt;</span>
+                        <h3>Coding Agent</h3>
+                        <p>Ready to assist with development.</p>
+                        <b class="idle-text">● Idle</b>
+                    </div>
+
+                    <div class="module-card create-card">
+                        <span>+</span>
+                        <h3>Create Agent</h3>
+                        <p>Build a specialized AI assistant.</p>
+                    </div>
+
+                </div>
+            </section>
+
+
+            <section
+                class="page module-page"
+                data-content="workflows"
+            >
+                <div class="module-header">
+                    <small>AUTOMATION</small>
+                    <h1>Workflow Builder</h1>
+                    <p>
+                        Design intelligent workflows that
+                        connect tasks and AI agents.
+                    </p>
+                </div>
+
+                <div class="workflow-demo">
+
+                    <div>Trigger</div>
+                    <span>→</span>
+                    <div>AI Agent</div>
+                    <span>→</span>
+                    <div>Analyze</div>
+                    <span>→</span>
+                    <div>Action</div>
+
+                </div>
+
+                <button
+                    class="primary-btn"
+                    id="create-workflow"
+                    type="button"
+                >
+                    + Create Workflow
+                </button>
+            </section>
+
+
+            <section
+                class="page module-page"
+                data-content="insights"
+            >
+                <div class="module-header">
+                    <small>INTELLIGENCE</small>
+                    <h1>AI Insights</h1>
+                    <p>
+                        Understand patterns across your
+                        NEXUS workspace.
+                    </p>
+                </div>
+
+                <div class="insight-grid">
+
+                    <div class="stat-card">
+                        <small>PRODUCTIVITY</small>
+                        <strong>+24%</strong>
+                        <span>vs previous week</span>
+                    </div>
+
+                    <div class="stat-card">
+                        <small>TASKS COMPLETED</small>
+                        <strong>128</strong>
+                        <span>this month</span>
+                    </div>
+
+                    <div class="stat-card">
+                        <small>AI EXECUTIONS</small>
+                        <strong>342</strong>
+                        <span>this month</span>
+                    </div>
+
+                </div>
+            </section>
+
+
+            <section
+                class="page module-page"
+                data-content="activity"
+            >
+                <div class="module-header">
+                    <small>HISTORY</small>
+                    <h1>Activity</h1>
+                    <p>
+                        A timeline of activity across
+                        your workspace.
+                    </p>
+                </div>
+
+                <div class="activity-list">
+
+                    <div>
+                        <span>✦</span>
+                        <div>
+                            <strong>Research Agent completed</strong>
+                            <small>2 minutes ago</small>
+                        </div>
+                    </div>
+
+                    <div>
+                        <span>⌘</span>
+                        <div>
+                            <strong>Workflow executed successfully</strong>
+                            <small>18 minutes ago</small>
+                        </div>
+                    </div>
+
+                    <div>
+                        <span>◈</span>
+                        <div>
+                            <strong>New AI insight generated</strong>
+                            <small>1 hour ago</small>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+
+
+            <section
+                class="page module-page"
+                data-content="integrations"
+            >
+                <div class="module-header">
+                    <small>CONNECTIONS</small>
+                    <h1>Integrations</h1>
+                    <p>
+                        Connect your favorite tools to
+                        your intelligent workspace.
+                    </p>
+                </div>
+
+                <div class="integration-grid">
+
+                    <button type="button">
+                        <span>G</span>
+                        <strong>Google Drive</strong>
+                        <small>Connected</small>
+                    </button>
+
+                    <button type="button">
+                        <span>GH</span>
+                        <strong>GitHub</strong>
+                        <small>Connected</small>
+                    </button>
+
+                    <button type="button">
+                        <span>SL</span>
+                        <strong>Slack</strong>
+                        <small>Connect</small>
+                    </button>
+
+                    <button type="button">
+                        <span>DC</span>
+                        <strong>Discord</strong>
+                        <small>Connect</small>
+                    </button>
+
+                </div>
+            </section>
+
+
+            <section
+                class="page module-page"
+                data-content="settings"
+            >
+                <div class="module-header">
+                    <small>CONFIGURATION</small>
+                    <h1>Settings</h1>
+                    <p>
+                        Manage your NEXUS AI preferences.
+                    </p>
+                </div>
+
+                <div class="settings-list">
+
+                    <button
+                        id="settings-theme"
+                        type="button"
+                    >
+                        <div>
+                            <strong>Appearance</strong>
+                            <small>Switch between light and dark mode</small>
+                        </div>
+                        <span>→</span>
+                    </button>
+
+                    <button
+                        id="settings-profile"
+                        type="button"
+                    >
+                        <div>
+                            <strong>Profile</strong>
+                            <small>Manage your personal information</small>
+                        </div>
+                        <span>→</span>
+                    </button>
+
+                    <button
+                        id="settings-reset"
+                        type="button"
+                    >
+                        <div>
+                            <strong>Reset Workspace</strong>
+                            <small>Return to first-launch onboarding</small>
+                        </div>
+                        <span>↻</span>
+                    </button>
+
+                </div>
+            </section>
+
+        </div>
+
+    </main>
+
+</div>
+
+
+<!-- =========================================================
+     WORKSPACE DROPDOWN
+========================================================= -->
+
+<div
+    id="workspace-menu"
+    class="dropdown hidden"
+>
+
+    <div class="dropdown-heading">
+        <small>CURRENT WORKSPACE</small>
+        <strong>Personal Workspace</strong>
+    </div>
+
+    <button
+        data-workspace-action="current"
+        type="button"
+    >
+        <span class="dropdown-icon">N</span>
+        Personal Workspace
+        <b>✓</b>
+    </button>
+
+    <button
+        data-workspace-action="create"
+        type="button"
+    >
+        <span class="dropdown-icon">+</span>
+        Create workspace
+    </button>
+
+    <button
+        data-workspace-action="settings"
+        type="button"
+    >
+        <span class="dropdown-icon">⚙</span>
+        Workspace settings
+    </button>
+
+</div>
+
+
+<!-- =========================================================
+     PROFILE DROPDOWN
+========================================================= -->
+
+<div
+    id="profile-menu"
+    class="dropdown profile-dropdown hidden"
+>
+
+    <div class="profile-dropdown-head">
+
+        <div
+            id="dropdown-avatar"
+            class="avatar"
+        >
+            U
+        </div>
+
+        <div>
+            <strong id="dropdown-name">
+                User
+            </strong>
+
+            <small id="dropdown-email">
+                user@example.com
+            </small>
+        </div>
+
+    </div>
+
+
+    <button
+        data-profile-action="profile"
+        type="button"
+    >
+        <span>◎</span>
+        My Profile
+    </button>
+
+
+    <button
+        data-profile-action="preferences"
+        type="button"
+    >
+        <span>⚙</span>
+        Preferences
+    </button>
+
+
+    <button
+        data-profile-action="reset"
+        type="button"
+    >
+        <span>↻</span>
+        Reset onboarding
+    </button>
+
+</div>
+
+
+<!-- =========================================================
+     NOTIFICATIONS
+========================================================= -->
+
+<div
+    id="notification-panel"
+    class="notification-panel hidden"
+>
+
+    <div class="notification-head">
+        <div>
+            <strong>Notifications</strong>
+            <small>Recent workspace activity</small>
+        </div>
+
+        <button
+            id="close-notifications"
+            type="button"
+        >
+            ×
+        </button>
+    </div>
+
+
+    <div class="notification">
+
+        <span>✦</span>
+
+        <div>
+            <strong>Research Agent completed</strong>
+            <small>2 minutes ago</small>
+        </div>
+
+    </div>
+
+
+    <div class="notification">
+
+        <span>⌘</span>
+
+        <div>
+            <strong>Workflow completed</strong>
+            <small>18 minutes ago</small>
+        </div>
+
+    </div>
+
+
+    <div class="notification">
+
+        <span>◈</span>
+
+        <div>
+            <strong>New AI insight available</strong>
+            <small>1 hour ago</small>
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =========================================================
+     MODAL
+========================================================= -->
+
+<div
+    id="modal-overlay"
+    class="modal-overlay hidden"
+>
+
+    <div
+        id="modal"
+        class="modal"
+    >
+
+        <div class="modal-head">
+
+            <div>
+                <small id="modal-kicker">
+                    NEXUS AI
+                </small>
+
+                <h2 id="modal-title">
+                    Modal
+                </h2>
+            </div>
+
+            <button
+                id="modal-close"
+                type="button"
+            >
+                ×
+            </button>
+
+        </div>
+
+
+        <div id="modal-body"></div>
+
+    </div>
+
+</div>
+
+
+<!-- =========================================================
+     COMMAND PALETTE
+========================================================= -->
+
+<div
+    id="command-palette"
+    class="palette-overlay hidden"
+>
+
+    <div class="palette">
+
+        <div class="palette-search">
+
+            <span>⌕</span>
+
+            <input
+                id="palette-input"
+                type="text"
+                placeholder="Search commands..."
+            >
+
+            <kbd>ESC</kbd>
+
+        </div>
+
+
+        <div class="palette-options">
+
+            <button data-command="ask" type="button">
+                <span>✦</span>
+                <div>
+                    <strong>Ask NEXUS</strong>
+                    <small>Open AI command interface</small>
+                </div>
+            </button>
+
+            <button data-command="agents" type="button">
+                <span>◈</span>
+                <div>
+                    <strong>Open Agents</strong>
+                    <small>View AI agents</small>
+                </div>
+            </button>
+
+            <button data-command="workflows" type="button">
+                <span>⌘</span>
+                <div>
+                    <strong>Open Workflows</strong>
+                    <small>Manage automations</small>
+                </div>
+            </button>
+
+            <button data-command="insights" type="button">
+                <span>◈</span>
+                <div>
+                    <strong>View Insights</strong>
+                    <small>Explore intelligence</small>
+                </div>
+            </button>
+
+            <button data-command="settings" type="button">
+                <span>⚙</span>
+                <div>
+                    <strong>Open Settings</strong>
+                    <small>Manage preferences</small>
+                </div>
+            </button>
+
+        </div>
+
+
+        <div class="palette-footer">
+            ↑↓ Navigate
+            <span>•</span>
+            Enter Select
+            <span>•</span>
+            Esc Close
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =========================================================
+     TOAST
+========================================================= -->
+
+<div
+    id="toast"
+    class="toast"
+>
+
+    <span id="toast-icon">✓</span>
+
+    <div>
+        <strong id="toast-title">
+            Success
+        </strong>
+
+        <small id="toast-message">
+            Action completed.
+        </small>
+    </div>
+
+</div>
+
+
+<script src="script.js"></script>
+
+</body>
+</html>
