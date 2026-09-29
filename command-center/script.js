@@ -1,2159 +1,4999 @@
 /* =========================================================
-   NEXUS AI
-   COMMAND CENTER
-   COMPLETE APPLICATION LOGIC
+   NEXUS AI — INTELLIGENT WORK STUDIO
+   Complete Command Center JavaScript
 ========================================================= */
 
+(() => {
+    "use strict";
 
-/* =========================================================
-   STORAGE
-========================================================= */
+    /* =====================================================
+       STORAGE
+    ====================================================== */
 
-const USER_KEY = "nexus_ai_user";
-const THEME_KEY = "nexus_ai_theme";
-
-
-/* =========================================================
-   STATE
-========================================================= */
-
-let user = {
-    name: "",
-    email: "",
-    interests: []
-};
+    const STORAGE_KEY = "nexus_ai_command_center_v4";
 
 
-/* =========================================================
-   DOM HELPERS
-========================================================= */
+    /* =====================================================
+       DEFAULT STATE
+    ====================================================== */
 
-const $ = id =>
-    document.getElementById(id);
+    const defaultState = {
 
-const $$ = selector =>
-    document.querySelectorAll(selector);
+        onboarded: false,
+
+        user: {
+            name: "",
+            email: ""
+        },
+
+        theme: "dark",
+
+        notificationsEnabled: true,
+
+        selectedFocus: "AI & Productivity",
+
+        currentWorkspaceId: "workspace-1",
+
+        workspaces: [
+            {
+                id: "workspace-1",
+                name: "Personal Workspace",
+                focus: "AI & Productivity"
+            }
+        ],
+
+        tasks: [
+            {
+                id: 1,
+                title: "Review project requirements",
+                description: "Prepare the final project checklist.",
+                priority: "high",
+                completed: false,
+                createdAt: Date.now() - 86400000
+            },
+            {
+                id: 2,
+                title: "Explore AI agent ideas",
+                description: "Define useful agents for the workspace.",
+                priority: "medium",
+                completed: false,
+                createdAt: Date.now() - 62000000
+            },
+            {
+                id: 3,
+                title: "Organize workspace",
+                description: "Clean up current project tasks.",
+                priority: "low",
+                completed: true,
+                createdAt: Date.now() - 45000000
+            }
+        ],
+
+        agents: [
+            {
+                id: 1,
+                name: "Research Agent",
+                description: "Finds, organizes and summarizes information.",
+                role: "Research",
+                status: "active",
+                runs: 28,
+                icon: "⌕"
+            },
+            {
+                id: 2,
+                name: "Insights Agent",
+                description: "Analyzes activity and discovers useful patterns.",
+                role: "Analytics",
+                status: "active",
+                runs: 19,
+                icon: "◇"
+            },
+            {
+                id: 3,
+                name: "Automation Agent",
+                description: "Handles repetitive workflow operations.",
+                role: "Automation",
+                status: "paused",
+                runs: 34,
+                icon: "⚡"
+            },
+            {
+                id: 4,
+                name: "Planning Agent",
+                description: "Turns goals into structured execution plans.",
+                role: "Planning",
+                status: "active",
+                runs: 14,
+                icon: "✦"
+            }
+        ],
+
+        workflows: [
+            {
+                id: 1,
+                name: "Daily Briefing",
+                description: "Prepare a concise workspace briefing every morning.",
+                status: "active",
+                progress: 82,
+                runs: 42
+            },
+            {
+                id: 2,
+                name: "Research Digest",
+                description: "Collect research and prepare a digest.",
+                status: "active",
+                progress: 64,
+                runs: 26
+            },
+            {
+                id: 3,
+                name: "Task Triage",
+                description: "Sort incoming work by priority.",
+                status: "paused",
+                progress: 41,
+                runs: 17
+            }
+        ],
+
+        notifications: [
+            {
+                id: 1,
+                title: "Workspace ready",
+                message: "Your NEXUS AI workspace is ready.",
+                time: Date.now() - 120000,
+                read: false
+            },
+            {
+                id: 2,
+                title: "Research Agent completed a run",
+                message: "The latest research operation finished successfully.",
+                time: Date.now() - 3600000,
+                read: false
+            },
+            {
+                id: 3,
+                title: "Workflow update",
+                message: "Daily Briefing is currently active.",
+                time: Date.now() - 7200000,
+                read: true
+            }
+        ],
+
+        activity: [
+            {
+                id: 1,
+                title: "Workspace initialized",
+                message: "NEXUS AI Command Center was created.",
+                time: Date.now() - 86400000
+            },
+            {
+                id: 2,
+                title: "Research Agent activated",
+                message: "Research Agent is ready for work.",
+                time: Date.now() - 54000000
+            },
+            {
+                id: 3,
+                title: "Task completed",
+                message: "Organize workspace was marked complete.",
+                time: Date.now() - 30000000
+            },
+            {
+                id: 4,
+                title: "Workflow started",
+                message: "Daily Briefing workflow is active.",
+                time: Date.now() - 18000000
+            }
+        ],
+
+        integrations: {}
+    };
 
 
-/* =========================================================
-   START APPLICATION
-========================================================= */
+    /* =====================================================
+       STATE
+    ====================================================== */
 
-document.addEventListener(
-    "DOMContentLoaded",
-    initialize
-);
+    let state = loadState();
 
+    let currentPage = "command";
 
-function initialize() {
+    let selectedFocus = state.selectedFocus || "AI & Productivity";
 
-    loadUser();
-
-    loadTheme();
-
-    setupOnboarding();
-
-    setupNavigation();
-
-    setupWorkspace();
-
-    setupProfile();
-
-    setupNotifications();
-
-    setupTheme();
-
-    setupCommandPalette();
-
-    setupAI();
-
-    setupQuickActions();
-
-    setupDashboardActions();
-
-    setupMobile();
-
-    setupSettings();
-
-}
+    let toastTimer = null;
 
 
-/* =========================================================
-   USER STORAGE
-========================================================= */
+    /* =====================================================
+       DOM HELPER
+    ====================================================== */
 
-function loadUser() {
+    const $ = (selector, parent = document) =>
+        parent.querySelector(selector);
 
-    const saved =
-        localStorage.getItem(USER_KEY);
+    const $$ = (selector, parent = document) =>
+        [...parent.querySelectorAll(selector)];
 
-    if (!saved) {
 
-        showOnboarding();
+    /* =====================================================
+       STORAGE FUNCTIONS
+    ====================================================== */
 
-        return;
+    function cloneDefaultState() {
+
+        return JSON.parse(
+            JSON.stringify(defaultState)
+        );
+
     }
 
 
-    try {
+    function loadState() {
 
-        user =
-            JSON.parse(saved);
+        try {
 
-        if (
-            user.name &&
-            user.email
-        ) {
+            const saved =
+                localStorage.getItem(STORAGE_KEY);
 
-            openApplication();
+            if (!saved) {
+                return cloneDefaultState();
+            }
 
-        } else {
+            const parsed =
+                JSON.parse(saved);
 
-            showOnboarding();
+            return mergeState(
+                cloneDefaultState(),
+                parsed
+            );
+
+        } catch (error) {
+
+            console.error(
+                "NEXUS state load error:",
+                error
+            );
+
+            return cloneDefaultState();
+        }
+    }
+
+
+    function mergeState(base, saved) {
+
+        return {
+            ...base,
+            ...saved,
+
+            user: {
+                ...base.user,
+                ...(saved.user || {})
+            },
+
+            tasks:
+                Array.isArray(saved.tasks)
+                    ? saved.tasks
+                    : base.tasks,
+
+            agents:
+                Array.isArray(saved.agents)
+                    ? saved.agents
+                    : base.agents,
+
+            workflows:
+                Array.isArray(saved.workflows)
+                    ? saved.workflows
+                    : base.workflows,
+
+            notifications:
+                Array.isArray(saved.notifications)
+                    ? saved.notifications
+                    : base.notifications,
+
+            activity:
+                Array.isArray(saved.activity)
+                    ? saved.activity
+                    : base.activity,
+
+            workspaces:
+                Array.isArray(saved.workspaces)
+                    ? saved.workspaces
+                    : base.workspaces,
+
+            integrations:
+                saved.integrations || {}
+        };
+    }
+
+
+    function saveState() {
+
+        localStorage.setItem(
+            STORAGE_KEY,
+            JSON.stringify(state)
+        );
+    }
+
+
+    /* =====================================================
+       INITIALIZATION
+    ====================================================== */
+
+    function init() {
+
+        initOnboarding();
+
+        if (state.onboarded) {
+
+            showApp();
+
+            bootApp();
 
         }
-
-    } catch {
-
-        localStorage.removeItem(USER_KEY);
-
-        showOnboarding();
-
     }
 
-}
+
+    /* =====================================================
+       ONBOARDING
+    ====================================================== */
+
+    function initOnboarding() {
+
+        const onboarding =
+            $("#onboarding");
+
+        const appShell =
+            $("#appShell");
+
+        if (!onboarding || !appShell) {
+            return;
+        }
 
 
-function saveUser() {
+        if (state.onboarded) {
 
-    localStorage.setItem(
-        USER_KEY,
-        JSON.stringify(user)
-    );
+            onboarding.classList.add("hidden");
 
-}
+            appShell.classList.remove("hidden");
 
-
-/* =========================================================
-   ONBOARDING
-========================================================= */
-
-function setupOnboarding() {
-
-    $("get-started").addEventListener(
-        "click",
-        () => showStep(2)
-    );
+            return;
+        }
 
 
-    $("back-step-1").addEventListener(
-        "click",
-        () => showStep(1)
-    );
+        showOnboardingStep(1);
 
 
-    $("back-step-2").addEventListener(
-        "click",
-        () => showStep(2)
-    );
+        $("#startBtn")?.addEventListener(
+            "click",
+            () => {
+
+                showOnboardingStep(2);
+
+            }
+        );
 
 
-    $("profile-form").addEventListener(
-        "submit",
-        handleProfile
-    );
+        $("#profileForm")?.addEventListener(
+            "submit",
+            event => {
+
+                event.preventDefault();
+
+                const name =
+                    $("#nameInput").value.trim();
+
+                const email =
+                    $("#emailInput").value.trim();
 
 
-    $$(".interest-card").forEach(
-        card => {
+                if (name.length < 2) {
+
+                    showToast(
+                        "Please enter your name.",
+                        "error"
+                    );
+
+                    return;
+                }
+
+
+                if (!isValidEmail(email)) {
+
+                    showToast(
+                        "Please enter a valid email address.",
+                        "error"
+                    );
+
+                    return;
+                }
+
+
+                state.user.name = name;
+
+                state.user.email = email;
+
+                saveState();
+
+                showOnboardingStep(3);
+
+            }
+        );
+
+
+        $$(".focus-card").forEach(card => {
 
             card.addEventListener(
                 "click",
                 () => {
 
-                    card.classList.toggle(
-                        "selected"
-                    );
-
-
-                    const interest =
-                        card.dataset.interest;
-
-
-                    if (
-                        user.interests.includes(
-                            interest
-                        )
-                    ) {
-
-                        user.interests =
-                            user.interests.filter(
-                                item =>
-                                    item !== interest
-                            );
-
-                    } else {
-
-                        user.interests.push(
-                            interest
+                    $$(".focus-card")
+                        .forEach(item =>
+                            item.classList.remove("active")
                         );
 
-                    }
+                    card.classList.add("active");
+
+                    selectedFocus =
+                        card.dataset.focus ||
+                        "AI & Productivity";
 
                 }
             );
 
-        }
-    );
+        });
 
 
-    $("launch-btn").addEventListener(
-        "click",
-        launchApplication
-    );
+        $("#workspaceForm")?.addEventListener(
+            "submit",
+            event => {
 
-}
+                event.preventDefault();
 
-
-function handleProfile(event) {
-
-    event.preventDefault();
-
-
-    const name =
-        $("name-input").value.trim();
-
-    const email =
-        $("email-input").value.trim();
+                const workspaceName =
+                    $("#workspaceInput")
+                        .value
+                        .trim();
 
 
-    if (name.length < 2) {
+                if (workspaceName.length < 2) {
 
-        $("form-error").textContent =
-            "Please enter your name.";
+                    showToast(
+                        "Please enter a workspace name.",
+                        "error"
+                    );
 
-        return;
+                    return;
+                }
+
+
+                const workspace = {
+
+                    id:
+                        "workspace-" +
+                        Date.now(),
+
+                    name:
+                        workspaceName,
+
+                    focus:
+                        selectedFocus
+
+                };
+
+
+                state.workspaces = [
+                    ...state.workspaces,
+                    workspace
+                ];
+
+
+                state.currentWorkspaceId =
+                    workspace.id;
+
+                state.selectedFocus =
+                    selectedFocus;
+
+                state.onboarded = true;
+
+
+                state.activity.unshift({
+
+                    id: Date.now(),
+
+                    title: "Workspace launched",
+
+                    message:
+                        `${workspaceName} was created with ${selectedFocus} focus.`,
+
+                    time: Date.now()
+
+                });
+
+
+                state.notifications.unshift({
+
+                    id: Date.now(),
+
+                    title: "Welcome to NEXUS AI",
+
+                    message:
+                        `${state.user.name}, your workspace is ready.`,
+
+                    time: Date.now(),
+
+                    read: false
+
+                });
+
+
+                saveState();
+
+
+                launchWorkspace();
+
+            }
+        );
+
     }
 
 
-    if (
-        !/^[^\s@]+@[^\s@]+\.[^\s@]+$/
-            .test(email)
-    ) {
+    function showOnboardingStep(step) {
 
-        $("form-error").textContent =
-            "Please enter a valid email.";
+        $$(".onboarding-step")
+            .forEach(section => {
 
-        return;
-    }
+                section.classList.toggle(
+                    "hidden",
+                    Number(section.dataset.step) !== step
+                );
 
-
-    $("form-error").textContent = "";
+            });
 
 
-    user.name = name;
-
-    user.email = email;
-
-
-    showStep(3);
-
-}
-
-
-function showStep(number) {
-
-    $$(".onboarding-step")
-        .forEach(
-            step =>
-                step.classList.remove(
-                    "active"
-                )
-        );
-
-
-    $(`step-${number}`)
-        .classList.add(
-            "active"
-        );
-
-
-    $$(".step-dot")
-        .forEach(
-            (dot,index) => {
+        $$(".onboarding-dots i")
+            .forEach((dot, index) => {
 
                 dot.classList.toggle(
                     "active",
-                    index < number
+                    index + 1 === step
                 );
 
-            }
-        );
-
-}
-
-
-function showOnboarding() {
-
-    $("onboarding")
-        .classList.remove("hidden");
-
-    $("initializing")
-        .classList.add("hidden");
-
-    $("app")
-        .classList.add("hidden");
-
-}
-
-
-function launchApplication() {
-
-    if (!user.name) {
-
-        showStep(2);
-
-        return;
-    }
-
-
-    saveUser();
-
-
-    $("onboarding")
-        .classList.add("hidden");
-
-    $("initializing")
-        .classList.remove("hidden");
-
-
-    const loaders =
-        $$(".loading-list div");
-
-
-    loaders.forEach(
-        item =>
-            item.classList.remove(
-                "done"
-            )
-    );
-
-
-    loaders.forEach(
-        (item,index) => {
-
-            setTimeout(
-                () =>
-                    item.classList.add(
-                        "done"
-                    ),
-                500 + index * 600
-            );
-
-        }
-    );
-
-
-    setTimeout(
-        openApplication,
-        3100
-    );
-
-}
-
-
-/* =========================================================
-   OPEN APPLICATION
-========================================================= */
-
-function openApplication() {
-
-    $("onboarding")
-        .classList.add("hidden");
-
-    $("initializing")
-        .classList.add("hidden");
-
-    $("app")
-        .classList.remove("hidden");
-
-
-    updateUserUI();
-
-}
-
-
-function updateUserUI() {
-
-    const name =
-        user.name || "User";
-
-    const email =
-        user.email || "user@example.com";
-
-    const initial =
-        name.charAt(0).toUpperCase();
-
-
-    $("dashboard-name")
-        .textContent = name;
-
-    $("sidebar-name")
-        .textContent = name;
-
-    $("sidebar-email")
-        .textContent = email;
-
-    $("sidebar-avatar")
-        .textContent = initial;
-
-    $("dropdown-avatar")
-        .textContent = initial;
-
-    $("dropdown-name")
-        .textContent = name;
-
-    $("dropdown-email")
-        .textContent = email;
-
-
-    updateGreeting();
-
-}
-
-
-function updateGreeting() {
-
-    const hour =
-        new Date().getHours();
-
-
-    let greeting =
-        "Good evening";
-
-
-    if (hour < 12) {
-
-        greeting =
-            "Good morning";
-
-    } else if (hour < 17) {
-
-        greeting =
-            "Good afternoon";
+            });
 
     }
 
 
-    $("greeting")
-        .textContent = greeting;
+    function launchWorkspace() {
 
-}
+        const onboarding =
+            $("#onboarding");
+
+        const appShell =
+            $("#appShell");
 
 
-/* =========================================================
-   NAVIGATION
-========================================================= */
+        onboarding.style.opacity = "0";
 
-function setupNavigation() {
+        onboarding.style.transform =
+            "scale(.98)";
 
-    $$(".nav-item").forEach(
-        button => {
 
-            button.addEventListener(
-                "click",
-                () => {
+        setTimeout(() => {
 
-                    showPage(
-                        button.dataset.page
-                    );
+            onboarding.classList.add("hidden");
 
-                    closeAllFloating();
+            appShell.classList.remove("hidden");
 
-                    closeMobile();
+            requestAnimationFrame(() => {
 
-                }
+                appShell.style.opacity = "1";
+
+            });
+
+            bootApp();
+
+            showToast(
+                `Welcome to NEXUS AI, ${state.user.name}.`,
+                "success"
             );
 
-        }
-    );
-
-
-    $$("[data-page-link]").forEach(
-        button => {
-
-            button.addEventListener(
-                "click",
-                () => {
-
-                    showPage(
-                        button.dataset.pageLink
-                    );
-
-                }
-            );
-
-        }
-    );
-
-}
-
-
-function showPage(page) {
-
-    $$(".page")
-        .forEach(
-            section =>
-                section.classList.remove(
-                    "active-page"
-                )
-        );
-
-
-    const target =
-        document.querySelector(
-            `[data-content="${page}"]`
-        );
-
-
-    if (target) {
-
-        target.classList.add(
-            "active-page"
-        );
+        }, 400);
 
     }
 
 
-    $$(".nav-item")
-        .forEach(
-            item => {
+    function showApp() {
 
-                item.classList.toggle(
-                    "active",
-                    item.dataset.page === page
-                );
-
-            }
-        );
-
-
-    const names = {
-
-        command: "Command Center",
-
-        agents: "AI Agents",
-
-        workflows: "Workflows",
-
-        insights: "AI Insights",
-
-        activity: "Activity",
-
-        integrations: "Integrations",
-
-        settings: "Settings"
-
-    };
-
-
-    $("breadcrumb-name")
-        .textContent =
-            names[page] || page;
-
-
-    window.scrollTo({
-        top: 0,
-        behavior: "smooth"
-    });
-
-}
-
-
-/* =========================================================
-   WORKSPACE
-========================================================= */
-
-function setupWorkspace() {
-
-    $("workspace-button")
-        .addEventListener(
-            "click",
-            event => {
-
-                event.stopPropagation();
-
-                closeProfile();
-
-                toggleDropdown(
-                    $("workspace-menu"),
-                    $("workspace-button")
-                );
-
-            }
-        );
-
-
-    $$("#workspace-menu button")
-        .forEach(
-            button => {
-
-                button.addEventListener(
-                    "click",
-                    () => {
-
-                        const action =
-                            button.dataset.workspaceAction;
-
-
-                        if (
-                            action === "current"
-                        ) {
-
-                            showToast(
-                                "Workspace",
-                                "Personal Workspace is active."
-                            );
-
-                        }
-
-
-                        if (
-                            action === "create"
-                        ) {
-
-                            closeWorkspace();
-
-                            openCreateWorkspaceModal();
-
-                        }
-
-
-                        if (
-                            action === "settings"
-                        ) {
-
-                            closeWorkspace();
-
-                            showPage(
-                                "settings"
-                            );
-
-                        }
-
-                    }
-                );
-
-            }
-        );
-
-}
-
-
-/* =========================================================
-   PROFILE
-========================================================= */
-
-function setupProfile() {
-
-    $("profile-button")
-        .addEventListener(
-            "click",
-            event => {
-
-                event.stopPropagation();
-
-                closeWorkspace();
-
-                toggleDropdown(
-                    $("profile-menu"),
-                    $("profile-button")
-                );
-
-            }
-        );
-
-
-    $$("#profile-menu button")
-        .forEach(
-            button => {
-
-                button.addEventListener(
-                    "click",
-                    () => {
-
-                        const action =
-                            button.dataset.profileAction;
-
-
-                        closeProfile();
-
-
-                        if (
-                            action === "profile"
-                        ) {
-
-                            openProfileModal();
-
-                        }
-
-
-                        if (
-                            action === "preferences"
-                        ) {
-
-                            openPreferencesModal();
-
-                        }
-
-
-                        if (
-                            action === "reset"
-                        ) {
-
-                            resetApplication();
-
-                        }
-
-                    }
-                );
-
-            }
-        );
-
-}
-
-
-function toggleDropdown(
-    menu,
-    anchor
-) {
-
-    const wasHidden =
-        menu.classList.contains(
+        $("#onboarding")?.classList.add(
             "hidden"
         );
 
-
-    closeAllFloating();
-
-
-    if (!wasHidden) {
-        return;
-    }
-
-
-    const rect =
-        anchor.getBoundingClientRect();
-
-
-    menu.classList.remove(
-        "hidden"
-    );
-
-
-    const width =
-        menu.offsetWidth;
-
-
-    let left =
-        rect.left;
-
-
-    let top =
-        rect.bottom + 8;
-
-
-    if (
-        left + width >
-        window.innerWidth - 15
-    ) {
-
-        left =
-            window.innerWidth -
-            width -
-            15;
-
-    }
-
-
-    if (
-        top + menu.offsetHeight >
-        window.innerHeight - 15
-    ) {
-
-        top =
-            rect.top -
-            menu.offsetHeight -
-            8;
-
-    }
-
-
-    menu.style.left =
-        `${left}px`;
-
-    menu.style.top =
-        `${top}px`;
-
-}
-
-
-function closeWorkspace() {
-
-    $("workspace-menu")
-        .classList.add("hidden");
-
-}
-
-
-function closeProfile() {
-
-    $("profile-menu")
-        .classList.add("hidden");
-
-}
-
-
-/* =========================================================
-   NOTIFICATIONS
-========================================================= */
-
-function setupNotifications() {
-
-    $("notification-button")
-        .addEventListener(
-            "click",
-            event => {
-
-                event.stopPropagation();
-
-                closeWorkspace();
-                closeProfile();
-
-                toggleNotification();
-
-            }
-        );
-
-
-    $("close-notifications")
-        .addEventListener(
-            "click",
-            closeNotifications
-        );
-
-}
-
-
-function toggleNotification() {
-
-    const panel =
-        $("notification-panel");
-
-
-    const hidden =
-        panel.classList.contains(
-            "hidden"
-        );
-
-
-    closeAllFloating();
-
-
-    if (hidden) {
-
-        panel.classList.remove(
+        $("#appShell")?.classList.remove(
             "hidden"
         );
 
     }
 
-}
 
+    /* =====================================================
+       APP BOOT
+    ====================================================== */
 
-function closeNotifications() {
+    function bootApp() {
 
-    $("notification-panel")
-        .classList.add("hidden");
+        applyTheme();
 
-}
+        renderIdentity();
 
+        renderAll();
 
-/* =========================================================
-   THEME
-========================================================= */
+        bindAppEvents();
 
-function loadTheme() {
-
-    const theme =
-        localStorage.getItem(
-            THEME_KEY
-        );
-
-
-    if (theme === "light") {
-
-        document.body
-            .classList.add("light");
+        navigate("command");
 
     }
 
 
-    updateThemeButton();
+    /* =====================================================
+       IDENTITY
+    ====================================================== */
 
-}
+    function renderIdentity() {
+
+        const name =
+            state.user.name ||
+            "there";
+
+        const email =
+            state.user.email ||
+            "user@example.com";
 
 
-function setupTheme() {
-
-    $("theme-button")
-        .addEventListener(
-            "click",
-            toggleTheme
+        setText(
+            "#dashboardName",
+            firstName(name)
         );
 
-}
+        setText(
+            "#profileName",
+            name
+        );
 
-
-function toggleTheme() {
-
-    document.body
-        .classList.toggle("light");
-
-
-    const light =
-        document.body
-            .classList.contains("light");
-
-
-    localStorage.setItem(
-        THEME_KEY,
-        light ? "light" : "dark"
-    );
-
-
-    updateThemeButton();
-
-
-    showToast(
-        "Appearance",
-        light
-            ? "Light mode enabled."
-            : "Dark mode enabled."
-    );
-
-}
-
-
-function updateThemeButton() {
-
-    const light =
-        document.body
-            .classList.contains("light");
-
-
-    $("theme-button")
-        .textContent =
-            light ? "☀" : "◐";
-
-}
-
-
-/* =========================================================
-   COMMAND PALETTE
-========================================================= */
-
-function setupCommandPalette() {
-
-    $("search-button")
-        .addEventListener(
-            "click",
-            openPalette
+        setText(
+            "#profileEmail",
+            email
         );
 
 
-    document.addEventListener(
-        "keydown",
-        event => {
-
-            if (
-                (event.ctrlKey ||
-                    event.metaKey) &&
-                event.key.toLowerCase() === "k"
-            ) {
-
-                event.preventDefault();
-
-                openPalette();
-
-            }
+        setText(
+            "#profileAvatar",
+            initials(name)
+        );
 
 
-            if (
-                event.key === "Escape"
-            ) {
+        const workspace =
+            getCurrentWorkspace();
 
-                closePalette();
 
-                closeAllFloating();
+        if (workspace) {
 
-                closeModal();
+            setText(
+                "#workspaceName",
+                workspace.name
+            );
 
-            }
+            setText(
+                "#workspaceFocus",
+                workspace.focus
+            );
+
+            setText(
+                "#workspaceAvatar",
+                initials(workspace.name)
+            );
 
         }
-    );
 
 
-    $("command-palette")
-        .addEventListener(
-            "click",
-            event => {
+        updateGreeting();
 
-                if (
-                    event.target ===
-                    $("command-palette")
-                ) {
+    }
 
-                    closePalette();
 
-                }
+    function updateGreeting() {
 
-            }
+        const hour =
+            new Date().getHours();
+
+        let greeting = "evening";
+
+        if (hour < 5) {
+            greeting = "night";
+        } else if (hour < 12) {
+            greeting = "morning";
+        } else if (hour < 17) {
+            greeting = "afternoon";
+        }
+
+        setText(
+            "#period",
+            greeting
         );
 
+    }
 
-    $$(".palette-options button")
-        .forEach(
-            button => {
+
+    function firstName(name) {
+
+        return (
+            name
+                .trim()
+                .split(/\s+/)[0] ||
+            "there"
+        );
+
+    }
+
+
+    function initials(value) {
+
+        const words =
+            value
+                .trim()
+                .split(/\s+/)
+                .filter(Boolean);
+
+
+        if (!words.length) {
+            return "N";
+        }
+
+
+        if (words.length === 1) {
+
+            return words[0]
+                .substring(0, 2)
+                .toUpperCase();
+
+        }
+
+
+        return (
+            words[0][0] +
+            words[words.length - 1][0]
+        ).toUpperCase();
+
+    }
+
+
+    function getCurrentWorkspace() {
+
+        return state.workspaces.find(
+            workspace =>
+                workspace.id ===
+                state.currentWorkspaceId
+        ) || state.workspaces[0];
+
+    }
+
+
+    /* =====================================================
+       RENDER ALL
+    ====================================================== */
+
+    function renderAll() {
+
+        renderWorkspaceList();
+
+        renderTasks();
+
+        renderAgents();
+
+        renderAgentPreview();
+
+        renderWorkflows();
+
+        renderActivity();
+
+        renderNotifications();
+
+        renderChart();
+
+        renderIntegrations();
+
+        updateStats();
+
+        updateAgentBadge();
+
+        updateNotificationDot();
+
+        updateSettings();
+
+    }
+
+
+    /* =====================================================
+       TASKS
+    ====================================================== */
+
+    function renderTasks() {
+
+        const container =
+            $("#taskList");
+
+        if (!container) {
+            return;
+        }
+
+
+        if (!state.tasks.length) {
+
+            container.innerHTML = `
+
+                <div class="empty-state">
+
+                    <strong>
+                        No tasks yet
+                    </strong>
+
+                    Create your first task to get started.
+
+                </div>
+
+            `;
+
+            return;
+        }
+
+
+        const sorted =
+            [...state.tasks].sort(
+                (a, b) =>
+                    Number(a.completed) -
+                    Number(b.completed)
+            );
+
+
+        container.innerHTML =
+            sorted
+                .map(task => taskHTML(task))
+                .join("");
+
+
+        $$(".task-check", container)
+            .forEach(button => {
 
                 button.addEventListener(
                     "click",
                     () => {
 
-                        executeCommand(
-                            button.dataset.command
+                        toggleTask(
+                            Number(button.dataset.id)
                         );
 
                     }
                 );
 
-            }
-        );
+            });
 
 
-    $("palette-input")
-        .addEventListener(
-            "input",
-            filterPalette
-        );
+        $$(".task-menu", container)
+            .forEach(button => {
 
-}
+                button.addEventListener(
+                    "click",
+                    () => {
 
+                        openTaskMenu(
+                            Number(button.dataset.id)
+                        );
 
-function openPalette() {
+                    }
+                );
 
-    closeAllFloating();
-
-    $("command-palette")
-        .classList.remove("hidden");
-
-
-    $("palette-input")
-        .value = "";
-
-
-    $("palette-input")
-        .focus();
-
-
-    filterPalette();
-
-}
-
-
-function closePalette() {
-
-    $("command-palette")
-        .classList.add("hidden");
-
-}
-
-
-function filterPalette() {
-
-    const query =
-        $("palette-input")
-            .value
-            .toLowerCase()
-            .trim();
-
-
-    $$(".palette-options button")
-        .forEach(
-            button => {
-
-                const text =
-                    button.textContent
-                        .toLowerCase();
-
-
-                button.style.display =
-                    text.includes(query)
-                        ? "flex"
-                        : "none";
-
-            }
-        );
-
-}
-
-
-function executeCommand(command) {
-
-    closePalette();
-
-
-    if (command === "ask") {
-
-        showPage("command");
-
-        $("prompt").focus();
-
-        return;
+            });
 
     }
 
 
-    showPage(command);
+    function taskHTML(task) {
 
-}
+        return `
+
+            <div
+                class="task-card ${task.completed ? "done" : ""}"
+                data-task-id="${task.id}">
+
+                <button
+                    class="task-check ${task.completed ? "checked" : ""}"
+                    data-id="${task.id}"
+                    title="Mark task complete">
+
+                    ${task.completed ? "✓" : ""}
+
+                </button>
 
 
-/* =========================================================
-   AI COMMAND
-========================================================= */
+                <div class="task-card-main">
 
-function setupAI() {
+                    <b>
+                        ${escapeHTML(task.title)}
+                    </b>
 
-    $("send-button")
-        .addEventListener(
-            "click",
-            sendPrompt
+                    <small>
+                        ${escapeHTML(
+                            task.description ||
+                            "No description"
+                        )}
+                    </small>
+
+                </div>
+
+
+                <span class="priority ${task.priority}">
+                    ${task.priority}
+                </span>
+
+
+                <button
+                    class="task-menu"
+                    data-id="${task.id}"
+                    title="Task options">
+
+                    ⋯
+
+                </button>
+
+            </div>
+
+        `;
+
+    }
+
+
+    function toggleTask(id) {
+
+        const task =
+            state.tasks.find(
+                item => item.id === id
+            );
+
+
+        if (!task) {
+            return;
+        }
+
+
+        task.completed =
+            !task.completed;
+
+
+        if (task.completed) {
+
+            addActivity(
+                "Task completed",
+                `"${task.title}" was marked complete.`
+            );
+
+            addNotification(
+                "Task completed",
+                task.title
+            );
+
+        } else {
+
+            addActivity(
+                "Task reopened",
+                `"${task.title}" was reopened.`
+            );
+
+        }
+
+
+        saveState();
+
+        renderAll();
+
+        showToast(
+            task.completed
+                ? "Task completed."
+                : "Task moved back to pending.",
+            "success"
         );
 
+    }
 
-    $("prompt")
-        .addEventListener(
-            "keydown",
-            event => {
 
-                if (
-                    event.key === "Enter" &&
-                    !event.shiftKey
-                ) {
+    function openTaskMenu(id) {
+
+        const task =
+            state.tasks.find(
+                item => item.id === id
+            );
+
+
+        if (!task) {
+            return;
+        }
+
+
+        openModal({
+
+            label: "TASK",
+
+            title: "Task options",
+
+            body: `
+
+                <div class="modal-form">
+
+                    <div class="confirm-box">
+
+                        <strong>
+                            ${escapeHTML(task.title)}
+                        </strong>
+
+                        <br><br>
+
+                        Choose what you want to do
+                        with this task.
+
+                    </div>
+
+
+                    <div class="modal-actions">
+
+                        <button
+                            class="secondary-button"
+                            data-modal-action="edit-task">
+
+                            Edit
+
+                        </button>
+
+
+                        <button
+                            class="danger-button"
+                            data-modal-action="delete-task">
+
+                            Delete
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+            `
+
+        });
+
+
+        $("#modalBody")
+            .querySelector(
+                '[data-modal-action="edit-task"]'
+            )
+            ?.addEventListener(
+                "click",
+                () => {
+
+                    closeModal();
+
+                    openTaskModal(task);
+
+                }
+            );
+
+
+        $("#modalBody")
+            .querySelector(
+                '[data-modal-action="delete-task"]'
+            )
+            ?.addEventListener(
+                "click",
+                () => {
+
+                    closeModal();
+
+                    deleteTask(task.id);
+
+                }
+            );
+
+    }
+
+
+    function openTaskModal(task = null) {
+
+        const editing =
+            Boolean(task);
+
+
+        openModal({
+
+            label: "PRODUCTIVITY",
+
+            title:
+                editing
+                    ? "Edit task"
+                    : "Create new task",
+
+            body: `
+
+                <form
+                    class="modal-form"
+                    id="taskModalForm">
+
+                    <label>
+
+                        Task title
+
+                        <input
+                            class="modal-input"
+                            id="modalTaskTitle"
+                            value="${editing ? escapeAttribute(task.title) : ""}"
+                            placeholder="e.g. Prepare project presentation"
+                            maxlength="100"
+                            required>
+
+                    </label>
+
+
+                    <label>
+
+                        Description
+
+                        <textarea
+                            class="modal-textarea"
+                            id="modalTaskDescription"
+                            placeholder="Add useful context..."
+                            maxlength="300">${editing ? escapeHTML(task.description || "") : ""}</textarea>
+
+                    </label>
+
+
+                    <label>
+
+                        Priority
+
+                        <select
+                            class="modal-select"
+                            id="modalTaskPriority">
+
+                            <option
+                                value="high"
+                                ${editing && task.priority === "high" ? "selected" : ""}>
+                                High
+                            </option>
+
+                            <option
+                                value="medium"
+                                ${editing && task.priority === "medium" ? "selected" : ""}>
+                                Medium
+                            </option>
+
+                            <option
+                                value="low"
+                                ${editing && task.priority === "low" ? "selected" : ""}>
+                                Low
+                            </option>
+
+                        </select>
+
+                    </label>
+
+
+                    <div class="modal-actions">
+
+                        <button
+                            type="button"
+                            class="secondary-button"
+                            id="cancelTaskModal">
+
+                            Cancel
+
+                        </button>
+
+
+                        <button
+                            type="submit"
+                            class="primary-btn">
+
+                            ${editing ? "Save changes" : "Create task"}
+
+                        </button>
+
+                    </div>
+
+                </form>
+
+            `
+
+        });
+
+
+        $("#cancelTaskModal")
+            ?.addEventListener(
+                "click",
+                closeModal
+            );
+
+
+        $("#taskModalForm")
+            ?.addEventListener(
+                "submit",
+                event => {
 
                     event.preventDefault();
 
-                    sendPrompt();
 
-                }
+                    const title =
+                        $("#modalTaskTitle")
+                            .value
+                            .trim();
 
-            }
-        );
+                    const description =
+                        $("#modalTaskDescription")
+                            .value
+                            .trim();
 
-
-    $("prompt")
-        .addEventListener(
-            "input",
-            () => {
-
-                const textarea =
-                    $("prompt");
-
-                textarea.style.height =
-                    "auto";
-
-                textarea.style.height =
-                    Math.min(
-                        textarea.scrollHeight,
-                        150
-                    ) + "px";
-
-            }
-        );
+                    const priority =
+                        $("#modalTaskPriority")
+                            .value;
 
 
-    $$(".suggestions button")
-        .forEach(
-            button => {
+                    if (!title) {
+                        return;
+                    }
 
-                button.addEventListener(
-                    "click",
-                    () => {
 
-                        $("prompt")
-                            .value =
-                            button.dataset.prompt;
+                    if (editing) {
 
-                        $("prompt")
-                            .focus();
+                        task.title =
+                            title;
+
+                        task.description =
+                            description;
+
+                        task.priority =
+                            priority;
+
+
+                        addActivity(
+                            "Task updated",
+                            `"${title}" was updated.`
+                        );
+
+
+                        showToast(
+                            "Task updated.",
+                            "success"
+                        );
+
+                    } else {
+
+                        const newTask = {
+
+                            id: Date.now(),
+
+                            title,
+
+                            description,
+
+                            priority,
+
+                            completed: false,
+
+                            createdAt: Date.now()
+
+                        };
+
+
+                        state.tasks.unshift(
+                            newTask
+                        );
+
+
+                        addActivity(
+                            "Task created",
+                            `"${title}" was added to your workspace.`
+                        );
+
+
+                        addNotification(
+                            "New task created",
+                            title
+                        );
+
+
+                        showToast(
+                            "Task created.",
+                            "success"
+                        );
 
                     }
-                );
-
-            }
-        );
 
 
-    $("close-response")
-        .addEventListener(
-            "click",
-            () => {
+                    saveState();
 
-                $("ai-response")
-                    .classList.add("hidden");
+                    closeModal();
 
-            }
-        );
+                    renderAll();
 
-}
+                }
+            );
 
-
-function sendPrompt() {
-
-    const prompt =
-        $("prompt")
-            .value
-            .trim();
-
-
-    if (!prompt) {
-
-        showToast(
-            "Ask NEXUS",
-            "Type something first."
-        );
-
-        return;
     }
 
 
-    const safe =
-        escapeHTML(prompt);
+    function deleteTask(id) {
+
+        const task =
+            state.tasks.find(
+                item => item.id === id
+            );
 
 
-    $("response-text").innerHTML = `
-
-        <strong>
-            I received your request:
-        </strong>
-
-        <br><br>
-
-        "${safe}"
-
-        <br><br>
-
-        This Command Center is ready for a
-        real AI API connection. The current
-        version demonstrates the complete
-        frontend interaction and response flow.
-
-    `;
+        if (!task) {
+            return;
+        }
 
 
-    $("ai-response")
-        .classList.remove("hidden");
+        openModal({
+
+            label: "TASK",
+
+            title: "Delete task?",
+
+            body: `
+
+                <div class="modal-form">
+
+                    <div class="confirm-box">
+
+                        This will permanently remove
+                        <strong>
+                            ${escapeHTML(task.title)}
+                        </strong>
+                        from this browser workspace.
+
+                    </div>
 
 
-    $("prompt")
-        .value = "";
+                    <div class="modal-actions">
 
-}
+                        <button
+                            class="secondary-button"
+                            id="cancelDelete">
 
+                            Cancel
 
-/* =========================================================
-   QUICK ACTIONS
-========================================================= */
-
-function setupQuickActions() {
-
-    $$(".quick-card")
-        .forEach(
-            card => {
-
-                card.addEventListener(
-                    "click",
-                    () => {
-
-                        const action =
-                            card.dataset.action;
+                        </button>
 
 
-                        if (
-                            action === "agent"
-                        ) {
+                        <button
+                            class="danger-button"
+                            id="confirmDelete">
 
-                            showPage("agents");
+                            Delete task
 
-                        }
+                        </button>
 
+                    </div>
 
-                        if (
-                            action === "workflow"
-                        ) {
+                </div>
 
-                            showPage("workflows");
+            `
 
-                        }
-
-
-                        if (
-                            action === "insights"
-                        ) {
-
-                            showPage("insights");
-
-                        }
+        });
 
 
-                        if (
-                            action === "research"
-                        ) {
+        $("#cancelDelete")
+            ?.addEventListener(
+                "click",
+                closeModal
+            );
 
-                            showPage("command");
 
-                            $("prompt")
-                                .value =
-                                "Help me start a research task.";
+        $("#confirmDelete")
+            ?.addEventListener(
+                "click",
+                () => {
 
-                            $("prompt")
-                                .focus();
+                    state.tasks =
+                        state.tasks.filter(
+                            item =>
+                                item.id !== id
+                        );
 
-                        }
 
-                    }
-                );
+                    addActivity(
+                        "Task deleted",
+                        `"${task.title}" was removed.`
+                    );
 
-            }
+
+                    saveState();
+
+                    closeModal();
+
+                    renderAll();
+
+                    showToast(
+                        "Task deleted.",
+                        "success"
+                    );
+
+                }
+            );
+
+    }
+
+
+    /* =====================================================
+       STATS
+    ====================================================== */
+
+    function updateStats() {
+
+        const total =
+            state.tasks.length;
+
+        const completed =
+            state.tasks.filter(
+                task => task.completed
+            ).length;
+
+        const pending =
+            total - completed;
+
+        const high =
+            state.tasks.filter(
+                task =>
+                    task.priority === "high" &&
+                    !task.completed
+            ).length;
+
+
+        setText(
+            "#totalTasks",
+            total
+        );
+
+        setText(
+            "#doneTasks",
+            completed
+        );
+
+        setText(
+            "#pendingTasks",
+            pending
+        );
+
+        setText(
+            "#highTasks",
+            high
         );
 
 
-    $("view-all-actions")
-        .addEventListener(
-            "click",
-            () => {
+        const percentage =
+            total
+                ? Math.round(
+                    (completed / total) * 100
+                )
+                : 0;
 
-                showToast(
-                    "Quick Actions",
-                    "All workspace actions are available through the Command Palette."
-                );
 
-                openPalette();
-
-            }
+        setText(
+            "#healthTasks",
+            `${percentage}%`
         );
 
-}
+    }
 
 
-/* =========================================================
-   DASHBOARD ACTIONS
-========================================================= */
+    /* =====================================================
+       AGENTS
+    ====================================================== */
 
-function setupDashboardActions() {
+    function renderAgents() {
 
-    $("new-task-button")
-        .addEventListener(
-            "click",
-            () => {
+        const container =
+            $("#agentGrid");
 
-                showPage("command");
-
-                $("prompt").focus();
-
-            }
-        );
+        if (!container) {
+            return;
+        }
 
 
-    $("refresh-button")
-        .addEventListener(
-            refreshWorkspace
-        );
+        if (!state.agents.length) {
+
+            container.innerHTML = `
+
+                <div class="empty-state">
+
+                    <strong>
+                        No AI agents
+                    </strong>
+
+                    Create your first specialized
+                    NEXUS AI agent.
+
+                </div>
+
+            `;
+
+            return;
+        }
 
 
-    $("help-button")
-        .addEventListener(
-            openHelpModal
-        );
+        container.innerHTML =
+            state.agents
+                .map(agent => agentHTML(agent))
+                .join("");
 
 
-    $("create-workflow")
-        .addEventListener(
-            openCreateWorkflowModal
-        );
-
-
-    $("activity-period")
-        .addEventListener(
-            event => {
-
-                showToast(
-                    "Activity updated",
-                    event.target.value
-                );
-
-            }
-        );
-
-
-    $$(".integration-grid button")
-        .forEach(
-            button => {
+        $$(".agent-toggle", container)
+            .forEach(button => {
 
                 button.addEventListener(
                     "click",
                     () => {
 
-                        showToast(
-                            "Integration",
-                            "Integration settings are ready to be connected."
+                        toggleAgent(
+                            Number(button.dataset.id)
                         );
 
                     }
                 );
 
-            }
+            });
+
+
+        $$(".agent-run", container)
+            .forEach(button => {
+
+                button.addEventListener(
+                    "click",
+                    () => {
+
+                        runAgent(
+                            Number(button.dataset.id)
+                        );
+
+                    }
+                );
+
+            });
+
+
+        $$(".agent-delete", container)
+            .forEach(button => {
+
+                button.addEventListener(
+                    "click",
+                    () => {
+
+                        deleteAgent(
+                            Number(button.dataset.id)
+                        );
+
+                    }
+                );
+
+            });
+
+    }
+
+
+    function agentHTML(agent) {
+
+        const active =
+            agent.status === "active";
+
+
+        return `
+
+            <article class="agent-card">
+
+                <div class="agent-card-top">
+
+                    <div class="agent-card-icon">
+                        ${agent.icon || "✦"}
+                    </div>
+
+
+                    <div
+                        class="agent-card-status ${active ? "active" : ""}">
+
+                        <i></i>
+
+                        ${active ? "Active" : "Paused"}
+
+                    </div>
+
+                </div>
+
+
+                <h3>
+                    ${escapeHTML(agent.name)}
+                </h3>
+
+
+                <p>
+                    ${escapeHTML(agent.description)}
+                </p>
+
+
+                <div class="agent-meta">
+
+                    <span>
+                        Role: ${escapeHTML(agent.role)}
+                    </span>
+
+                    <span>
+                        ${agent.runs} runs
+                    </span>
+
+                </div>
+
+
+                <div class="agent-card-actions">
+
+                    <button
+                        class="small-button agent-toggle"
+                        data-id="${agent.id}">
+
+                        ${active ? "Pause" : "Activate"}
+
+                    </button>
+
+
+                    <button
+                        class="small-button agent-run"
+                        data-id="${agent.id}">
+
+                        Run now
+
+                    </button>
+
+
+                    <button
+                        class="small-button agent-delete"
+                        data-id="${agent.id}">
+
+                        Delete
+
+                    </button>
+
+                </div>
+
+            </article>
+
+        `;
+
+    }
+
+
+    function renderAgentPreview() {
+
+        const container =
+            $("#agentPreview");
+
+        if (!container) {
+            return;
+        }
+
+
+        const agents =
+            state.agents.slice(0, 4);
+
+
+        if (!agents.length) {
+
+            container.innerHTML = `
+
+                <div class="empty-state">
+                    No agents created yet.
+                </div>
+
+            `;
+
+            return;
+        }
+
+
+        container.innerHTML =
+            agents
+                .map(agent => `
+
+                    <div class="agent-preview">
+
+                        <div class="agent-icon">
+                            ${agent.icon || "✦"}
+                        </div>
+
+
+                        <div class="agent-preview-main">
+
+                            <b>
+                                ${escapeHTML(agent.name)}
+                            </b>
+
+                            <small>
+                                ${escapeHTML(agent.role)}
+                            </small>
+
+                        </div>
+
+
+                        <div
+                            class="agent-status ${agent.status === "active" ? "active" : ""}">
+
+                            <i></i>
+
+                            ${agent.status === "active"
+                                ? "Active"
+                                : "Paused"}
+
+                        </div>
+
+                    </div>
+
+                `)
+                .join("");
+
+    }
+
+
+    function updateAgentBadge() {
+
+        const active =
+            state.agents.filter(
+                agent =>
+                    agent.status === "active"
+            ).length;
+
+
+        setText(
+            "#agentBadge",
+            active
         );
 
-}
+
+        setText(
+            "#activeAgentLabel",
+            `${active} active`
+        );
+
+    }
 
 
-function refreshWorkspace() {
+    function toggleAgent(id) {
 
-    const button =
-        $("refresh-button");
-
-
-    button.disabled = true;
-
-    button.textContent =
-        "↻ Refreshing";
-
-
-    setTimeout(
-        () => {
-
-            button.disabled = false;
-
-            button.textContent =
-                "↻ Refresh";
-
-            showToast(
-                "Workspace refreshed",
-                "Your workspace is up to date."
+        const agent =
+            state.agents.find(
+                item => item.id === id
             );
 
-        },
-        800
-    );
 
-}
+        if (!agent) {
+            return;
+        }
 
 
-/* =========================================================
-   MOBILE
-========================================================= */
+        agent.status =
+            agent.status === "active"
+                ? "paused"
+                : "active";
 
-function setupMobile() {
 
-    $("mobile-menu")
-        .addEventListener(
-            "click",
-            () => {
+        addActivity(
+            agent.status === "active"
+                ? "Agent activated"
+                : "Agent paused",
+            `${agent.name} is now ${agent.status}.`
+        );
 
-                $("sidebar")
-                    .classList.toggle(
-                        "mobile-open"
+
+        saveState();
+
+        renderAll();
+
+        showToast(
+            `${agent.name} is ${agent.status}.`,
+            "success"
+        );
+
+    }
+
+
+    function runAgent(id) {
+
+        const agent =
+            state.agents.find(
+                item => item.id === id
+            );
+
+
+        if (!agent) {
+            return;
+        }
+
+
+        if (agent.status !== "active") {
+
+            showToast(
+                "Activate this agent before running it.",
+                "error"
+            );
+
+            return;
+        }
+
+
+        agent.runs += 1;
+
+
+        addActivity(
+            "Agent execution",
+            `${agent.name} completed a simulated run.`
+        );
+
+
+        addNotification(
+            "Agent run completed",
+            `${agent.name} finished successfully.`
+        );
+
+
+        saveState();
+
+        renderAll();
+
+
+        showToast(
+            `${agent.name} completed a run.`,
+            "success"
+        );
+
+    }
+
+
+    function deleteAgent(id) {
+
+        const agent =
+            state.agents.find(
+                item => item.id === id
+            );
+
+
+        if (!agent) {
+            return;
+        }
+
+
+        openModal({
+
+            label: "AI AGENT",
+
+            title: "Delete agent?",
+
+            body: `
+
+                <div class="modal-form">
+
+                    <div class="confirm-box">
+
+                        Remove
+                        <strong>
+                            ${escapeHTML(agent.name)}
+                        </strong>
+                        from your workspace?
+
+                    </div>
+
+
+                    <div class="modal-actions">
+
+                        <button
+                            class="secondary-button"
+                            id="cancelAgentDelete">
+
+                            Cancel
+
+                        </button>
+
+
+                        <button
+                            class="danger-button"
+                            id="confirmAgentDelete">
+
+                            Delete agent
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+            `
+
+        });
+
+
+        $("#cancelAgentDelete")
+            ?.addEventListener(
+                "click",
+                closeModal
+            );
+
+
+        $("#confirmAgentDelete")
+            ?.addEventListener(
+                "click",
+                () => {
+
+                    state.agents =
+                        state.agents.filter(
+                            item =>
+                                item.id !== id
+                        );
+
+
+                    addActivity(
+                        "Agent deleted",
+                        `${agent.name} was removed.`
                     );
 
-                $("sidebar-overlay")
-                    .style.display =
-                    $("sidebar")
-                        .classList.contains(
-                            "mobile-open"
-                        )
-                        ? "block"
-                        : "none";
 
-            }
-        );
+                    saveState();
 
+                    closeModal();
 
-    $("sidebar-overlay")
-        .addEventListener(
-            "click",
-            closeMobile
-        );
-
-}
-
-
-function closeMobile() {
-
-    $("sidebar")
-        .classList.remove(
-            "mobile-open"
-        );
-
-    $("sidebar-overlay")
-        .style.display =
-        "none";
-
-}
-
-
-/* =========================================================
-   SETTINGS
-========================================================= */
-
-function setupSettings() {
-
-    $("settings-theme")
-        .addEventListener(
-            "click",
-            () => {
-
-                toggleTheme();
-
-            }
-        );
-
-
-    $("settings-profile")
-        .addEventListener(
-            "click",
-            openProfileModal
-        );
-
-
-    $("settings-reset")
-        .addEventListener(
-            "click",
-            resetApplication
-        );
-
-}
-
-
-/* =========================================================
-   MODALS
-========================================================= */
-
-function openModal(
-    title,
-    kicker,
-    html
-) {
-
-    $("modal-title")
-        .textContent = title;
-
-    $("modal-kicker")
-        .textContent = kicker;
-
-    $("modal-body")
-        .innerHTML = html;
-
-    $("modal-overlay")
-        .classList.remove("hidden");
-
-}
-
-
-function closeModal() {
-
-    $("modal-overlay")
-        .classList.add("hidden");
-
-}
-
-
-$("modal-close")
-    .addEventListener(
-        "click",
-        closeModal
-    );
-
-
-$("modal-overlay")
-    .addEventListener(
-        "click",
-        event => {
-
-            if (
-                event.target ===
-                $("modal-overlay")
-            ) {
-
-                closeModal();
-
-            }
-
-        }
-    );
-
-
-function openProfileModal() {
-
-    openModal(
-        "My Profile",
-        "ACCOUNT",
-        `
-
-        <form
-            id="profile-edit-form"
-            class="modal-form"
-        >
-
-            <label>
-                Name
-
-                <input
-                    id="edit-name"
-                    value="${escapeAttribute(user.name)}"
-                    required
-                >
-            </label>
-
-
-            <label>
-                Email
-
-                <input
-                    id="edit-email"
-                    type="email"
-                    value="${escapeAttribute(user.email)}"
-                    required
-                >
-            </label>
-
-
-            <div class="modal-actions">
-
-                <button
-                    type="button"
-                    class="secondary-btn"
-                    id="cancel-profile"
-                >
-                    Cancel
-                </button>
-
-                <button
-                    type="submit"
-                    class="primary-btn"
-                >
-                    Save Changes
-                </button>
-
-            </div>
-
-        </form>
-
-        `
-    );
-
-
-    $("cancel-profile")
-        .addEventListener(
-            "click",
-            closeModal
-        );
-
-
-    $("profile-edit-form")
-        .addEventListener(
-            "submit",
-            event => {
-
-                event.preventDefault();
-
-
-                const newName =
-                    $("edit-name")
-                        .value
-                        .trim();
-
-                const newEmail =
-                    $("edit-email")
-                        .value
-                        .trim();
-
-
-                if (
-                    newName.length < 2 ||
-                    !/^[^\s@]+@[^\s@]+\.[^\s@]+$/
-                        .test(newEmail)
-                ) {
+                    renderAll();
 
                     showToast(
-                        "Invalid profile",
-                        "Please enter valid details."
+                        "Agent deleted.",
+                        "success"
                     );
 
-                    return;
                 }
+            );
+
+    }
 
 
-                user.name =
-                    newName;
+    function openAgentModal() {
 
-                user.email =
-                    newEmail;
+        openModal({
+
+            label: "AI AGENTS",
+
+            title: "Create AI agent",
+
+            body: `
+
+                <form
+                    class="modal-form"
+                    id="agentModalForm">
+
+                    <label>
+
+                        Agent name
+
+                        <input
+                            class="modal-input"
+                            id="agentName"
+                            placeholder="e.g. Content Research Agent"
+                            maxlength="50"
+                            required>
+
+                    </label>
 
 
-                saveUser();
+                    <label>
 
-                updateUserUI();
+                        Role
 
-                closeModal();
+                        <select
+                            class="modal-select"
+                            id="agentRole">
+
+                            <option>
+                                Research
+                            </option>
+
+                            <option>
+                                Analytics
+                            </option>
+
+                            <option>
+                                Automation
+                            </option>
+
+                            <option>
+                                Planning
+                            </option>
+
+                            <option>
+                                Development
+                            </option>
+
+                        </select>
+
+                    </label>
 
 
-                showToast(
-                    "Profile updated",
-                    "Your profile has been saved."
+                    <label>
+
+                        Description
+
+                        <textarea
+                            class="modal-textarea"
+                            id="agentDescription"
+                            placeholder="What should this agent do?"
+                            maxlength="250"
+                            required></textarea>
+
+                    </label>
+
+
+                    <div class="modal-actions">
+
+                        <button
+                            type="button"
+                            class="secondary-button"
+                            id="cancelAgent">
+
+                            Cancel
+
+                        </button>
+
+
+                        <button
+                            type="submit"
+                            class="primary-btn">
+
+                            Create agent
+
+                        </button>
+
+                    </div>
+
+                </form>
+
+            `
+
+        });
+
+
+        $("#cancelAgent")
+            ?.addEventListener(
+                "click",
+                closeModal
+            );
+
+
+        $("#agentModalForm")
+            ?.addEventListener(
+                "submit",
+                event => {
+
+                    event.preventDefault();
+
+
+                    const name =
+                        $("#agentName")
+                            .value
+                            .trim();
+
+                    const role =
+                        $("#agentRole")
+                            .value;
+
+                    const description =
+                        $("#agentDescription")
+                            .value
+                            .trim();
+
+
+                    if (!name || !description) {
+                        return;
+                    }
+
+
+                    const icons = {
+
+                        Research: "⌕",
+
+                        Analytics: "◇",
+
+                        Automation: "⚡",
+
+                        Planning: "✦",
+
+                        Development: "⌘"
+
+                    };
+
+
+                    const agent = {
+
+                        id: Date.now(),
+
+                        name,
+
+                        description,
+
+                        role,
+
+                        status: "active",
+
+                        runs: 0,
+
+                        icon:
+                            icons[role] || "✦"
+
+                    };
+
+
+                    state.agents.unshift(
+                        agent
+                    );
+
+
+                    addActivity(
+                        "AI agent created",
+                        `${name} was added to Agent Hub.`
+                    );
+
+
+                    addNotification(
+                        "New AI agent",
+                        `${name} is ready.`
+                    );
+
+
+                    saveState();
+
+                    closeModal();
+
+                    renderAll();
+
+                    navigate("agents");
+
+
+                    showToast(
+                        `${name} created successfully.`,
+                        "success"
+                    );
+
+                }
+            );
+
+    }
+
+
+    /* =====================================================
+       WORKFLOWS
+    ====================================================== */
+
+    function renderWorkflows() {
+
+        const container =
+            $("#workflowGrid");
+
+        if (!container) {
+            return;
+        }
+
+
+        if (!state.workflows.length) {
+
+            container.innerHTML = `
+
+                <div class="empty-state">
+
+                    <strong>
+                        No workflows
+                    </strong>
+
+                    Create an automation workflow.
+
+                </div>
+
+            `;
+
+            return;
+        }
+
+
+        container.innerHTML =
+            state.workflows
+                .map(workflow =>
+                    workflowHTML(workflow)
+                )
+                .join("");
+
+
+        $$(".workflow-toggle", container)
+            .forEach(button => {
+
+                button.addEventListener(
+                    "click",
+                    () => {
+
+                        toggleWorkflow(
+                            Number(button.dataset.id)
+                        );
+
+                    }
+                );
+
+            });
+
+
+        $$(".workflow-run", container)
+            .forEach(button => {
+
+                button.addEventListener(
+                    "click",
+                    () => {
+
+                        runWorkflow(
+                            Number(button.dataset.id)
+                        );
+
+                    }
+                );
+
+            });
+
+    }
+
+
+    function workflowHTML(workflow) {
+
+        const active =
+            workflow.status === "active";
+
+
+        return `
+
+            <article class="workflow-card">
+
+                <div class="workflow-icon">
+                    ⌘
+                </div>
+
+
+                <h3>
+                    ${escapeHTML(workflow.name)}
+                </h3>
+
+
+                <p>
+                    ${escapeHTML(workflow.description)}
+                </p>
+
+
+                <div class="workflow-progress">
+
+                    <span
+                        style="width:${workflow.progress}%">
+                    </span>
+
+                </div>
+
+
+                <div class="workflow-bottom">
+
+                    <small>
+                        ${workflow.runs} runs
+                    </small>
+
+
+                    <small>
+                        ${workflow.progress}% ready
+                    </small>
+
+                </div>
+
+
+                <div class="agent-card-actions">
+
+                    <button
+                        class="small-button workflow-toggle"
+                        data-id="${workflow.id}">
+
+                        ${active ? "Pause" : "Activate"}
+
+                    </button>
+
+
+                    <button
+                        class="small-button workflow-run"
+                        data-id="${workflow.id}">
+
+                        Run now
+
+                    </button>
+
+                </div>
+
+            </article>
+
+        `;
+
+    }
+
+
+    function toggleWorkflow(id) {
+
+        const workflow =
+            state.workflows.find(
+                item => item.id === id
+            );
+
+
+        if (!workflow) {
+            return;
+        }
+
+
+        workflow.status =
+            workflow.status === "active"
+                ? "paused"
+                : "active";
+
+
+        addActivity(
+            workflow.status === "active"
+                ? "Workflow activated"
+                : "Workflow paused",
+            `${workflow.name} is now ${workflow.status}.`
+        );
+
+
+        saveState();
+
+        renderAll();
+
+
+        showToast(
+            `${workflow.name} is ${workflow.status}.`,
+            "success"
+        );
+
+    }
+
+
+    function runWorkflow(id) {
+
+        const workflow =
+            state.workflows.find(
+                item => item.id === id
+            );
+
+
+        if (!workflow) {
+            return;
+        }
+
+
+        if (workflow.status !== "active") {
+
+            showToast(
+                "Activate this workflow before running it.",
+                "error"
+            );
+
+            return;
+        }
+
+
+        workflow.runs += 1;
+
+
+        workflow.progress =
+            Math.min(
+                100,
+                workflow.progress + 2
+            );
+
+
+        addActivity(
+            "Workflow executed",
+            `${workflow.name} completed a simulated run.`
+        );
+
+
+        addNotification(
+            "Workflow completed",
+            `${workflow.name} finished successfully.`
+        );
+
+
+        saveState();
+
+        renderAll();
+
+
+        showToast(
+            `${workflow.name} completed.`,
+            "success"
+        );
+
+    }
+
+
+    function openWorkflowModal() {
+
+        openModal({
+
+            label: "AUTOMATION",
+
+            title: "Create workflow",
+
+            body: `
+
+                <form
+                    class="modal-form"
+                    id="workflowModalForm">
+
+                    <label>
+
+                        Workflow name
+
+                        <input
+                            class="modal-input"
+                            id="workflowName"
+                            placeholder="e.g. Weekly Project Review"
+                            maxlength="60"
+                            required>
+
+                    </label>
+
+
+                    <label>
+
+                        Description
+
+                        <textarea
+                            class="modal-textarea"
+                            id="workflowDescription"
+                            placeholder="Describe what this workflow automates..."
+                            maxlength="250"
+                            required></textarea>
+
+                    </label>
+
+
+                    <div class="modal-actions">
+
+                        <button
+                            type="button"
+                            class="secondary-button"
+                            id="cancelWorkflow">
+
+                            Cancel
+
+                        </button>
+
+
+                        <button
+                            type="submit"
+                            class="primary-btn">
+
+                            Create workflow
+
+                        </button>
+
+                    </div>
+
+                </form>
+
+            `
+
+        });
+
+
+        $("#cancelWorkflow")
+            ?.addEventListener(
+                "click",
+                closeModal
+            );
+
+
+        $("#workflowModalForm")
+            ?.addEventListener(
+                "submit",
+                event => {
+
+                    event.preventDefault();
+
+
+                    const name =
+                        $("#workflowName")
+                            .value
+                            .trim();
+
+                    const description =
+                        $("#workflowDescription")
+                            .value
+                            .trim();
+
+
+                    if (!name || !description) {
+                        return;
+                    }
+
+
+                    const workflow = {
+
+                        id: Date.now(),
+
+                        name,
+
+                        description,
+
+                        status: "active",
+
+                        progress: 25,
+
+                        runs: 0
+
+                    };
+
+
+                    state.workflows.unshift(
+                        workflow
+                    );
+
+
+                    addActivity(
+                        "Workflow created",
+                        `${name} was added to your automation workspace.`
+                    );
+
+
+                    addNotification(
+                        "New workflow",
+                        `${name} is ready.`
+                    );
+
+
+                    saveState();
+
+                    closeModal();
+
+                    renderAll();
+
+                    navigate("workflows");
+
+
+                    showToast(
+                        `${name} created successfully.`,
+                        "success"
+                    );
+
+                }
+            );
+
+    }
+
+
+    /* =====================================================
+       ACTIVITY
+    ====================================================== */
+
+    function addActivity(title, message) {
+
+        state.activity.unshift({
+
+            id: Date.now(),
+
+            title,
+
+            message,
+
+            time: Date.now()
+
+        });
+
+
+        state.activity =
+            state.activity.slice(0, 50);
+
+
+        saveState();
+
+        renderActivity();
+
+    }
+
+
+    function renderActivity() {
+
+        const container =
+            $("#timeline");
+
+        if (!container) {
+            return;
+        }
+
+
+        if (!state.activity.length) {
+
+            container.innerHTML = `
+
+                <div class="empty-state">
+
+                    <strong>
+                        No activity
+                    </strong>
+
+                    Workspace activity will appear here.
+
+                </div>
+
+            `;
+
+            return;
+        }
+
+
+        container.innerHTML =
+            state.activity
+                .slice(0, 30)
+                .map(item => `
+
+                    <div class="timeline-item">
+
+                        <div class="timeline-item-content">
+
+                            <b>
+                                ${escapeHTML(item.title)}
+                            </b>
+
+                            <p>
+                                ${escapeHTML(item.message)}
+                            </p>
+
+                            <time>
+                                ${formatRelativeTime(item.time)}
+                            </time>
+
+                        </div>
+
+                    </div>
+
+                `)
+                .join("");
+
+    }
+
+
+    /* =====================================================
+       NOTIFICATIONS
+    ====================================================== */
+
+    function addNotification(title, message) {
+
+        if (!state.notificationsEnabled) {
+            return;
+        }
+
+
+        state.notifications.unshift({
+
+            id: Date.now(),
+
+            title,
+
+            message,
+
+            time: Date.now(),
+
+            read: false
+
+        });
+
+
+        state.notifications =
+            state.notifications.slice(0, 20);
+
+
+        saveState();
+
+        renderNotifications();
+
+        updateNotificationDot();
+
+    }
+
+
+    function renderNotifications() {
+
+        const container =
+            $("#notificationList");
+
+        if (!container) {
+            return;
+        }
+
+
+        if (!state.notifications.length) {
+
+            container.innerHTML = `
+
+                <div class="empty-state">
+
+                    No notifications yet.
+
+                </div>
+
+            `;
+
+            return;
+        }
+
+
+        container.innerHTML =
+            state.notifications
+                .slice(0, 8)
+                .map(item => `
+
+                    <div class="notification-item">
+
+                        <i
+                            style="${item.read ? "opacity:.25" : ""}">
+                        </i>
+
+                        <div>
+
+                            <b>
+                                ${escapeHTML(item.title)}
+                            </b>
+
+                            <p>
+                                ${escapeHTML(item.message)}
+                            </p>
+
+                            <time>
+                                ${formatRelativeTime(item.time)}
+                            </time>
+
+                        </div>
+
+                    </div>
+
+                `)
+                .join("");
+
+    }
+
+
+    function updateNotificationDot() {
+
+        const unread =
+            state.notifications.some(
+                item => !item.read
+            );
+
+
+        $("#notificationDot")
+            ?.classList.toggle(
+                "read",
+                !unread
+            );
+
+    }
+
+
+    function markNotificationsRead() {
+
+        state.notifications
+            .forEach(
+                notification =>
+                    notification.read = true
+            );
+
+
+        saveState();
+
+        renderNotifications();
+
+        updateNotificationDot();
+
+        showToast(
+            "Notifications marked as read.",
+            "success"
+        );
+
+    }
+
+
+    /* =====================================================
+       CHART
+    ====================================================== */
+
+    function renderChart() {
+
+        const chart =
+            $("#chart");
+
+        if (!chart) {
+            return;
+        }
+
+
+        const values =
+            getChartValues();
+
+
+        chart.innerHTML =
+            values
+                .map((value, index) => `
+
+                    <div
+                        class="chart-bar"
+                        style="height:${value}%"
+                        title="${value} activity">
+
+                    </div>
+
+                `)
+                .join("");
+
+    }
+
+
+    function getChartValues() {
+
+        const base =
+            state.activity.length;
+
+
+        const seed = [
+            34,
+            52,
+            42,
+            70,
+            58,
+            82,
+            66
+        ];
+
+
+        return seed.map(
+            (value, index) =>
+                Math.min(
+                    95,
+                    value +
+                    Math.min(
+                        18,
+                        base * 2
+                    ) +
+                    ((index + base) % 7)
+                )
+        );
+
+    }
+
+
+    /* =====================================================
+       WORKSPACES
+    ====================================================== */
+
+    function renderWorkspaceList() {
+
+        const container =
+            $("#workspaceList");
+
+        if (!container) {
+            return;
+        }
+
+
+        container.innerHTML =
+            state.workspaces
+                .map(workspace => `
+
+                    <button
+                        class="dropdown-item workspace-option"
+                        data-id="${workspace.id}">
+
+                        <span class="workspace-avatar">
+                            ${escapeHTML(
+                                initials(workspace.name)
+                            )}
+                        </span>
+
+                        <span>
+
+                            <b>
+                                ${escapeHTML(workspace.name)}
+                            </b>
+
+                            <small>
+                                ${escapeHTML(workspace.focus)}
+                            </small>
+
+                        </span>
+
+                    </button>
+
+                `)
+                .join("");
+
+
+        $$(".workspace-option", container)
+            .forEach(button => {
+
+                button.addEventListener(
+                    "click",
+                    () => {
+
+                        switchWorkspace(
+                            button.dataset.id
+                        );
+
+                    }
+                );
+
+            });
+
+    }
+
+
+    function switchWorkspace(id) {
+
+        const workspace =
+            state.workspaces.find(
+                item => item.id === id
+            );
+
+
+        if (!workspace) {
+            return;
+        }
+
+
+        state.currentWorkspaceId =
+            id;
+
+        state.selectedFocus =
+            workspace.focus;
+
+
+        saveState();
+
+        renderIdentity();
+
+        renderWorkspaceList();
+
+        closeDropdowns();
+
+
+        addActivity(
+            "Workspace switched",
+            `Switched to ${workspace.name}.`
+        );
+
+
+        showToast(
+            `${workspace.name} selected.`,
+            "success"
+        );
+
+    }
+
+
+    function openWorkspaceModal() {
+
+        openModal({
+
+            label: "WORKSPACE",
+
+            title: "Create workspace",
+
+            body: `
+
+                <form
+                    class="modal-form"
+                    id="workspaceModalForm">
+
+                    <label>
+
+                        Workspace name
+
+                        <input
+                            class="modal-input"
+                            id="newWorkspaceName"
+                            placeholder="e.g. College Projects"
+                            maxlength="40"
+                            required>
+
+                    </label>
+
+
+                    <label>
+
+                        Focus
+
+                        <select
+                            class="modal-select"
+                            id="newWorkspaceFocus">
+
+                            <option>
+                                AI & Productivity
+                            </option>
+
+                            <option>
+                                Development
+                            </option>
+
+                            <option>
+                                Research
+                            </option>
+
+                            <option>
+                                Automation
+                            </option>
+
+                        </select>
+
+                    </label>
+
+
+                    <div class="modal-actions">
+
+                        <button
+                            type="button"
+                            class="secondary-button"
+                            id="cancelWorkspace">
+
+                            Cancel
+
+                        </button>
+
+
+                        <button
+                            type="submit"
+                            class="primary-btn">
+
+                            Create workspace
+
+                        </button>
+
+                    </div>
+
+                </form>
+
+            `
+
+        });
+
+
+        $("#cancelWorkspace")
+            ?.addEventListener(
+                "click",
+                closeModal
+            );
+
+
+        $("#workspaceModalForm")
+            ?.addEventListener(
+                "submit",
+                event => {
+
+                    event.preventDefault();
+
+
+                    const name =
+                        $("#newWorkspaceName")
+                            .value
+                            .trim();
+
+                    const focus =
+                        $("#newWorkspaceFocus")
+                            .value;
+
+
+                    if (!name) {
+                        return;
+                    }
+
+
+                    const workspace = {
+
+                        id:
+                            "workspace-" +
+                            Date.now(),
+
+                        name,
+
+                        focus
+
+                    };
+
+
+                    state.workspaces.push(
+                        workspace
+                    );
+
+                    state.currentWorkspaceId =
+                        workspace.id;
+
+                    state.selectedFocus =
+                        focus;
+
+
+                    addActivity(
+                        "Workspace created",
+                        `${name} was created.`
+                    );
+
+
+                    saveState();
+
+                    closeModal();
+
+                    renderAll();
+
+                    renderIdentity();
+
+                    closeDropdowns();
+
+
+                    showToast(
+                        `${name} created.`,
+                        "success"
+                    );
+
+                }
+            );
+
+    }
+
+
+    /* =====================================================
+       INTEGRATIONS
+    ====================================================== */
+
+    function renderIntegrations() {
+
+        $$("[data-integration]")
+            .forEach(button => {
+
+                const name =
+                    button.dataset.integration;
+
+                const connected =
+                    Boolean(
+                        state.integrations[name]
+                    );
+
+
+                button.classList.toggle(
+                    "connected",
+                    connected
+                );
+
+
+                button.textContent =
+                    connected
+                        ? "Connected"
+                        : "Connect";
+
+            });
+
+    }
+
+
+    function toggleIntegration(name) {
+
+        const connected =
+            Boolean(
+                state.integrations[name]
+            );
+
+
+        state.integrations[name] =
+            !connected;
+
+
+        addActivity(
+            connected
+                ? "Integration disconnected"
+                : "Integration connected",
+            `${name} is now ${
+                connected
+                    ? "disconnected"
+                    : "connected"
+            }.`
+        );
+
+
+        saveState();
+
+        renderIntegrations();
+
+
+        showToast(
+            `${name} ${
+                connected
+                    ? "disconnected"
+                    : "connected"
+            }.`,
+            "success"
+        );
+
+    }
+
+
+    /* =====================================================
+       SETTINGS
+    ====================================================== */
+
+    function updateSettings() {
+
+        const toggle =
+            $("#notificationToggle");
+
+
+        if (toggle) {
+
+            toggle.checked =
+                Boolean(
+                    state.notificationsEnabled
+                );
+
+        }
+
+    }
+
+
+    function toggleTheme() {
+
+        state.theme =
+            state.theme === "dark"
+                ? "light"
+                : "dark";
+
+
+        saveState();
+
+        applyTheme();
+
+
+        showToast(
+            `${capitalize(state.theme)} mode enabled.`,
+            "success"
+        );
+
+    }
+
+
+    function applyTheme() {
+
+        document.body.classList.toggle(
+            "light",
+            state.theme === "light"
+        );
+
+    }
+
+
+    function updateNotificationPreference(enabled) {
+
+        state.notificationsEnabled =
+            enabled;
+
+
+        saveState();
+
+
+        showToast(
+            enabled
+                ? "Notifications enabled."
+                : "Notifications disabled.",
+            "success"
+        );
+
+    }
+
+
+    /* =====================================================
+       PROFILE
+    ====================================================== */
+
+    function openProfileModal() {
+
+        openModal({
+
+            label: "PROFILE",
+
+            title: "Edit profile",
+
+            body: `
+
+                <form
+                    class="modal-form"
+                    id="profileEditForm">
+
+                    <label>
+
+                        Name
+
+                        <input
+                            class="modal-input"
+                            id="editName"
+                            value="${escapeAttribute(state.user.name)}"
+                            maxlength="40"
+                            required>
+
+                    </label>
+
+
+                    <label>
+
+                        Email
+
+                        <input
+                            class="modal-input"
+                            type="email"
+                            id="editEmail"
+                            value="${escapeAttribute(state.user.email)}"
+                            maxlength="100"
+                            required>
+
+                    </label>
+
+
+                    <div class="modal-actions">
+
+                        <button
+                            type="button"
+                            class="secondary-button"
+                            id="cancelProfile">
+
+                            Cancel
+
+                        </button>
+
+
+                        <button
+                            type="submit"
+                            class="primary-btn">
+
+                            Save profile
+
+                        </button>
+
+                    </div>
+
+                </form>
+
+            `
+
+        });
+
+
+        $("#cancelProfile")
+            ?.addEventListener(
+                "click",
+                closeModal
+            );
+
+
+        $("#profileEditForm")
+            ?.addEventListener(
+                "submit",
+                event => {
+
+                    event.preventDefault();
+
+
+                    const name =
+                        $("#editName")
+                            .value
+                            .trim();
+
+                    const email =
+                        $("#editEmail")
+                            .value
+                            .trim();
+
+
+                    if (
+                        name.length < 2 ||
+                        !isValidEmail(email)
+                    ) {
+
+                        showToast(
+                            "Please enter valid profile information.",
+                            "error"
+                        );
+
+                        return;
+
+                    }
+
+
+                    state.user.name =
+                        name;
+
+                    state.user.email =
+                        email;
+
+
+                    addActivity(
+                        "Profile updated",
+                        "Your NEXUS AI profile was updated."
+                    );
+
+
+                    saveState();
+
+                    renderIdentity();
+
+                    closeModal();
+
+
+                    showToast(
+                        "Profile updated.",
+                        "success"
+                    );
+
+                }
+            );
+
+    }
+
+
+    /* =====================================================
+       HELP
+    ====================================================== */
+
+    function openHelpModal() {
+
+        openModal({
+
+            label: "NEXUS GUIDE",
+
+            title: "How NEXUS AI works",
+
+            body: `
+
+                <div class="modal-form">
+
+                    <div class="confirm-box">
+
+                        <strong>
+                            Command Center
+                        </strong>
+
+                        <br>
+
+                        Use the dashboard to manage
+                        tasks, agents and workspace activity.
+
+                    </div>
+
+
+                    <div class="confirm-box">
+
+                        <strong>
+                            AI Agents
+                        </strong>
+
+                        <br>
+
+                        Create specialized assistants
+                        and control their execution.
+
+                    </div>
+
+
+                    <div class="confirm-box">
+
+                        <strong>
+                            Workflows
+                        </strong>
+
+                        <br>
+
+                        Build reusable automation flows
+                        for repetitive operations.
+
+                    </div>
+
+
+                    <div class="confirm-box">
+
+                        <strong>
+                            Command Palette
+                        </strong>
+
+                        <br>
+
+                        Press
+                        <strong>Ctrl + K</strong>
+                        or
+                        <strong>⌘ + K</strong>
+                        to quickly access commands.
+
+                    </div>
+
+                </div>
+
+            `
+
+        });
+
+    }
+
+
+    /* =====================================================
+       AI COMMAND INTERFACE
+    ====================================================== */
+
+    function executeAICommand(command) {
+
+        const text =
+            command
+                .trim()
+                .toLowerCase();
+
+
+        if (!text) {
+            return;
+        }
+
+
+        let response = "";
+
+
+        if (
+            text.includes("summarize") &&
+            text.includes("activity")
+        ) {
+
+            const completed =
+                state.tasks.filter(
+                    task => task.completed
+                ).length;
+
+
+            response =
+                `Your workspace currently has ` +
+                `${state.tasks.length} tasks, ` +
+                `${completed} completed, ` +
+                `${state.agents.filter(a => a.status === "active").length} active AI agents, ` +
+                `and ${state.workflows.filter(w => w.status === "active").length} active workflows.`;
+
+        } else if (
+            text.includes("focus") ||
+            text.includes("should i do")
+        ) {
+
+            const priority =
+                state.tasks.find(
+                    task =>
+                        !task.completed &&
+                        task.priority === "high"
+                );
+
+
+            response =
+                priority
+                    ? `Your current high-priority focus could be "${priority.title}".`
+                    : "You have no unfinished high-priority task right now. Consider creating a focused task.";
+
+        } else if (
+            text.includes("active") &&
+            text.includes("agent")
+        ) {
+
+            const active =
+                state.agents
+                    .filter(
+                        agent =>
+                            agent.status === "active"
+                    )
+                    .map(
+                        agent =>
+                            agent.name
+                    );
+
+
+            response =
+                active.length
+                    ? `Active agents: ${active.join(", ")}.`
+                    : "There are currently no active agents.";
+
+        } else if (
+            text.includes("task")
+        ) {
+
+            response =
+                `You currently have ${state.tasks.length} tasks. ` +
+                `${state.tasks.filter(t => !t.completed).length} still need attention.`;
+
+        } else if (
+            text.includes("workflow")
+        ) {
+
+            response =
+                `There are ${state.workflows.length} workflows, ` +
+                `with ${state.workflows.filter(w => w.status === "active").length} currently active.`;
+
+        } else {
+
+            response =
+                `NEXUS analyzed your request: "${command}". ` +
+                `Try asking about your activity, tasks, agents, workflows, or focus.`;
+
+        }
+
+
+        const responseBox =
+            $("#aiResponse");
+
+
+        if (!responseBox) {
+            return;
+        }
+
+
+        responseBox.innerHTML = `
+            <strong>✦ NEXUS AI</strong>
+            <br>
+            ${escapeHTML(response)}
+        `;
+
+
+        responseBox.classList.remove(
+            "hidden"
+        );
+
+
+        addActivity(
+            "NEXUS AI command",
+            `Processed: ${command}`
+        );
+
+    }
+
+
+    /* =====================================================
+       COMMAND PALETTE
+    ====================================================== */
+
+    const paletteCommands = [
+
+        {
+            icon: "✦",
+            name: "Ask NEXUS AI",
+            action: () => {
+
+                closePalette();
+
+                navigate("command");
+
+                setTimeout(
+                    () => $("#aiInput")?.focus(),
+                    100
                 );
 
             }
-        );
+        },
 
-}
+        {
+            icon: "＋",
+            name: "Create task",
+            action: () => {
 
+                closePalette();
 
-function openPreferencesModal() {
+                openTaskModal();
 
-    openModal(
-        "Preferences",
-        "NEXUS AI",
-        `
+            }
+        },
 
-        <div class="modal-message">
+        {
+            icon: "✦",
+            name: "Open Agent Hub",
+            action: () => {
 
-            <p>
-                Your preferences are stored locally
-                for this demo.
-            </p>
+                closePalette();
 
-            <br>
+                navigate("agents");
 
-            <p>
-                Current theme:
-                <strong>
-                    ${
-                        document.body.classList.contains(
-                            "light"
-                        )
-                        ? "Light"
-                        : "Dark"
-                    }
-                </strong>
-            </p>
+            }
+        },
 
-            <div class="modal-actions">
+        {
+            icon: "⚡",
+            name: "Create AI agent",
+            action: () => {
 
-                <button
-                    id="preference-theme"
-                    class="primary-btn"
-                    type="button"
-                >
-                    Toggle Theme
-                </button>
+                closePalette();
 
-            </div>
+                openAgentModal();
 
-        </div>
+            }
+        },
 
-        `
-    );
+        {
+            icon: "⌘",
+            name: "Open Workflows",
+            action: () => {
 
+                closePalette();
 
-    $("preference-theme")
-        .addEventListener(
-            "click",
-            () => {
+                navigate("workflows");
+
+            }
+        },
+
+        {
+            icon: "◇",
+            name: "Open Insights",
+            action: () => {
+
+                closePalette();
+
+                navigate("insights");
+
+            }
+        },
+
+        {
+            icon: "◐",
+            name: "Toggle theme",
+            action: () => {
+
+                closePalette();
 
                 toggleTheme();
 
-                closeModal();
+            }
+        },
+
+        {
+            icon: "↻",
+            name: "Refresh workspace",
+            action: () => {
+
+                closePalette();
+
+                refreshWorkspace();
 
             }
-        );
+        },
 
-}
+        {
+            icon: "⚙",
+            name: "Open Settings",
+            action: () => {
 
+                closePalette();
 
-function openCreateWorkspaceModal() {
-
-    openModal(
-        "Create Workspace",
-        "WORKSPACE",
-        `
-
-        <form
-            id="workspace-form"
-            class="modal-form"
-        >
-
-            <label>
-                Workspace name
-
-                <input
-                    id="workspace-name"
-                    placeholder="e.g. College Project"
-                    required
-                >
-            </label>
-
-
-            <div class="modal-actions">
-
-                <button
-                    type="button"
-                    class="secondary-btn"
-                    id="cancel-workspace"
-                >
-                    Cancel
-                </button>
-
-                <button
-                    type="submit"
-                    class="primary-btn"
-                >
-                    Create
-                </button>
-
-            </div>
-
-        </form>
-
-        `
-    );
-
-
-    $("cancel-workspace")
-        .addEventListener(
-            "click",
-            closeModal
-        );
-
-
-    $("workspace-form")
-        .addEventListener(
-            "submit",
-            event => {
-
-                event.preventDefault();
-
-
-                const name =
-                    $("workspace-name")
-                        .value
-                        .trim();
-
-
-                if (!name) {
-                    return;
-                }
-
-
-                closeModal();
-
-
-                showToast(
-                    "Workspace created",
-                    `${name} is ready to configure.`
-                );
+                navigate("settings");
 
             }
-        );
+        }
 
-}
-
-
-function openCreateWorkflowModal() {
-
-    openModal(
-        "Create Workflow",
-        "AUTOMATION",
-        `
-
-        <div class="modal-message">
-
-            <p>
-                Build a workflow by connecting
-                triggers, AI agents and actions.
-            </p>
-
-            <br>
-
-            <p>
-                Example:
-            </p>
-
-            <br>
-
-            <strong>
-                New File → AI Agent → Analyze →
-                Generate Report
-            </strong>
-
-            <div class="modal-actions">
-
-                <button
-                    id="start-workflow"
-                    class="primary-btn"
-                    type="button"
-                >
-                    Start Building
-                </button>
-
-            </div>
-
-        </div>
-
-        `
-    );
+    ];
 
 
-    $("start-workflow")
-        .addEventListener(
-            "click",
-            () => {
+    function openPalette() {
 
-                closeModal();
-
-                showToast(
-                    "Workflow Builder",
-                    "Workflow canvas is ready for the next development phase."
-                );
-
-            }
-        );
-
-}
+        const overlay =
+            $("#paletteOverlay");
 
 
-function openHelpModal() {
-
-    openModal(
-        "NEXUS AI Guide",
-        "HELP",
-        `
-
-        <div class="modal-message">
-
-            <p>
-                <strong>Command Center</strong>
-                is your central workspace.
-            </p>
-
-            <br>
-
-            <p>
-                Use the sidebar to navigate between
-                AI Agents, Workflows, Insights,
-                Activity, Integrations and Settings.
-            </p>
-
-            <br>
-
-            <p>
-                Press
-                <strong>Ctrl + K</strong>
-                anytime to open the Command Palette.
-            </p>
-
-        </div>
-
-        `
-    );
-
-}
+        if (!overlay) {
+            return;
+        }
 
 
-/* =========================================================
-   RESET
-========================================================= */
-
-function resetApplication() {
-
-    const confirmed =
-        confirm(
-            "Reset NEXUS AI and return to onboarding?"
+        overlay.classList.remove(
+            "hidden"
         );
 
 
-    if (!confirmed) {
-        return;
+        renderPalette(
+            ""
+        );
+
+
+        setTimeout(
+            () =>
+                $("#paletteInput")
+                    ?.focus(),
+            50
+        );
+
     }
 
 
-    localStorage.removeItem(
-        USER_KEY
-    );
+    function closePalette() {
 
-    localStorage.removeItem(
-        THEME_KEY
-    );
-
-
-    location.reload();
-
-}
-
-
-/* =========================================================
-   FLOATING ELEMENTS
-========================================================= */
-
-function closeAllFloating() {
-
-    closeWorkspace();
-
-    closeProfile();
-
-    closeNotifications();
-
-}
-
-
-/* =========================================================
-   OUTSIDE CLICK
-========================================================= */
-
-document.addEventListener(
-    "click",
-    event => {
-
-        const workspace =
-            $("workspace-menu");
-
-        const profile =
-            $("profile-menu");
-
-        const workspaceButton =
-            $("workspace-button");
-
-        const profileButton =
-            $("profile-button");
-
-        const notification =
-            $("notification-panel");
-
-        const notificationButton =
-            $("notification-button");
-
-
-        if (
-            !workspace.contains(event.target) &&
-            !workspaceButton.contains(event.target)
-        ) {
-
-            closeWorkspace();
-
-        }
-
-
-        if (
-            !profile.contains(event.target) &&
-            !profileButton.contains(event.target)
-        ) {
-
-            closeProfile();
-
-        }
-
-
-        if (
-            !notification.contains(event.target) &&
-            !notificationButton.contains(event.target)
-        ) {
-
-            closeNotifications();
-
-        }
+        $("#paletteOverlay")
+            ?.classList.add(
+                "hidden"
+            );
 
     }
-);
 
 
-/* =========================================================
-   ESCAPE HTML
-========================================================= */
+    function renderPalette(query = "") {
 
-function escapeHTML(value) {
+        const container =
+            $("#paletteResults");
 
-    const div =
-        document.createElement("div");
-
-    div.textContent =
-        value;
-
-    return div.innerHTML;
-
-}
+        if (!container) {
+            return;
+        }
 
 
-function escapeAttribute(value) {
-
-    return escapeHTML(value)
-        .replaceAll('"', "&quot;")
-        .replaceAll("'", "&#039;");
-
-}
+        const normalized =
+            query
+                .toLowerCase()
+                .trim();
 
 
-/* =========================================================
-   TOAST
-========================================================= */
-
-let toastTimer;
-
-
-function showToast(
-    title,
-    message
-) {
-
-    $("toast-title")
-        .textContent = title;
-
-    $("toast-message")
-        .textContent = message;
+        const filtered =
+            paletteCommands.filter(
+                command =>
+                    command.name
+                        .toLowerCase()
+                        .includes(normalized)
+            );
 
 
-    $("toast")
-        .classList.add("show");
+        if (!filtered.length) {
+
+            container.innerHTML = `
+
+                <div class="empty-state">
+                    No commands found.
+                </div>
+
+            `;
+
+            return;
+        }
 
 
-    clearTimeout(
-        toastTimer
-    );
+        container.innerHTML =
+            filtered
+                .map(
+                    (command, index) => `
+
+                        <button
+                            class="palette-item ${index === 0 ? "selected" : ""}"
+                            data-command-index="${paletteCommands.indexOf(command)}">
+
+                            <span class="palette-item-icon">
+                                ${command.icon}
+                            </span>
+
+                            <span>
+                                ${escapeHTML(command.name)}
+                            </span>
+
+                            <span>
+                                →
+                            </span>
+
+                        </button>
+
+                    `
+                )
+                .join("");
 
 
-    toastTimer =
+        $$(".palette-item", container)
+            .forEach(button => {
+
+                button.addEventListener(
+                    "click",
+                    () => {
+
+                        const command =
+                            paletteCommands[
+                                Number(
+                                    button.dataset.commandIndex
+                                )
+                            ];
+
+
+                        command?.action();
+
+                    }
+                );
+
+            });
+
+    }
+
+
+    /* =====================================================
+       NAVIGATION
+    ====================================================== */
+
+    function navigate(page) {
+
+        const validPages = [
+            "command",
+            "agents",
+            "workflows",
+            "insights",
+            "activity",
+            "integrations",
+            "settings"
+        ];
+
+
+        if (!validPages.includes(page)) {
+            page = "command";
+        }
+
+
+        currentPage = page;
+
+
+        $$(".page")
+            .forEach(section => {
+
+                section.classList.toggle(
+                    "active",
+                    section.id ===
+                    `page-${page}`
+                );
+
+            });
+
+
+        $$(".nav-item")
+            .forEach(button => {
+
+                button.classList.toggle(
+                    "active",
+                    button.dataset.page === page
+                );
+
+            });
+
+
+        const labels = {
+
+            command: "Command Center",
+
+            agents: "AI Agents",
+
+            workflows: "Workflows",
+
+            insights: "AI Insights",
+
+            activity: "Activity",
+
+            integrations: "Integrations",
+
+            settings: "Settings"
+
+        };
+
+
+        setText(
+            "#breadcrumbName",
+            labels[page]
+        );
+
+
+        closeDropdowns();
+
+        closeSidebarMobile();
+
+
+        window.scrollTo({
+            top: 0,
+            behavior: "smooth"
+        });
+
+    }
+
+
+    /* =====================================================
+       REFRESH
+    ====================================================== */
+
+    function refreshWorkspace() {
+
+        const refreshButton =
+            $("#refreshBtn");
+
+
+        if (refreshButton) {
+
+            refreshButton.disabled = true;
+
+            refreshButton.innerHTML =
+                "↻ Refreshing...";
+
+        }
+
+
         setTimeout(
             () => {
 
-                $("toast")
-                    .classList.remove(
-                        "show"
-                    );
+                state =
+                    loadState();
+
+
+                renderIdentity();
+
+                renderAll();
+
+
+                if (refreshButton) {
+
+                    refreshButton.disabled =
+                        false;
+
+                    refreshButton.innerHTML =
+                        "↻ <span>Refresh</span>";
+
+                }
+
+
+                addActivity(
+                    "Workspace refreshed",
+                    "Workspace data was synchronized locally."
+                );
+
+
+                showToast(
+                    "Workspace refreshed.",
+                    "success"
+                );
 
             },
-            2800
+            550
         );
 
-}
+    }
+
+
+    /* =====================================================
+       MODAL SYSTEM
+    ====================================================== */
+
+    function openModal({
+        label = "NEXUS AI",
+        title = "Modal",
+        body = ""
+    }) {
+
+        setText(
+            "#modalLabel",
+            label
+        );
+
+        setText(
+            "#modalTitle",
+            title
+        );
+
+
+        const bodyElement =
+            $("#modalBody");
+
+
+        if (bodyElement) {
+            bodyElement.innerHTML = body;
+        }
+
+
+        $("#modalOverlay")
+            ?.classList.remove(
+                "hidden"
+            );
+
+    }
+
+
+    function closeModal() {
+
+        $("#modalOverlay")
+            ?.classList.add(
+                "hidden"
+            );
+
+    }
+
+
+    /* =====================================================
+       DROPDOWNS
+    ====================================================== */
+
+    function closeDropdowns() {
+
+        $$(".dropdown")
+            .forEach(dropdown =>
+                dropdown.classList.add(
+                    "hidden"
+                )
+            );
+
+    }
+
+
+    function toggleDropdown(id) {
+
+        const dropdown =
+            $(`#${id}`);
+
+
+        if (!dropdown) {
+            return;
+        }
+
+
+        const currentlyHidden =
+            dropdown.classList.contains(
+                "hidden"
+            );
+
+
+        closeDropdowns();
+
+
+        if (currentlyHidden) {
+
+            dropdown.classList.remove(
+                "hidden"
+            );
+
+        }
+
+    }
+
+
+    /* =====================================================
+       MOBILE SIDEBAR
+    ====================================================== */
+
+    function openSidebarMobile() {
+
+        $("#sidebar")
+            ?.classList.add(
+                "mobile-open"
+            );
+
+        $("#sidebarOverlay")
+            ?.classList.remove(
+                "hidden"
+            );
+
+    }
+
+
+    function closeSidebarMobile() {
+
+        $("#sidebar")
+            ?.classList.remove(
+                "mobile-open"
+            );
+
+        $("#sidebarOverlay")
+            ?.classList.add(
+                "hidden"
+            );
+
+    }
+
+
+    /* =====================================================
+       RESET
+    ====================================================== */
+
+    function resetWorkspace() {
+
+        openModal({
+
+            label: "DANGER ZONE",
+
+            title: "Reset workspace?",
+
+            body: `
+
+                <div class="modal-form">
+
+                    <div class="confirm-box">
+
+                        This will remove all locally stored
+                        NEXUS AI workspace data from this browser.
+
+                        <br><br>
+
+                        Your GitHub files and project files
+                        will <strong>not</strong> be affected.
+
+                    </div>
+
+
+                    <div class="modal-actions">
+
+                        <button
+                            class="secondary-button"
+                            id="cancelReset">
+
+                            Cancel
+
+                        </button>
+
+
+                        <button
+                            class="danger-button"
+                            id="confirmReset">
+
+                            Reset workspace
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+            `
+
+        });
+
+
+        $("#cancelReset")
+            ?.addEventListener(
+                "click",
+                closeModal
+            );
+
+
+        $("#confirmReset")
+            ?.addEventListener(
+                "click",
+                () => {
+
+                    localStorage.removeItem(
+                        STORAGE_KEY
+                    );
+
+
+                    state =
+                        cloneDefaultState();
+
+
+                    closeModal();
+
+
+                    location.reload();
+
+                }
+            );
+
+    }
+
+
+    /* =====================================================
+       EVENT BINDING
+    ====================================================== */
+
+    function bindAppEvents() {
+
+        /* Navigation */
+
+        $$(".nav-item")
+            .forEach(button => {
+
+                button.addEventListener(
+                    "click",
+                    () => {
+
+                        navigate(
+                            button.dataset.page
+                        );
+
+                    }
+                );
+
+            });
+
+
+        /* Top controls */
+
+        $("#searchBtn")
+            ?.addEventListener(
+                "click",
+                openPalette
+            );
+
+
+        $("#themeBtn")
+            ?.addEventListener(
+                "click",
+                toggleTheme
+            );
+
+
+        $("#settingsTheme")
+            ?.addEventListener(
+                "click",
+                toggleTheme
+            );
+
+
+        $("#notificationBtn")
+            ?.addEventListener(
+                "click",
+                event => {
+
+                    event.stopPropagation();
+
+                    toggleDropdown(
+                        "notificationMenu"
+                    );
+
+                }
+            );
+
+
+        $("#markRead")
+            ?.addEventListener(
+                "click",
+                markNotificationsRead
+            );
+
+
+        /* Workspace */
+
+        $("#workspaceSwitcher")
+            ?.addEventListener(
+                "click",
+                event => {
+
+                    event.stopPropagation();
+
+                    toggleDropdown(
+                        "workspaceMenu"
+                    );
+
+                }
+            );
+
+
+        $("#addWorkspaceBtn")
+            ?.addEventListener(
+                "click",
+                () => {
+
+                    closeDropdowns();
+
+                    openWorkspaceModal();
+
+                }
+            );
+
+
+        /* Tasks */
+
+        $("#newTaskBtn")
+            ?.addEventListener(
+                "click",
+                () =>
+                    openTaskModal()
+            );
+
+
+        $("#addTaskText")
+            ?.addEventListener(
+                "click",
+                () =>
+                    openTaskModal()
+            );
+
+
+        /* Quick actions */
+
+        $("#quickAgent")
+            ?.addEventListener(
+                "click",
+                openAgentModal
+            );
+
+
+        $("#quickWorkflow")
+            ?.addEventListener(
+                "click",
+                openWorkflowModal
+            );
+
+
+        $("#quickInsight")
+            ?.addEventListener(
+                "click",
+                () =>
+                    navigate("insights")
+            );
+
+
+        $("#quickResearch")
+            ?.addEventListener(
+                "click",
+                () => {
+
+                    openTaskModal();
+
+                    setTimeout(
+                        () => {
+
+                            if ($("#modalTaskTitle")) {
+
+                                $("#modalTaskTitle")
+                                    .value =
+                                    "Research new topic";
+
+                                $("#modalTaskDescription")
+                                    .value =
+                                    "Start a focused research task.";
+
+                                $("#modalTaskPriority")
+                                    .value =
+                                    "medium";
+
+                            }
+
+                        },
+                        50
+                    );
+
+                }
+            );
+
+
+        /* Page links */
+
+        $$("[data-go]")
+            .forEach(button => {
+
+                button.addEventListener(
+                    "click",
+                    () => {
+
+                        navigate(
+                            button.dataset.go
+                        );
+
+                    }
+                );
+
+            });
+
+
+        /* AI form */
+
+        $("#aiForm")
+            ?.addEventListener(
+                "submit",
+                event => {
+
+                    event.preventDefault();
+
+                    const input =
+                        $("#aiInput");
+
+                    const command =
+                        input.value.trim();
+
+
+                    if (!command) {
+
+                        showToast(
+                            "Ask NEXUS something first.",
+                            "error"
+                        );
+
+                        return;
+                    }
+
+
+                    executeAICommand(
+                        command
+                    );
+
+
+                    input.value = "";
+
+                }
+            );
+
+
+        /* AI suggestion chips */
+
+        $$(".ai-chips button")
+            .forEach(button => {
+
+                button.addEventListener(
+                    "click",
+                    () => {
+
+                        const command =
+                            button.dataset.command;
+
+                        $("#aiInput").value =
+                            command;
+
+                        executeAICommand(
+                            command
+                        );
+
+                        $("#aiInput").value = "";
+
+                    }
+                );
+
+            });
+
+
+        /* Refresh */
+
+        $("#refreshBtn")
+            ?.addEventListener(
+                "click",
+                refreshWorkspace
+            );
+
+
+        /* Agents */
+
+        $("#createAgentBtn")
+            ?.addEventListener(
+                "click",
+                openAgentModal
+            );
+
+
+        /* Workflows */
+
+        $("#createWorkflowBtn")
+            ?.addEventListener(
+                "click",
+                openWorkflowModal
+            );
+
+
+        /* Integrations */
+
+        $$("[data-integration]")
+            .forEach(button => {
+
+                button.addEventListener(
+                    "click",
+                    () => {
+
+                        toggleIntegration(
+                            button.dataset.integration
+                        );
+
+                    }
+                );
+
+            });
+
+
+        /* Profile */
+
+        $("#profileBtn")
+            ?.addEventListener(
+                "click",
+                openProfileModal
+            );
+
+
+        $("#settingsProfile")
+            ?.addEventListener(
+                "click",
+                openProfileModal
+            );
+
+
+        /* Help */
+
+        $("#helpBtn")
+            ?.addEventListener(
+                "click",
+                openHelpModal
+            );
+
+
+        /* Notifications */
+
+        $("#notificationToggle")
+            ?.addEventListener(
+                "change",
+                event =>
+                    updateNotificationPreference(
+                        event.target.checked
+                    )
+            );
+
+
+        /* Reset */
+
+        $("#resetBtn")
+            ?.addEventListener(
+                "click",
+                resetWorkspace
+            );
+
+
+        /* Modal close */
+
+        $("#modalClose")
+            ?.addEventListener(
+                "click",
+                closeModal
+            );
+
+
+        /* Sidebar */
+
+        $("#openSidebar")
+            ?.addEventListener(
+                "click",
+                openSidebarMobile
+            );
+
+
+        $("#closeSidebar")
+            ?.addEventListener(
+                "click",
+                closeSidebarMobile
+            );
+
+
+        $("#sidebarOverlay")
+            ?.addEventListener(
+                "click",
+                closeSidebarMobile
+            );
+
+
+        /* Palette search */
+
+        $("#paletteInput")
+            ?.addEventListener(
+                "input",
+                event =>
+                    renderPalette(
+                        event.target.value
+                    )
+            );
+
+
+        /* Palette overlay */
+
+        $("#paletteOverlay")
+            ?.addEventListener(
+                "click",
+                event => {
+
+                    if (
+                        event.target ===
+                        $("#paletteOverlay")
+                    ) {
+
+                        closePalette();
+
+                    }
+
+                }
+            );
+
+
+        /* Modal overlay */
+
+        $("#modalOverlay")
+            ?.addEventListener(
+                "click",
+                event => {
+
+                    if (
+                        event.target ===
+                        $("#modalOverlay")
+                    ) {
+
+                        closeModal();
+
+                    }
+
+                }
+            );
+
+
+        /* Keyboard shortcuts */
+
+        document.addEventListener(
+            "keydown",
+            handleKeyboard
+        );
+
+
+        /* Outside click */
+
+        document.addEventListener(
+            "click",
+            event => {
+
+                if (
+                    !event.target.closest(
+                        ".workspace-container"
+                    ) &&
+                    !event.target.closest(
+                        ".notification-container"
+                    )
+                ) {
+
+                    closeDropdowns();
+
+                }
+
+            }
+        );
+
+    }
+
+
+    /* =====================================================
+       KEYBOARD
+    ====================================================== */
+
+    function handleKeyboard(event) {
+
+        const key =
+            event.key.toLowerCase();
+
+
+        if (
+            (event.ctrlKey || event.metaKey) &&
+            key === "k"
+        ) {
+
+            event.preventDefault();
+
+            openPalette();
+
+            return;
+        }
+
+
+        if (key === "escape") {
+
+            closePalette();
+
+            closeModal();
+
+            closeDropdowns();
+
+            return;
+
+        }
+
+
+        const palette =
+            $("#paletteOverlay");
+
+
+        if (
+            !palette?.classList.contains(
+                "hidden"
+            )
+        ) {
+
+            if (key === "enter") {
+
+                const selected =
+                    $(".palette-item.selected");
+
+                selected?.click();
+
+            }
+
+        }
+
+    }
+
+
+    /* =====================================================
+       TOAST
+    ====================================================== */
+
+    function showToast(
+        message,
+        type = "success"
+    ) {
+
+        const toast =
+            $("#toast");
+
+
+        if (!toast) {
+            return;
+        }
+
+
+        clearTimeout(
+            toastTimer
+        );
+
+
+        toast.textContent =
+            message;
+
+
+        toast.className =
+            `toast ${type}`;
+
+
+        toast.classList.remove(
+            "hidden"
+        );
+
+
+        toastTimer =
+            setTimeout(
+                () => {
+
+                    toast.classList.add(
+                        "hidden"
+                    );
+
+                },
+                3000
+            );
+
+    }
+
+
+    /* =====================================================
+       UTILITY
+    ====================================================== */
+
+    function setText(
+        selector,
+        value
+    ) {
+
+        const element =
+            $(selector);
+
+
+        if (element) {
+            element.textContent =
+                String(value);
+        }
+
+    }
+
+
+    function isValidEmail(email) {
+
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+            .test(email);
+
+    }
+
+
+    function capitalize(value) {
+
+        return value
+            ? value.charAt(0).toUpperCase() +
+              value.slice(1)
+            : "";
+
+    }
+
+
+    function escapeHTML(value) {
+
+        return String(value ?? "")
+            .replaceAll("&", "&amp;")
+            .replaceAll("<", "&lt;")
+            .replaceAll(">", "&gt;")
+            .replaceAll('"', "&quot;")
+            .replaceAll("'", "&#039;");
+
+    }
+
+
+    function escapeAttribute(value) {
+
+        return escapeHTML(value);
+
+    }
+
+
+    function formatRelativeTime(timestamp) {
+
+        const difference =
+            Math.max(
+                0,
+                Date.now() - timestamp
+            );
+
+
+        const seconds =
+            Math.floor(
+                difference / 1000
+            );
+
+
+        if (seconds < 10) {
+            return "just now";
+        }
+
+
+        if (seconds < 60) {
+            return `${seconds}s ago`;
+        }
+
+
+        const minutes =
+            Math.floor(
+                seconds / 60
+            );
+
+
+        if (minutes < 60) {
+            return `${minutes}m ago`;
+        }
+
+
+        const hours =
+            Math.floor(
+                minutes / 60
+            );
+
+
+        if (hours < 24) {
+            return `${hours}h ago`;
+        }
+
+
+        const days =
+            Math.floor(
+                hours / 24
+            );
+
+
+        if (days < 30) {
+            return `${days}d ago`;
+        }
+
+
+        return new Date(timestamp)
+            .toLocaleDateString();
+
+    }
+
+
+    /* =====================================================
+       START APPLICATION
+    ====================================================== */
+
+    init();
+
+})();
