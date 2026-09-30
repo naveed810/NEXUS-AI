@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="NEXUS AI Agent Hub — manage, monitor, and run AI agents from one workspace.">
+
+    <title>NEXUS AI — Agent Hub</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<div class="app-shell">
+
+    <!-- ================= SIDEBAR ================= -->
+
+    <aside class="sidebar" id="sidebar">
+
+        <div class="brand">
+            <div class="brand-mark">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+
+            <div>
+                <h1>NEXUS</h1>
+                <small>AI WORKSPACE</small>
+            </div>
+        </div>
+
+        <nav class="main-nav">
+
+            <p class="nav-label">WORKSPACE</p>
+
+            <button class="nav-item" data-page="Command Center">
+                <span class="nav-icon">⌂</span>
+                <span>Command Center</span>
+            </button>
+
+            <button class="nav-item active" data-page="Agent Hub">
+                <span class="nav-icon">✦</span>
+                <span>Agent Hub</span>
+                <span class="nav-badge">4</span>
+            </button>
+
+            <button class="nav-item" data-page="Workflow Builder">
+                <span class="nav-icon">⌘</span>
+                <span>Workflow Builder</span>
+            </button>
+
+            <button class="nav-item" data-page="AI Insights">
+                <span class="nav-icon">◈</span>
+                <span>AI Insights</span>
+            </button>
+
+            <p class="nav-label">SYSTEM</p>
+
+            <button class="nav-item" id="integrationsBtn">
+                <span class="nav-icon">◎</span>
+                <span>Integrations</span>
+            </button>
+
+            <button class="nav-item" id="settingsBtn">
+                <span class="nav-icon">⚙</span>
+                <span>Settings</span>
+            </button>
+
+        </nav>
+
+        <div class="sidebar-bottom">
+
+            <div class="system-status">
+                <span class="status-dot"></span>
+
+                <div>
+                    <strong>All systems operational</strong>
+                    <small>API latency 84ms</small>
+                </div>
+            </div>
+
+            <div class="user-mini">
+                <div class="avatar">N</div>
+
+                <div class="user-info">
+                    <strong>Nexus User</strong>
+                    <small>Administrator</small>
+                </div>
+
+                <button id="userMenuBtn" class="icon-button">⋮</button>
+            </div>
+
+        </div>
+
+    </aside>
+
+    <!-- ================= MAIN ================= -->
+
+    <main class="main-content">
+
+        <!-- TOP BAR -->
+
+        <header class="topbar">
+
+            <button class="mobile-menu" id="mobileMenuBtn">☰</button>
+
+            <div class="breadcrumb">
+                <span>NEXUS</span>
+                <b>/</b>
+                <strong>Agent Hub</strong>
+            </div>
+
+            <div class="top-actions">
+
+                <button class="icon-button" id="searchBtn" title="Search">
+                    ⌕
+                </button>
+
+                <button class="icon-button notification-button" id="notificationBtn">
+                    ♢
+                    <span class="notification-dot"></span>
+                </button>
+
+                <button class="create-top-btn" id="createAgentTop">
+                    <span>+</span>
+                    Create Agent
+                </button>
+
+            </div>
+
+        </header>
+
+
+        <!-- ================= PAGE ================= -->
+
+        <section class="page-content">
+
+            <!-- HERO -->
+
+            <div class="hero-section">
+
+                <div>
+                    <div class="eyebrow">
+                        <span class="pulse-dot"></span>
+                        AUTONOMOUS AI CONTROL
+                    </div>
+
+                    <h2>Agent <span>Hub</span></h2>
+
+                    <p>
+                        Build, monitor and orchestrate intelligent AI agents
+                        from one unified workspace.
+                    </p>
+                </div>
+
+                <button class="primary-button" id="createAgentBtn">
+                    <span>+</span>
+                    Create New Agent
+                </button>
+
+            </div>
+
+
+            <!-- METRIC CARDS -->
+
+            <div class="metrics-grid">
+
+                <div class="metric-card">
+
+                    <div class="metric-top">
+                        <span>ACTIVE AGENTS</span>
+                        <div class="metric-icon green">✦</div>
+                    </div>
+
+                    <div class="metric-value" id="activeCount">2</div>
+
+                    <div class="metric-footer">
+                        <span class="positive">+12.5%</span>
+                        <span>vs last week</span>
+                    </div>
+
+                </div>
+
+
+                <div class="metric-card">
+
+                    <div class="metric-top">
+                        <span>TASKS COMPLETED</span>
+                        <div class="metric-icon purple">✓</div>
+                    </div>
+
+                    <div class="metric-value" id="completedCount">1,284</div>
+
+                    <div class="metric-footer">
+                        <span class="positive">+24.8%</span>
+                        <span>this month</span>
+                    </div>
+
+                </div>
+
+
+                <div class="metric-card">
+
+                    <div class="metric-top">
+                        <span>SUCCESS RATE</span>
+                        <div class="metric-icon blue">◉</div>
+                    </div>
+
+                    <div class="metric-value">96.8<span>%</span></div>
+
+                    <div class="metric-footer">
+                        <span class="positive">+2.4%</span>
+                        <span>performance</span>
+                    </div>
+
+                </div>
+
+
+                <div class="metric-card">
+
+                    <div class="metric-top">
+                        <span>AVG RESPONSE</span>
+                        <div class="metric-icon orange">⚡</div>
+                    </div>
+
+                    <div class="metric-value">1.42<span>s</span></div>
+
+                    <div class="metric-footer">
+                        <span class="positive">-18.2%</span>
+                        <span>faster</span>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- CONTROL BAR -->
+
+            <div class="control-bar">
+
+                <div class="tabs">
+
+                    <button class="tab active" data-filter="all">
+                        All Agents
+                        <span>4</span>
+                    </button>
+
+                    <button class="tab" data-filter="active">
+                        Active
+                        <span>2</span>
+                    </button>
+
+                    <button class="tab" data-filter="paused">
+                        Paused
+                        <span>1</span>
+                    </button>
+
+                    <button class="tab" data-filter="draft">
+                        Draft
+                        <span>1</span>
+                    </button>
+
+                </div>
+
+                <div class="controls-right">
+
+                    <div class="search-box">
+                        <span>⌕</span>
+                        <input
+                            type="text"
+                            id="agentSearch"
+                            placeholder="Search agents..."
+                        >
+                    </div>
+
+                    <button class="filter-button" id="filterBtn">
+                        ☷ Filter
+                    </button>
+
+                    <button class="sort-button" id="sortBtn">
+                        ↕ Sort
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <!-- AGENT GRID -->
+
+            <div class="section-heading">
+
+                <div>
+                    <h3>Your AI Agents</h3>
+                    <p>Monitor and control autonomous agents.</p>
+                </div>
+
+                <button class="text-button" id="refreshBtn">
+                    ↻ Refresh
+                </button>
+
+            </div>
+
+
+            <div class="agents-grid" id="agentsGrid">
+
+
+                <!-- RESEARCH AGENT -->
+
+                <article
+                    class="agent-card"
+                    data-name="Research Agent"
+                    data-status="active"
+                >
+
+                    <div class="agent-card-header">
+
+                        <div class="agent-avatar research">
+                            🔎
+                        </div>
+
+                        <div class="agent-title">
+                            <h4>Research Agent</h4>
+
+                            <span class="status active-status">
+                                <i></i>
+                                Active
+                            </span>
+                        </div>
+
+                        <button class="more-button" data-menu="research">
+                            ⋮
+                        </button>
+
+                    </div>
+
+                    <p class="agent-description">
+                        Searches, analyzes and summarizes information
+                        from multiple sources.
+                    </p>
+
+                    <div class="agent-stats">
+
+                        <div>
+                            <span>Tasks</span>
+                            <strong class="task-count">342</strong>
+                        </div>
+
+                        <div>
+                            <span>Success</span>
+                            <strong>98.4%</strong>
+                        </div>
+
+                        <div>
+                            <span>Avg. Time</span>
+                            <strong>2.1s</strong>
+                        </div>
+
+                    </div>
+
+                    <div class="progress-wrapper">
+
+                        <div class="progress-label">
+                            <span>Current task</span>
+                            <span class="current-task">Researching AI trends...</span>
+                        </div>
+
+                        <div class="progress-bar">
+                            <span style="width: 72%"></span>
+                        </div>
+
+                    </div>
+
+                    <div class="agent-card-footer">
+
+                        <span class="last-run">
+                            Last run 2 min ago
+                        </span>
+
+                        <button
+                            class="run-button"
+                            data-agent="Research Agent"
+                        >
+                            ▶ Run
+                        </button>
+
+                    </div>
+
+                </article>
+
+
+                <!-- CONTENT AGENT -->
+
+                <article
+                    class="agent-card"
+                    data-name="Content Agent"
+                    data-status="active"
+                >
+
+                    <div class="agent-card-header">
+
+                        <div class="agent-avatar content">
+                            ✍
+                        </div>
+
+                        <div class="agent-title">
+                            <h4>Content Agent</h4>
+
+                            <span class="status active-status">
+                                <i></i>
+                                Active
+                            </span>
+                        </div>
+
+                        <button class="more-button" data-menu="content">
+                            ⋮
+                        </button>
+
+                    </div>
+
+                    <p class="agent-description">
+                        Creates, edits and optimizes content for
+                        different audiences.
+                    </p>
+
+                    <div class="agent-stats">
+
+                        <div>
+                            <span>Tasks</span>
+                            <strong class="task-count">287</strong>
+                        </div>
+
+                        <div>
+                            <span>Success</span>
+                            <strong>97.1%</strong>
+                        </div>
+
+                        <div>
+                            <span>Avg. Time</span>
+                            <strong>1.8s</strong>
+                        </div>
+
+                    </div>
+
+                    <div class="progress-wrapper">
+
+                        <div class="progress-label">
+                            <span>Current task</span>
+                            <span class="current-task">Drafting campaign copy...</span>
+                        </div>
+
+                        <div class="progress-bar">
+                            <span style="width: 45%"></span>
+                        </div>
+
+                    </div>
+
+                    <div class="agent-card-footer">
+
+                        <span class="last-run">
+                            Last run 5 min ago
+                        </span>
+
+                        <button
+                            class="run-button"
+                            data-agent="Content Agent"
+                        >
+                            ▶ Run
+                        </button>
+
+                    </div>
+
+                </article>
+
+
+                <!-- DATA AGENT -->
+
+                <article
+                    class="agent-card"
+                    data-name="Data Analyst"
+                    data-status="paused"
+                >
+
+                    <div class="agent-card-header">
+
+                        <div class="agent-avatar data">
+                            ◈
+                        </div>
+
+                        <div class="agent-title">
+                            <h4>Data Analyst</h4>
+
+                            <span class="status paused-status">
+                                <i></i>
+                                Paused
+                            </span>
+                        </div>
+
+                        <button class="more-button" data-menu="data">
+                            ⋮
+                        </button>
+
+                    </div>
+
+                    <p class="agent-description">
+                        Analyzes datasets and transforms raw data
+                        into actionable insights.
+                    </p>
+
+                    <div class="agent-stats">
+
+                        <div>
+                            <span>Tasks</span>
+                            <strong class="task-count">451</strong>
+                        </div>
+
+                        <div>
+                            <span>Success</span>
+                            <strong>95.7%</strong>
+                        </div>
+
+                        <div>
+                            <span>Avg. Time</span>
+                            <strong>3.4s</strong>
+                        </div>
+
+                    </div>
+
+                    <div class="progress-wrapper">
+
+                        <div class="progress-label">
+                            <span>Current task</span>
+                            <span class="current-task">Agent paused</span>
+                        </div>
+
+                        <div class="progress-bar muted">
+                            <span style="width: 0%"></span>
+                        </div>
+
+                    </div>
+
+                    <div class="agent-card-footer">
+
+                        <span class="last-run">
+                            Last run 1 hour ago
+                        </span>
+
+                        <button
+                            class="run-button"
+                            data-agent="Data Analyst"
+                        >
+                            ▶ Run
+                        </button>
+
+                    </div>
+
+                </article>
+
+
+                <!-- CUSTOMER AGENT -->
+
+                <article
+                    class="agent-card"
+                    data-name="Customer Support"
+                    data-status="draft"
+                >
+
+                    <div class="agent-card-header">
+
+                        <div class="agent-avatar support">
+                            ♧
+                        </div>
+
+                        <div class="agent-title">
+                            <h4>Customer Support</h4>
+
+                            <span class="status draft-status">
+                                <i></i>
+                                Draft
+                            </span>
+                        </div>
+
+                        <button class="more-button" data-menu="support">
+                            ⋮
+                        </button>
+
+                    </div>
+
+                    <p class="agent-description">
+                        Handles customer questions and routes
+                        complex issues to human teams.
+                    </p>
+
+                    <div class="agent-stats">
+
+                        <div>
+                            <span>Tasks</span>
+                            <strong class="task-count">204</strong>
+                        </div>
+
+                        <div>
+                            <span>Success</span>
+                            <strong>94.2%</strong>
+                        </div>
+
+                        <div>
+                            <span>Avg. Time</span>
+                            <strong>2.7s</strong>
+                        </div>
+
+                    </div>
+
+                    <div class="progress-wrapper">
+
+                        <div class="progress-label">
+                            <span>Current task</span>
+                            <span class="current-task">Ready to deploy</span>
+                        </div>
+
+                        <div class="progress-bar muted">
+                            <span style="width: 0%"></span>
+                        </div>
+
+                    </div>
+
+                    <div class="agent-card-footer">
+
+                        <span class="last-run">
+                            Never run
+                        </span>
+
+                        <button
+                            class="run-button"
+                            data-agent="Customer Support"
+                        >
+                            ▶ Run
+                        </button>
+
+                    </div>
+
+                </article>
+
+            </div>
+
+
+            <!-- ACTIVITY -->
+
+            <section class="activity-section">
+
+                <div class="section-heading">
+
+                    <div>
+                        <h3>Live Activity</h3>
+                        <p>Real-time agent execution events.</p>
+                    </div>
+
+                    <button class="text-button" id="clearActivityBtn">
+                        Clear
+                    </button>
+
+                </div>
+
+
+                <div class="activity-panel" id="activityPanel">
+
+                    <div class="activity-item">
+
+                        <div class="activity-icon success">✓</div>
+
+                        <div class="activity-content">
+                            <strong>Research Agent completed a task</strong>
+                            <span>AI industry report generated successfully</span>
+                        </div>
+
+                        <time>2m ago</time>
+
+                    </div>
+
+
+                    <div class="activity-item">
+
+                        <div class="activity-icon purple">✦</div>
+
+                        <div class="activity-content">
+                            <strong>Content Agent started execution</strong>
+                            <span>Campaign content generation initiated</span>
+                        </div>
+
+                        <time>5m ago</time>
+
+                    </div>
+
+
+                    <div class="activity-item">
+
+                        <div class="activity-icon warning">!</div>
+
+                        <div class="activity-content">
+                            <strong>Data Analyst was paused</strong>
+                            <span>Manual intervention required</span>
+                        </div>
+
+                        <time>1h ago</time>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+        </section>
+
+    </main>
+
+</div>
+
+
+<!-- ================= CREATE AGENT MODAL ================= -->
+
+<div class="modal-overlay" id="createModal">
+
+    <div class="modal">
+
+        <button class="modal-close" id="closeCreateModal">×</button>
+
+        <div class="modal-header">
+
+            <div class="modal-icon">✦</div>
+
+            <div>
+                <h3>Create AI Agent</h3>
+                <p>Configure your autonomous agent.</p>
+            </div>
+
+        </div>
+
+
+        <form id="agentForm">
+
+            <label>
+                Agent Name
+                <input
+                    type="text"
+                    id="agentName"
+                    placeholder="e.g. Marketing Agent"
+                    required
+                >
+            </label>
+
+
+            <label>
+                Agent Type
+
+                <select id="agentType">
+
+                    <option value="research">Research</option>
+                    <option value="content">Content</option>
+                    <option value="analytics">Analytics</option>
+                    <option value="support">Customer Support</option>
+                    <option value="custom">Custom Agent</option>
+
+                </select>
+
+            </label>
+
+
+            <label>
+                Objective
+
+                <textarea
+                    id="agentObjective"
+                    placeholder="Describe what this agent should accomplish..."
+                    required
+                ></textarea>
+
+            </label>
+
+
+            <label>
+                Autonomy Level
+
+                <div class="range-container">
+
+                    <input
+                        type="range"
+                        id="autonomyRange"
+                        min="1"
+                        max="5"
+                        value="3"
+                    >
+
+                    <strong id="autonomyValue">3 / 5</strong>
+
+                </div>
+
+            </label>
+
+
+            <div class="modal-actions">
+
+                <button
+                    type="button"
+                    class="secondary-button"
+                    id="cancelCreate"
+                >
+                    Cancel
+                </button>
+
+                <button
+                    type="submit"
+                    class="primary-button"
+                >
+                    Create Agent
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+<!-- ================= CHATBOT ================= -->
+
+<button class="chat-toggle" id="chatToggle">
+    <span>✦</span>
+</button>
+
+
+<div class="chat-window" id="chatWindow">
+
+    <div class="chat-header">
+
+        <div>
+
+            <strong>NEXUS Assistant</strong>
+
+            <span>
+                <i></i>
+                Online
+            </span>
+
+        </div>
+
+        <button id="closeChat">×</button>
+
+    </div>
+
+
+    <div class="chat-messages" id="chatMessages">
+
+        <div class="message bot">
+            Hey! I'm NEXUS Assistant. Ask me about your agents or executions.
+        </div>
+
+    </div>
+
+
+    <div class="chat-input">
+
+        <input
+            type="text"
+            id="chatInput"
+            placeholder="Ask NEXUS..."
+        >
+
+        <button id="sendChat">➤</button>
+
+    </div>
+
+</div>
+
+
+<!-- ================= TOAST ================= -->
+
+<div class="toast-container" id="toastContainer"></div>
+
+
+<script src="script.js"></script>
+
+</body>
+</html>
