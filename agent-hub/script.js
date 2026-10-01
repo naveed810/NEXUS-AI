@@ -11,6 +11,20 @@
 
 const STORAGE_KEY = "nexus_agent_hub_state_v1";
 
+function syncNexusProfile() {
+    try {
+        const raw = localStorage.getItem("nexus_ai_command_center_v4");
+        const state = raw ? JSON.parse(raw) : {};
+        const name = state?.user?.name || "NEXUS User";
+        const email = state?.user?.email || "user@example.com";
+        const avatar = name.trim().charAt(0).toUpperCase() || "N";
+        document.getElementById("profileName")?.replaceChildren(document.createTextNode(name));
+        document.getElementById("profileEmail")?.replaceChildren(document.createTextNode(email));
+        document.getElementById("profileAvatar")?.replaceChildren(document.createTextNode(avatar));
+    } catch (_) {}
+}
+
+
 
 /* =========================================================
    DEFAULT AGENTS
@@ -235,6 +249,7 @@ function saveState() {
 ========================================================= */
 
 document.addEventListener("DOMContentLoaded", () => {
+    syncNexusProfile();
 
     applyTheme();
 
@@ -2277,49 +2292,26 @@ function toggleTheme() {
 
 function handleNavigation(destination) {
 
-    $$(".nav-item").forEach(
-        (button) =>
-            button.classList.toggle(
-                "active",
-                button.dataset.nav === destination
-            )
-    );
-
-
-    if (destination === "agents") {
-
-        $("#agentsSection")?.scrollIntoView({
-            behavior: "smooth",
-            block: "start"
-        });
-
-        return;
-
-    }
-
-
-    const messages = {
-
-        command:
-            "Command Center belongs to the main workspace. This Agent Hub keeps agent operations focused.",
-
-        workflows:
-            "Workflow Builder is the automation module for connecting agents and tasks.",
-
-        insights:
-            "AI Insights will provide analytics and performance intelligence.",
-
-        tasks:
-            "Tasks are managed through the Command Center and agent execution layer.",
-
-        activity:
-            "Showing the latest Agent Hub system activity.",
-
-        settings:
-            "Agent Hub settings are ready for backend integration."
-
+    const routes = {
+        command: "../command-center/index.html",
+        agents: "../agent-hub/index.html",
+        workflows: "../workflow-builder/index.html",
+        insights: "../ai-insights/index.html"
     };
 
+    if (routes[destination]) {
+        window.location.href = routes[destination];
+        return;
+    }
+
+    const messages = {
+        tasks:
+            "Tasks are managed through the Command Center and agent execution layer.",
+        activity:
+            "Showing the latest Agent Hub system activity.",
+        settings:
+            "Agent Hub settings are ready for backend integration."
+    };
 
     showToast(
         capitalize(destination),

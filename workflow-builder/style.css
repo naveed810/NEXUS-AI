@@ -1236,3 +1236,158 @@ body {
     }
 
 }
+
+/* ================= MODULE NAVIGATION ================= */
+
+.module-nav {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-left: auto;
+    margin-right: 18px;
+    padding: 5px;
+    border: 1px solid rgba(255,255,255,.08);
+    border-radius: 14px;
+    background: rgba(255,255,255,.03);
+    backdrop-filter: blur(14px);
+}
+
+.module-nav a {
+    color: rgba(255,255,255,.68);
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 9px 11px;
+    border-radius: 10px;
+    transition: .2s ease;
+    white-space: nowrap;
+}
+
+.module-nav a:hover {
+    color: #fff;
+    background: rgba(255,255,255,.07);
+    transform: translateY(-1px);
+}
+
+.module-nav a.active {
+    color: #fff;
+    background: linear-gradient(135deg, rgba(93, 225, 255, .18), rgba(154, 104, 255, .18));
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,.08);
+}
+
+@media (max-width: 1100px) {
+    .module-nav {
+        margin-right: 10px;
+    }
+
+    .module-nav a {
+        padding: 8px;
+        font-size: 11px;
+    }
+}
+
+@media (max-width: 820px) {
+    .module-nav {
+        order: 3;
+        width: 100%;
+        margin: 8px 0 0;
+        overflow-x: auto;
+        justify-content: flex-start;
+    }
+
+    .module-nav a {
+        flex: 0 0 auto;
+    }
+}
+
+
+/* =========================================================
+   NEXUS SHARED WORKSPACE NAVIGATION
+========================================================= */
+.sidebar-workspace {
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:10px 10px 16px;
+    margin-bottom:12px;
+    border-bottom:1px solid var(--border);
+}
+.sidebar-workspace .workspace-icon {
+    width:34px;
+    height:34px;
+    display:grid;
+    place-items:center;
+    border-radius:10px;
+    color:#fff;
+    font-weight:900;
+    background:linear-gradient(135deg,#46dfff,#9b7cff);
+    box-shadow:0 8px 24px rgba(70,223,255,.16);
+}
+.sidebar-workspace strong { display:block; font-size:12px; }
+.sidebar-workspace span { display:block; color:var(--muted); font-size:10px; margin-top:2px; }
+.module-sidebar-nav { display:grid; gap:4px; margin-bottom:20px; }
+.module-sidebar-nav .nav-label {
+    color:#68758a; font-size:10px; font-weight:800; letter-spacing:.12em; margin:0 0 5px 8px;
+}
+.module-sidebar-nav a {
+    display:flex; align-items:center; gap:10px; min-height:40px; padding:0 10px;
+    color:var(--muted); border:1px solid transparent; border-radius:10px;
+    text-decoration:none; font-size:12px; font-weight:700; transition:.18s ease;
+}
+.module-sidebar-nav a span { width:18px; text-align:center; color:#46dfff; }
+.module-sidebar-nav a:hover { color:var(--text); background:rgba(255,255,255,.045); border-color:var(--border); transform:translateX(1px); }
+.module-sidebar-nav a.active {
+    color:var(--text); background:linear-gradient(90deg,rgba(70,223,255,.12),rgba(155,124,255,.08));
+    border-color:rgba(70,223,255,.18); box-shadow:inset 2px 0 0 #46dfff;
+}
+.mobile-menu-btn { display:none; }
+
+@media (max-width:760px) {
+    .topbar { position:relative; padding-left:12px; }
+    .mobile-menu-btn {
+        display:grid; place-items:center; width:34px; height:34px; margin-right:2px;
+        border:1px solid var(--border); border-radius:9px; background:rgba(255,255,255,.04); color:var(--text);
+    }
+    .workspace { position:relative; display:block; }
+    .sidebar {
+        position:fixed; z-index:60; left:-292px; top:0; bottom:0; width:270px; height:100vh;
+        transition:left .22s ease; box-shadow:20px 0 60px rgba(0,0,0,.35);
+    }
+    .sidebar.open { left:0; }
+    .sidebar::after {
+        content:""; position:fixed; inset:0; left:270px; background:rgba(0,0,0,.42); backdrop-filter:blur(2px);
+        opacity:0; pointer-events:none; transition:.22s ease;
+    }
+    .sidebar.open::after { opacity:1; pointer-events:auto; }
+    .canvas-panel { min-height:calc(100vh - 72px); }
+}
+
+
+/* =========================================================
+   NEXUS AI SHARED VISUAL SYSTEM — FINAL
+========================================================= */
+:root{--nexus-bg:#070a12;--nexus-bg-2:#0b0f1a;--nexus-surface:rgba(15,20,33,.82);--nexus-border:rgba(255,255,255,.08);--nexus-text:#f5f7ff;--nexus-muted:#a8b0c2;--nexus-faint:#687287;--nexus-cyan:#46dfff;--nexus-purple:#9b7cff;}
+html,body{background:var(--nexus-bg);color:var(--nexus-text);}
+body{background-image:radial-gradient(circle at 10% 8%,rgba(70,223,255,.07),transparent 28%),radial-gradient(circle at 88% 16%,rgba(155,124,255,.08),transparent 30%),linear-gradient(180deg,#070a12,#0b0f1a);}
+.topbar{background:rgba(7,10,18,.84)!important;border-bottom:1px solid var(--nexus-border)!important;backdrop-filter:blur(18px);}
+.brand-mark{position:relative!important;width:40px!important;height:40px!important;border-radius:13px!important;background:linear-gradient(135deg,rgba(70,223,255,.18),rgba(155,124,255,.22))!important;border:1px solid rgba(70,223,255,.28)!important;display:grid!important;place-items:center!important;box-shadow:0 0 30px rgba(70,223,255,.10)!important;color:#fff!important;}
+.brand-mark:before{content:"";position:absolute;width:27px;height:27px;border:1px solid rgba(70,223,255,.75);border-radius:50%;transform:rotate(-28deg);}
+.brand-mark:after{content:"N";position:relative;font-weight:800;font-size:15px;}
+.brand-wrap .brand-mark{font-size:0;}
+.brand{color:#fff!important;letter-spacing:.12em!important;font-weight:800!important;}
+.brand-subtitle{color:var(--nexus-faint)!important;letter-spacing:.16em!important;}
+.sidebar{background:rgba(7,10,18,.94)!important;border-right:1px solid var(--nexus-border)!important;backdrop-filter:blur(18px);}
+.sidebar-workspace{background:rgba(15,20,33,.76)!important;border:1px solid var(--nexus-border)!important;}
+.workspace-icon,.avatar{background:linear-gradient(135deg,#46dfff,#9b7cff)!important;color:#07101a!important;}
+.module-sidebar-nav a.active{background:linear-gradient(90deg,rgba(70,223,255,.13),rgba(155,124,255,.09))!important;border-color:rgba(70,223,255,.18)!important;box-shadow:inset 2px 0 0 #46dfff;}
+.workspace,.canvas,.node-palette,.sidebar-heading{background:transparent!important;}
+.node-card,.panel,.canvas-card,.toolbar,.inspector,.properties-panel,.workflow-panel{background:var(--nexus-surface)!important;border-color:var(--nexus-border)!important;}
+.btn-primary{background:linear-gradient(135deg,#46dfff,#9b7cff)!important;color:#061018!important;border:none!important;box-shadow:0 12px 30px rgba(70,223,255,.14)!important;}
+.btn-secondary,.btn-ghost,.side-btn,.icon-btn{background:rgba(255,255,255,.035)!important;color:var(--nexus-text)!important;border-color:var(--nexus-border)!important;}
+.sidebar-profile{display:flex;align-items:center;gap:10px;padding:10px;border:1px solid var(--nexus-border);border-radius:14px;background:rgba(255,255,255,.025);cursor:pointer;margin:14px 0;}
+.sidebar-profile .profile-info{display:flex;flex-direction:column;min-width:0;flex:1;}
+.sidebar-profile strong{font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.sidebar-profile span{font-size:10px;color:var(--nexus-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+@media(max-width:760px){.sidebar-profile{margin-top:10px;}.topbar-actions{gap:6px;}.topbar-actions .btn{padding:9px 10px;}}
+
+@media(max-width:760px){#workflowSidebar{transform:translateX(-110%);transition:transform .25s ease;position:fixed!important;left:0!important;top:0!important;bottom:0!important;width:min(86vw,330px)!important;z-index:1000;overflow-y:auto;}#workflowSidebar.open{transform:translateX(0);}body:has(#workflowSidebar.open)::after{content:"";position:fixed;inset:0;background:rgba(0,0,0,.58);z-index:999;pointer-events:none;}.mobile-menu-btn{display:grid!important;place-items:center;}}

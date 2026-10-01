@@ -1,3 +1,17 @@
+
+function syncNexusProfile() {
+    try {
+        const raw = localStorage.getItem("nexus_ai_command_center_v4");
+        const state = raw ? JSON.parse(raw) : {};
+        const name = state?.user?.name || "NEXUS User";
+        const email = state?.user?.email || "user@example.com";
+        const avatar = name.trim().charAt(0).toUpperCase() || "N";
+        document.getElementById("profileName")?.replaceChildren(document.createTextNode(name));
+        document.getElementById("profileEmail")?.replaceChildren(document.createTextNode(email));
+        document.getElementById("profileAvatar")?.replaceChildren(document.createTextNode(avatar));
+    } catch (_) {}
+}
+
 const state = {
 
     workflowName:
@@ -76,6 +90,8 @@ document.addEventListener(
     "DOMContentLoaded",
     () => {
 
+        syncNexusProfile();
+
         els.canvas =
             document.getElementById(
                 "workflowCanvas"
@@ -121,6 +137,26 @@ document.addEventListener(
                 "modalBackdrop"
             );
 
+
+        /*
+         * MOBILE WORKSPACE NAVIGATION
+         */
+        const mobileMenuBtn = document.getElementById("mobileMenuBtn");
+        const workflowSidebar = document.getElementById("workflowSidebar");
+
+        mobileMenuBtn?.addEventListener("click", () => {
+            workflowSidebar?.classList.toggle("open");
+        });
+
+        document.getElementById("sidebarProfile")?.addEventListener("click", () => {
+        window.location.href = "../command-center/index.html#profile";
+    });
+
+    document.querySelectorAll(".module-sidebar-nav a").forEach(link => {
+            link.addEventListener("click", () => {
+                workflowSidebar?.classList.remove("open");
+            });
+        });
 
         /*
          * NODE BUTTONS
