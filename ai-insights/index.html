@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="NEXUS AI Insights dashboard" />
+  <title>NEXUS AI — AI Insights</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+  <div class="app-shell">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar" aria-label="Primary navigation">
+
+      <div class="brand">
+        <div class="brand-mark">N</div>
+
+        <div>
+          <div class="brand-name">
+            NEXUS <span>AI</span>
+          </div>
+
+          <div class="brand-subtitle">
+            INTELLIGENCE PLATFORM
+          </div>
+        </div>
+      </div>
+
+      <nav class="nav-list">
+
+        <a
+          class="nav-item"
+          href="../command-center/index.html"
+          data-nav="Command Center"
+        >
+          <span class="nav-icon">⌂</span>
+          <span>Command Center</span>
+        </a>
+
+        <a
+          class="nav-item"
+          href="../agent-hub/index.html"
+          data-nav="Agent Hub"
+        >
+          <span class="nav-icon">◈</span>
+          <span>Agent Hub</span>
+        </a>
+
+        <a
+          class="nav-item"
+          href="../workflow-builder/index.html"
+          data-nav="Workflow Builder"
+        >
+          <span class="nav-icon">⌁</span>
+          <span>Workflow Builder</span>
+        </a>
+
+        <a
+          class="nav-item active"
+          href="index.html"
+          data-nav="AI Insights"
+          aria-current="page"
+        >
+          <span class="nav-icon">✦</span>
+          <span>AI Insights</span>
+        </a>
+
+      </nav>
+
+      <div class="sidebar-bottom">
+
+        <div class="system-status">
+          <span class="status-dot"></span>
+          <span>Systems operational</span>
+        </div>
+
+        <button
+          class="sidebar-action"
+          id="resetDataBtn"
+          type="button"
+        >
+          ↻ Reset demo data
+        </button>
+
+      </div>
+
+    </aside>
+
+
+    <!-- MAIN -->
+    <main class="main-content">
+
+      <!-- TOP BAR -->
+      <header class="topbar">
+
+        <div class="mobile-brand">
+          <button
+            class="icon-button"
+            id="menuBtn"
+            type="button"
+            aria-label="Open navigation"
+          >
+            ☰
+          </button>
+
+          <span>
+            NEXUS <b>AI</b>
+          </span>
+        </div>
+
+
+        <div class="topbar-title">
+
+          <div class="eyebrow">
+            ANALYTICS / INTELLIGENCE
+          </div>
+
+          <h1>AI Insights</h1>
+
+          <p>
+            Understand agent execution, reliability, and operational trends.
+          </p>
+
+        </div>
+
+
+        <div class="topbar-actions">
+
+          <label class="select-wrap">
+            <span>Range</span>
+
+            <select id="rangeSelect" aria-label="Select time range">
+              <option value="7">Last 7 days</option>
+              <option value="14">Last 14 days</option>
+              <option value="30" selected>Last 30 days</option>
+              <option value="90">Last 90 days</option>
+            </select>
+          </label>
+
+
+          <button
+            class="icon-button"
+            id="themeBtn"
+            type="button"
+            aria-label="Toggle theme"
+            title="Toggle theme"
+          >
+            ☾
+          </button>
+
+
+          <button
+            class="primary-button"
+            id="refreshBtn"
+            type="button"
+          >
+            <span>↻</span>
+            Refresh
+          </button>
+
+        </div>
+
+      </header>
+
+
+      <!-- CONTENT -->
+      <div class="content-wrap">
+
+        <!-- KPI CARDS -->
+        <section
+          class="kpi-grid"
+          aria-label="Key performance indicators"
+        >
+
+          <article class="kpi-card">
+
+            <div class="kpi-top">
+              <span>Total Runs</span>
+              <span class="kpi-icon">↗</span>
+            </div>
+
+            <div
+              class="kpi-value"
+              id="totalRuns"
+            >
+              0
+            </div>
+
+            <div class="kpi-meta">
+              <span
+                class="trend positive"
+                id="runsTrend"
+              >
+                +0%
+              </span>
+
+              vs previous period
+            </div>
+
+          </article>
+
+
+          <article class="kpi-card">
+
+            <div class="kpi-top">
+              <span>Success Rate</span>
+              <span class="kpi-icon">✓</span>
+            </div>
+
+            <div
+              class="kpi-value"
+              id="successRate"
+            >
+              0%
+            </div>
+
+            <div class="kpi-meta">
+
+              <span
+                class="trend positive"
+                id="successTrend"
+              >
+                +0%
+              </span>
+
+              reliability
+
+            </div>
+
+          </article>
+
+
+          <article class="kpi-card">
+
+            <div class="kpi-top">
+              <span>Active Agents</span>
+              <span class="kpi-icon">◉</span>
+            </div>
+
+            <div
+              class="kpi-value"
+              id="activeAgents"
+            >
+              0
+            </div>
+
+            <div class="kpi-meta">
+
+              <span
+                class="trend neutral"
+                id="agentTrend"
+              >
+                0
+              </span>
+
+              currently available
+
+            </div>
+
+          </article>
+
+
+          <article class="kpi-card">
+
+            <div class="kpi-top">
+              <span>Avg Runtime</span>
+              <span class="kpi-icon">◷</span>
+            </div>
+
+            <div
+              class="kpi-value"
+              id="avgRuntime"
+            >
+              0s
+            </div>
+
+            <div class="kpi-meta">
+
+              <span
+                class="trend neutral"
+                id="runtimeTrend"
+              >
+                0%
+              </span>
+
+              execution time
+
+            </div>
+
+          </article>
+
+        </section>
+
+
+        <!-- CHARTS -->
+        <section class="dashboard-grid">
+
+          <!-- RUNS -->
+          <article class="panel chart-panel wide">
+
+            <div class="panel-header">
+
+              <div>
+
+                <div class="panel-kicker">
+                  EXECUTION ACTIVITY
+                </div>
+
+                <h2>Runs over time</h2>
+
+              </div>
+
+              <div class="legend">
+
+                <span>
+                  <i class="legend-dot runs"></i>
+                  Runs
+                </span>
+
+                <span>
+                  <i class="legend-dot success"></i>
+                  Successful
+                </span>
+
+              </div>
+
+            </div>
+
+            <div
+              class="chart-wrap"
+              id="runsChart"
+              aria-label="Runs over time chart"
+            ></div>
+
+          </article>
+
+
+          <!-- OUTCOMES -->
+          <article class="panel chart-panel">
+
+            <div class="panel-header">
+
+              <div>
+
+                <div class="panel-kicker">
+                  RELIABILITY
+                </div>
+
+                <h2>Run outcomes</h2>
+
+              </div>
+
+            </div>
+
+
+            <div class="donut-area">
+
+              <div
+                class="donut"
+                id="donutChart"
+              >
+
+                <div>
+
+                  <strong id="donutValue">
+                    0%
+                  </strong>
+
+                  <span>
+                    success
+                  </span>
+
+                </div>
+
+              </div>
+
+
+              <div class="outcome-list">
+
+                <div>
+                  <span class="outcome-label">
+                    <i class="legend-dot success"></i>
+                    Successful
+                  </span>
+
+                  <b id="successfulRuns">0</b>
+                </div>
+
+
+                <div>
+                  <span class="outcome-label">
+                    <i class="legend-dot failed"></i>
+                    Failed
+                  </span>
+
+                  <b id="failedRuns">0</b>
+                </div>
+
+
+                <div>
+                  <span class="outcome-label">
+                    <i class="legend-dot pending"></i>
+                    Other
+                  </span>
+
+                  <b id="otherRuns">0</b>
+                </div>
+
+              </div>
+
+            </div>
+
+          </article>
+
+
+          <!-- RUNTIME -->
+          <article class="panel chart-panel wide">
+
+            <div class="panel-header">
+
+              <div>
+
+                <div class="panel-kicker">
+                  PERFORMANCE
+                </div>
+
+                <h2>Average runtime</h2>
+
+              </div>
+
+              <span class="small-note">
+                seconds
+              </span>
+
+            </div>
+
+            <div
+              class="bar-chart"
+              id="runtimeChart"
+              aria-label="Average runtime by agent"
+            ></div>
+
+          </article>
+
+
+          <!-- AI INSIGHTS -->
+          <article class="panel insight-panel">
+
+            <div class="panel-header">
+
+              <div>
+
+                <div class="panel-kicker">
+                  AI GENERATED
+                </div>
+
+                <h2>Insights</h2>
+
+              </div>
+
+              <button
+                class="text-button"
+                id="generateInsightsBtn"
+                type="button"
+              >
+                Generate
+              </button>
+
+            </div>
+
+            <div
+              id="insightsList"
+              class="insights-list"
+            ></div>
+
+          </article>
+
+        </section>
+
+
+        <!-- AGENT PERFORMANCE -->
+        <section class="panel agents-panel">
+
+          <div class="panel-header agents-header">
+
+            <div>
+
+              <div class="panel-kicker">
+                AGENT PERFORMANCE
+              </div>
+
+              <h2>Execution performance</h2>
+
+            </div>
+
+
+            <div class="table-tools">
+
+              <label class="search-box">
+
+                <span>⌕</span>
+
+                <input
+                  id="agentSearch"
+                  type="search"
+                  placeholder="Search agents..."
+                  autocomplete="off"
+                />
+
+              </label>
+
+
+              <select
+                id="statusFilter"
+                aria-label="Filter agents"
+              >
+
+                <option value="all">
+                  All statuses
+                </option>
+
+                <option value="active">
+                  Active
+                </option>
+
+                <option value="idle">
+                  Idle
+                </option>
+
+                <option value="paused">
+                  Paused
+                </option>
+
+              </select>
+
+
+              <button
+                class="secondary-button"
+                id="exportBtn"
+                type="button"
+              >
+                ⇩ Export CSV
+              </button>
+
+            </div>
+
+          </div>
+
+
+          <div class="table-scroll">
+
+            <table>
+
+              <thead>
+
+                <tr>
+                  <th>Agent</th>
+                  <th>Status</th>
+                  <th>Runs</th>
+                  <th>Success</th>
+                  <th>Avg. Time</th>
+                  <th>Reliability</th>
+                  <th>Action</th>
+                </tr>
+
+              </thead>
+
+              <tbody id="agentTableBody"></tbody>
+
+            </table>
+
+          </div>
+
+
+          <div
+            class="empty-state hidden"
+            id="emptyTable"
+          >
+            No agents match your current filters.
+          </div>
+
+        </section>
+
+
+        <!-- ACTIVITY -->
+        <section class="panel activity-panel">
+
+          <div class="panel-header">
+
+            <div>
+
+              <div class="panel-kicker">
+                LIVE ACTIVITY
+              </div>
+
+              <h2>Recent executions</h2>
+
+            </div>
+
+            <button
+              class="text-button"
+              id="clearActivityBtn"
+              type="button"
+            >
+              Clear view
+            </button>
+
+          </div>
+
+
+          <div
+            id="activityList"
+            class="activity-list"
+          ></div>
+
+        </section>
+
+
+        <!-- FOOTER -->
+        <footer class="footer">
+
+          <span>
+            NEXUS AI Insights
+          </span>
+
+          <span id="lastUpdated">
+            Updated just now
+          </span>
+
+        </footer>
+
+      </div>
+
+    </main>
+
+  </div>
+
+
+  <!-- TOAST -->
+  <div
+    class="toast-region"
+    id="toastRegion"
+    aria-live="polite"
+    aria-atomic="true"
+  ></div>
+
+
+  <!-- DETAILS MODAL -->
+  <dialog
+    class="details-dialog"
+    id="agentDialog"
+  >
+
+    <div class="dialog-header">
+
+      <div>
+
+        <div class="panel-kicker">
+          AGENT DETAILS
+        </div>
+
+        <h2 id="dialogAgentName">
+          Agent
+        </h2>
+
+      </div>
+
+      <button
+        class="icon-button"
+        id="closeDialogBtn"
+        type="button"
+        aria-label="Close"
+      >
+        ×
+      </button>
+
+    </div>
+
+    <div id="dialogContent"></div>
+
+  </dialog>
+
+
+  <script src="script.js"></script>
+
+</body>
+</html>
