@@ -4303,9 +4303,22 @@
                     "click",
                     () => {
 
-                        navigate(
-                            button.dataset.page
-                        );
+                        const page =
+                            button.dataset.page;
+
+                        const moduleRoutes = {
+                            agents: "../agent-hub/index.html",
+                            workflows: "../workflow-builder/index.html",
+                            insights: "../ai-insights/index.html"
+                        };
+
+                        if (moduleRoutes[page]) {
+                            window.location.href =
+                                moduleRoutes[page];
+                            return;
+                        }
+
+                        navigate(page);
 
                     }
                 );

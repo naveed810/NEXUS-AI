@@ -23,6 +23,7 @@
     <header class="topbar">
 
         <div class="brand-wrap">
+            <button class="mobile-menu-btn" id="mobileMenuBtn" type="button" aria-label="Open navigation">☰</button>
 
             <div class="brand-mark">N</div>
 
@@ -34,6 +35,8 @@
             </div>
 
         </div>
+
+
 
         <div class="topbar-actions">
 
@@ -63,7 +66,23 @@
 
         <!-- ================= LEFT SIDEBAR ================= -->
 
-        <aside class="sidebar">
+        <aside class="sidebar" id="workflowSidebar">
+
+            <div class="sidebar-workspace">
+                <div class="workspace-icon">N</div>
+                <div>
+                    <strong>NEXUS Workspace</strong>
+                    <span>AI Operations</span>
+                </div>
+            </div>
+
+            <div class="module-sidebar-nav" aria-label="NEXUS AI workspace navigation">
+                <div class="nav-label">WORKSPACE</div>
+                <a href="../command-center/index.html"><span>⌂</span> Command Center</a>
+                <a href="../agent-hub/index.html"><span>✦</span> Agent Hub</a>
+                <a class="active" href="index.html" aria-current="page"><span>◇</span> Workflow Builder</a>
+                <a href="../ai-insights/index.html"><span>◌</span> AI Insights</a>
+            </div>
 
             <div class="sidebar-heading">
 
@@ -73,6 +92,15 @@
                     Build your AI automation step by step.
                 </p>
 
+            </div>
+
+
+            <div class="sidebar-profile" id="sidebarProfile">
+                <div class="avatar" id="profileAvatar">N</div>
+                <div class="profile-info">
+                    <strong id="profileName">NEXUS User</strong>
+                    <span id="profileEmail">user@example.com</span>
+                </div>
             </div>
 
 
