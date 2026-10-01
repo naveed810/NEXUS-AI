@@ -1,137 +1,746 @@
 /* =========================================================
    NEXUS AI — AGENT HUB
-   Frontend Interaction Engine
-   ========================================================= */
+   Complete frontend interaction layer
+========================================================= */
+
+"use strict";
+
+/* =========================================================
+   STORAGE
+========================================================= */
+
+const STORAGE_KEY = "nexus_agent_hub_state_v1";
 
 
 /* =========================================================
-   DOM HELPERS
-   ========================================================= */
+   DEFAULT AGENTS
+========================================================= */
 
-const $ = (selector) => document.querySelector(selector);
+const defaultAgents = [
+    {
+        id: "research-001",
+        name: "Research Agent",
+        role: "Research",
+        description:
+            "Researches information, compares sources and produces structured summaries.",
+        model: "NEXUS Reasoner",
+        status: "running",
+        progress: 72,
+        tasks: 42,
+        success: 98,
+        lastRun: "2 min ago",
+        activity: 94,
+        color: "cyan",
+        capabilities: [
+            "Web Research",
+            "Summarization",
+            "Source Analysis",
+            "Report Generation"
+        ],
+        history: [62, 75, 69, 88, 74, 91, 82, 96, 84, 93, 87, 98]
+    },
 
-const $$ = (selector) => document.querySelectorAll(selector);
+    {
+        id: "analysis-002",
+        name: "Data Analyst",
+        role: "Analysis",
+        description:
+            "Analyzes structured information and converts complex data into useful insights.",
+        model: "NEXUS Reasoner",
+        status: "running",
+        progress: 56,
+        tasks: 36,
+        success: 97,
+        lastRun: "8 min ago",
+        activity: 87,
+        color: "purple",
+        capabilities: [
+            "Data Analysis",
+            "Pattern Detection",
+            "Insights",
+            "Visualization"
+        ],
+        history: [70, 78, 73, 84, 81, 88, 91, 86, 89, 94, 90, 97]
+    },
+
+    {
+        id: "automation-003",
+        name: "Task Automator",
+        role: "Automation",
+        description:
+            "Handles repeatable work, task preparation and automated workflow operations.",
+        model: "NEXUS Core",
+        status: "idle",
+        progress: 31,
+        tasks: 29,
+        success: 95,
+        lastRun: "21 min ago",
+        activity: 63,
+        color: "green",
+        capabilities: [
+            "Task Execution",
+            "Scheduling",
+            "Workflow Actions",
+            "Notifications"
+        ],
+        history: [52, 63, 70, 66, 76, 81, 73, 87, 79, 84, 91, 95]
+    },
+
+    {
+        id: "content-004",
+        name: "Content Agent",
+        role: "Content",
+        description:
+            "Creates structured drafts, summaries and content concepts from instructions.",
+        model: "NEXUS Fast",
+        status: "paused",
+        progress: 18,
+        tasks: 21,
+        success: 94,
+        lastRun: "1 hr ago",
+        activity: 42,
+        color: "orange",
+        capabilities: [
+            "Drafting",
+            "Summarization",
+            "Content Planning",
+            "Formatting"
+        ],
+        history: [60, 58, 72, 64, 75, 70, 81, 77, 86, 82, 91, 94]
+    }
+];
+
+
+/* =========================================================
+   DEFAULT STATE
+========================================================= */
+
+const defaultState = {
+    agents: defaultAgents,
+    selectedAgentId: "research-001",
+
+    completedTasks: 128,
+
+    activities: [
+        {
+            id: "a1",
+            icon: "✓",
+            type: "success",
+            title: "Research Agent completed a task",
+            description: "Research summary generated successfully.",
+            time: "2 min ago"
+        },
+        {
+            id: "a2",
+            icon: "▶",
+            type: "",
+            title: "Data Analyst started execution",
+            description: "Workspace analytics task is running.",
+            time: "8 min ago"
+        },
+        {
+            id: "a3",
+            icon: "!",
+            type: "warning",
+            title: "Content Agent paused",
+            description: "Agent is waiting for new configuration.",
+            time: "1 hr ago"
+        },
+        {
+            id: "a4",
+            icon: "✦",
+            type: "",
+            title: "Agent Hub synchronized",
+            description: "All local agent configurations are ready.",
+            time: "2 hr ago"
+        }
+    ],
+
+    notifications: 3,
+
+    lightMode: false
+};
 
 
 /* =========================================================
    STATE
-   ========================================================= */
+========================================================= */
 
-let agents = [];
+let state = loadState();
 
-let completedTasks = 1284;
+let activeExecution = null;
+let executionTimer = null;
+let toastTimer = null;
 
 
 /* =========================================================
-   INITIALIZE
-   ========================================================= */
+   DOM HELPERS
+========================================================= */
+
+const $ = (selector) => document.querySelector(selector);
+
+const $$ = (selector) => Array.from(document.querySelectorAll(selector));
+
+
+/* =========================================================
+   LOAD / SAVE
+========================================================= */
+
+function cloneDefaultState() {
+    return JSON.parse(JSON.stringify(defaultState));
+}
+
+
+function loadState() {
+    try {
+        const saved = localStorage.getItem(STORAGE_KEY);
+
+        if (!saved) {
+            return cloneDefaultState();
+        }
+
+        const parsed = JSON.parse(saved);
+
+        if (
+            !parsed ||
+            !Array.isArray(parsed.agents) ||
+            parsed.agents.length === 0
+        ) {
+            return cloneDefaultState();
+        }
+
+        return {
+            ...cloneDefaultState(),
+            ...parsed
+        };
+
+    } catch (error) {
+        console.warn("NEXUS Agent Hub: Could not load saved state.", error);
+        return cloneDefaultState();
+    }
+}
+
+
+function saveState() {
+    try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    } catch (error) {
+        console.warn("NEXUS Agent Hub: Could not save state.", error);
+    }
+}
+
+
+/* =========================================================
+   INITIALIZATION
+========================================================= */
 
 document.addEventListener("DOMContentLoaded", () => {
 
-    initializeAgents();
+    applyTheme();
 
-    setupNavigation();
+    bindEvents();
 
-    setupCreateAgent();
+    renderAll();
 
-    setupAgentFilters();
-
-    setupAgentSearch();
-
-    setupAgentRunButtons();
-
-    setupActivityControls();
-
-    setupChat();
-
-    setupNotifications();
-
-    setupGlobalSearch();
-
-    setupMobileMenu();
-
-    setupSettings();
-
-    setupIntegrations();
-
-    setupSort();
-
-    setupFilterButton();
-
-    setupUserMenu();
-
-    updateCounts();
+    showToast(
+        "Agent Hub ready",
+        "Your AI workforce is connected and ready.",
+        "success"
+    );
 
 });
 
 
 /* =========================================================
-   AGENT STATE
-   ========================================================= */
+   EVENT BINDING
+========================================================= */
 
-function initializeAgents() {
+function bindEvents() {
 
-    agents = [
+    /* Create agent */
+    $("#headerCreateButton")?.addEventListener(
+        "click",
+        () => openModal("createModal")
+    );
 
-        {
-            name: "Research Agent",
-            status: "active",
-            tasks: 342
-        },
+    $("#heroCreateButton")?.addEventListener(
+        "click",
+        () => openModal("createModal")
+    );
 
-        {
-            name: "Content Agent",
-            status: "active",
-            tasks: 287
-        },
-
-        {
-            name: "Data Analyst",
-            status: "paused",
-            tasks: 451
-        },
-
-        {
-            name: "Customer Support",
-            status: "draft",
-            tasks: 204
-        }
-
-    ];
-
-}
+    $("#emptyCreateButton")?.addEventListener(
+        "click",
+        () => openModal("createModal")
+    );
 
 
-/* =========================================================
-   NAVIGATION
-   ========================================================= */
+    /* Hero run */
+    $("#heroRunButton")?.addEventListener(
+        "click",
+        () => {
+            const agent = getSelectedAgent();
 
-function setupNavigation() {
-
-    $$(".nav-item").forEach(button => {
-
-        button.addEventListener("click", () => {
-
-            const page = button.dataset.page;
-
-            if (!page) return;
-
-            $$(".nav-item").forEach(item => {
-                item.classList.remove("active");
-            });
-
-            button.classList.add("active");
-
-            if (page !== "Agent Hub") {
-
+            if (!agent) {
                 showToast(
-                    "Navigation",
-                    `${page} module is ready for integration.`
+                    "No agent selected",
+                    "Select an agent before starting an execution.",
+                    "warning"
                 );
+
+                return;
+            }
+
+            runAgent(agent.id);
+        }
+    );
+
+
+    /* Search */
+    $("#agentSearch")?.addEventListener(
+        "input",
+        renderAgents
+    );
+
+
+    /* Filters */
+    $("#statusFilter")?.addEventListener(
+        "change",
+        renderAgents
+    );
+
+    $("#sortAgents")?.addEventListener(
+        "change",
+        renderAgents
+    );
+
+
+    /* Refresh */
+    $("#refreshButton")?.addEventListener(
+        "click",
+        () => {
+
+            renderAll();
+
+            showToast(
+                "Dashboard refreshed",
+                "Agent Hub data has been synchronized.",
+                "success"
+            );
+        }
+    );
+
+
+    /* Theme */
+    $("#themeButton")?.addEventListener(
+        "click",
+        toggleTheme
+    );
+
+
+    /* Notifications */
+    $("#notificationButton")?.addEventListener(
+        "click",
+        (event) => {
+
+            event.stopPropagation();
+
+            const panel = $("#notificationPanel");
+
+            panel.classList.toggle("hidden");
+        }
+    );
+
+
+    $("#markNotificationsButton")?.addEventListener(
+        "click",
+        markNotificationsRead
+    );
+
+
+    /* Activity */
+    $("#clearActivityButton")?.addEventListener(
+        "click",
+        clearActivity
+    );
+
+
+    /* Create form */
+    $("#createAgentForm")?.addEventListener(
+        "submit",
+        handleCreateAgent
+    );
+
+
+    /* Console */
+    $("#sendAgentButton")?.addEventListener(
+        "click",
+        sendAgentPrompt
+    );
+
+
+    $("#agentPrompt")?.addEventListener(
+        "keydown",
+        (event) => {
+
+            if (
+                event.key === "Enter" &&
+                !event.shiftKey
+            ) {
+                event.preventDefault();
+
+                sendAgentPrompt();
+            }
+        }
+    );
+
+
+    /* Suggestions */
+    $$(".suggestion-button").forEach((button) => {
+
+        button.addEventListener(
+            "click",
+            () => {
+
+                const prompt = button.dataset.prompt || "";
+
+                $("#agentPrompt").value = prompt;
+
+                $("#agentPrompt").focus();
+            }
+        );
+
+    });
+
+
+    /* Details controls */
+    $("#detailsRunButton")?.addEventListener(
+        "click",
+        () => {
+
+            const agent = getSelectedAgent();
+
+            if (!agent) return;
+
+            closeModal("detailsModal");
+
+            runAgent(agent.id);
+        }
+    );
+
+
+    $("#detailsPauseButton")?.addEventListener(
+        "click",
+        () => {
+
+            const agent = getSelectedAgent();
+
+            if (!agent) return;
+
+            toggleAgentStatus(agent.id);
+
+            renderAll();
+
+            updateDetailsModal(agent.id);
+        }
+    );
+
+
+    /* Mobile menu */
+    $("#mobileMenuButton")?.addEventListener(
+        "click",
+        () => {
+
+            $("#sidebar")?.classList.toggle("mobile-open");
+        }
+    );
+
+
+    /* Workspace */
+    $("#workspaceButton")?.addEventListener(
+        "click",
+        () => {
+
+            showToast(
+                "Workspace",
+                "NEXUS Workspace is currently active.",
+                "info"
+            );
+        }
+    );
+
+
+    /* Profile */
+    $("#profileButton")?.addEventListener(
+        "click",
+        () => {
+
+            showToast(
+                "Member profile",
+                "Agent Engineer workspace profile.",
+                "info"
+            );
+        }
+    );
+
+
+    /* Navigation */
+    $$(".nav-item").forEach((button) => {
+
+        button.addEventListener(
+            "click",
+            () => {
+
+                handleNavigation(button.dataset.nav);
+
+            }
+        );
+
+    });
+
+
+    /* Modal close buttons */
+    $$("[data-close-modal]").forEach((button) => {
+
+        button.addEventListener(
+            "click",
+            () => {
+
+                closeModal(button.dataset.closeModal);
+
+            }
+        );
+
+    });
+
+
+    /* Backdrop close */
+    $$(".modal-backdrop").forEach((backdrop) => {
+
+        backdrop.addEventListener(
+            "click",
+            (event) => {
+
+                if (event.target === backdrop) {
+
+                    backdrop.classList.add("hidden");
+
+                }
+
+            }
+        );
+
+    });
+
+
+    /* Escape */
+    document.addEventListener(
+        "keydown",
+        (event) => {
+
+            if (event.key === "Escape") {
+
+                closeAllModals();
+
+                $("#notificationPanel")?.classList.add("hidden");
 
             }
 
+        }
+    );
+
+
+    /* Outside notification click */
+    document.addEventListener(
+        "click",
+        (event) => {
+
+            const panel = $("#notificationPanel");
+            const button = $("#notificationButton");
+
+            if (
+                panel &&
+                !panel.classList.contains("hidden") &&
+                !panel.contains(event.target) &&
+                !button.contains(event.target)
+            ) {
+                panel.classList.add("hidden");
+            }
+
+        }
+    );
+}
+
+
+/* =========================================================
+   RENDER ALL
+========================================================= */
+
+function renderAll() {
+
+    renderAgents();
+
+    renderStats();
+
+    renderActivities();
+
+    renderExecution();
+
+    renderConsole();
+
+    updateNotificationBadge();
+
+    $("#navAgentCount").textContent = state.agents.length;
+
+}
+
+
+/* =========================================================
+   AGENTS
+========================================================= */
+
+function renderAgents() {
+
+    const grid = $("#agentsGrid");
+    const empty = $("#emptyAgents");
+
+    if (!grid || !empty) return;
+
+    const searchValue =
+        ($("#agentSearch")?.value || "")
+            .trim()
+            .toLowerCase();
+
+    const status =
+        $("#statusFilter")?.value || "all";
+
+    const sort =
+        $("#sortAgents")?.value || "name";
+
+    let agents = [...state.agents];
+
+
+    /* Search */
+    if (searchValue) {
+
+        agents = agents.filter((agent) => {
+
+            const searchable =
+                `${agent.name} ${agent.role} ${agent.description}`
+                    .toLowerCase();
+
+            return searchable.includes(searchValue);
+
         });
+
+    }
+
+
+    /* Status */
+    if (status !== "all") {
+
+        agents = agents.filter(
+            (agent) => agent.status === status
+        );
+
+    }
+
+
+    /* Sort */
+    if (sort === "name") {
+
+        agents.sort((a, b) =>
+            a.name.localeCompare(b.name)
+        );
+
+    } else if (sort === "status") {
+
+        const order = {
+            running: 1,
+            idle: 2,
+            paused: 3
+        };
+
+        agents.sort(
+            (a, b) =>
+                (order[a.status] || 9) -
+                (order[b.status] || 9)
+        );
+
+    } else if (sort === "activity") {
+
+        agents.sort(
+            (a, b) =>
+                Number(b.activity || 0) -
+                Number(a.activity || 0)
+        );
+
+    }
+
+
+    if (agents.length === 0) {
+
+        grid.innerHTML = "";
+
+        empty.classList.remove("hidden");
+
+        return;
+
+    }
+
+
+    empty.classList.add("hidden");
+
+
+    grid.innerHTML = agents
+        .map(createAgentCard)
+        .join("");
+
+
+    $$(".agent-card").forEach((card) => {
+
+        card.addEventListener(
+            "click",
+            () => {
+
+                selectAgent(card.dataset.agentId);
+
+            }
+        );
+
+    });
+
+
+    $$(".agent-run").forEach((button) => {
+
+        button.addEventListener(
+            "click",
+            (event) => {
+
+                event.stopPropagation();
+
+                runAgent(button.dataset.agentId);
+
+            }
+        );
+
+    });
+
+
+    $$(".agent-secondary").forEach((button) => {
+
+        button.addEventListener(
+            "click",
+            (event) => {
+
+                event.stopPropagation();
+
+                handleAgentSecondaryAction(
+                    button.dataset.action,
+                    button.dataset.agentId
+                );
+
+            }
+        );
 
     });
 
@@ -139,114 +748,209 @@ function setupNavigation() {
 
 
 /* =========================================================
-   CREATE AGENT MODAL
-   ========================================================= */
+   AGENT CARD
+========================================================= */
 
-function setupCreateAgent() {
+function createAgentCard(agent) {
 
-    const modal = $("#createModal");
+    const selected =
+        state.selectedAgentId === agent.id
+            ? "selected"
+            : "";
 
-    const openButtons = [
-        $("#createAgentBtn"),
-        $("#createAgentTop")
-    ];
+    const statusClass =
+        agent.status || "idle";
 
-    openButtons.forEach(button => {
+    const statusLabel =
+        capitalize(agent.status || "idle");
 
-        if (!button) return;
+    const color =
+        agent.color || "cyan";
 
-        button.addEventListener("click", openCreateModal);
+    const actionText =
+        agent.status === "running"
+            ? "Run Again"
+            : "Run Agent";
 
-    });
+    return `
+        <article
+            class="agent-card ${selected}"
+            data-agent-id="${escapeAttribute(agent.id)}"
+        >
+
+            <div class="agent-top">
+
+                <div class="agent-identity">
+
+                    <div class="agent-avatar ${escapeAttribute(color)}">
+                        ${getInitials(agent.name)}
+                    </div>
+
+                    <div>
+                        <h3 title="${escapeAttribute(agent.name)}">
+                            ${escapeHTML(agent.name)}
+                        </h3>
+
+                        <span class="agent-role">
+                            ${escapeHTML(agent.role)} Agent
+                        </span>
+                    </div>
+
+                </div>
+
+                <span class="status-chip ${statusClass}">
+                    <span class="status-dot ${getStatusDotClass(agent.status)}"></span>
+                    ${statusLabel}
+                </span>
+
+            </div>
 
 
-    $("#closeCreateModal").addEventListener(
-        "click",
-        closeCreateModal
+            <p class="agent-description">
+                ${escapeHTML(agent.description)}
+            </p>
+
+
+            <div class="agent-progress">
+
+                <div class="progress-header">
+                    <span>Current workload</span>
+                    <strong>${Number(agent.progress) || 0}%</strong>
+                </div>
+
+                <div class="progress-track">
+                    <div
+                        class="progress-fill"
+                        style="width: ${clamp(agent.progress, 0, 100)}%"
+                    ></div>
+                </div>
+
+            </div>
+
+
+            <div class="agent-meta">
+
+                <div class="agent-meta-item">
+                    <span>Tasks</span>
+                    <strong>${Number(agent.tasks) || 0}</strong>
+                </div>
+
+                <div class="agent-meta-item">
+                    <span>Success</span>
+                    <strong>${Number(agent.success) || 0}%</strong>
+                </div>
+
+                <div class="agent-meta-item">
+                    <span>Last run</span>
+                    <strong>${escapeHTML(agent.lastRun || "Never")}</strong>
+                </div>
+
+            </div>
+
+
+            <div class="agent-actions">
+
+                <button
+                    class="agent-run"
+                    type="button"
+                    data-agent-id="${escapeAttribute(agent.id)}"
+                >
+                    ▶ ${actionText}
+                </button>
+
+                <button
+                    class="agent-secondary"
+                    type="button"
+                    title="View agent details"
+                    data-action="details"
+                    data-agent-id="${escapeAttribute(agent.id)}"
+                >
+                    ◉
+                </button>
+
+                <button
+                    class="agent-secondary"
+                    type="button"
+                    title="${agent.status === "paused" ? "Resume agent" : "Pause agent"}"
+                    data-action="toggle"
+                    data-agent-id="${escapeAttribute(agent.id)}"
+                >
+                    ${agent.status === "paused" ? "▶" : "Ⅱ"}
+                </button>
+
+                <button
+                    class="agent-secondary"
+                    type="button"
+                    title="Delete agent"
+                    data-action="delete"
+                    data-agent-id="${escapeAttribute(agent.id)}"
+                >
+                    ×
+                </button>
+
+            </div>
+
+        </article>
+    `;
+}
+
+
+/* =========================================================
+   SELECT AGENT
+========================================================= */
+
+function selectAgent(agentId) {
+
+    const agent = state.agents.find(
+        (item) => item.id === agentId
     );
 
+    if (!agent) return;
 
-    $("#cancelCreate").addEventListener(
-        "click",
-        closeCreateModal
-    );
+    state.selectedAgentId = agentId;
 
+    saveState();
 
-    modal.addEventListener("click", event => {
+    renderAgents();
 
-        if (event.target === modal) {
+    renderExecution();
 
-            closeCreateModal();
-
-        }
-
-    });
-
-
-    $("#agentForm").addEventListener(
-        "submit",
-        createAgent
-    );
-
-
-    $("#autonomyRange").addEventListener(
-        "input",
-        updateAutonomy
-    );
+    renderConsole();
 
 }
 
 
-function openCreateModal() {
+/* =========================================================
+   GET SELECTED
+========================================================= */
 
-    $("#createModal").classList.add("show");
+function getSelectedAgent() {
 
-    setTimeout(() => {
-        $("#agentName").focus();
-    }, 200);
-
-}
-
-
-function closeCreateModal() {
-
-    $("#createModal").classList.remove("show");
+    return state.agents.find(
+        (agent) =>
+            agent.id === state.selectedAgentId
+    ) || null;
 
 }
 
 
-function updateAutonomy() {
+/* =========================================================
+   AGENT ACTIONS
+========================================================= */
 
-    const value = $("#autonomyRange").value;
+function handleAgentSecondaryAction(action, agentId) {
 
-    $("#autonomyValue").textContent =
-        `${value} / 5`;
+    const agent =
+        state.agents.find(
+            (item) => item.id === agentId
+        );
 
-}
-
-
-function createAgent(event) {
-
-    event.preventDefault();
-
-    const name =
-        $("#agentName").value.trim();
-
-    const objective =
-        $("#agentObjective").value.trim();
-
-    const type =
-        $("#agentType").value;
-
-    const autonomy =
-        $("#autonomyRange").value;
-
-
-    if (!name || !objective) {
+    if (!agent) {
 
         showToast(
-            "Missing information",
-            "Please complete all required fields."
+            "Agent unavailable",
+            "The selected agent could not be found.",
+            "warning"
         );
 
         return;
@@ -254,297 +958,169 @@ function createAgent(event) {
     }
 
 
-    const grid = $("#agentsGrid");
+    if (action === "details") {
+
+        selectAgent(agentId);
+
+        updateDetailsModal(agentId);
+
+        openModal("detailsModal");
+
+        return;
+
+    }
 
 
-    const card =
-        document.createElement("article");
+    if (action === "toggle") {
+
+        toggleAgentStatus(agentId);
+
+        return;
+
+    }
 
 
-    card.className = "agent-card";
+    if (action === "delete") {
 
-    card.dataset.name = name;
+        deleteAgent(agentId);
 
-    card.dataset.status = "draft";
+    }
 
-
-    const iconMap = {
-
-        research: "🔎",
-        content: "✍",
-        analytics: "◈",
-        support: "♧",
-        custom: "✦"
-
-    };
+}
 
 
-    const avatarClassMap = {
+/* =========================================================
+   TOGGLE STATUS
+========================================================= */
 
-        research: "research",
-        content: "content",
-        analytics: "data",
-        support: "support",
-        custom: "research"
+function toggleAgentStatus(agentId) {
 
-    };
+    const agent =
+        state.agents.find(
+            (item) => item.id === agentId
+        );
 
-
-    card.innerHTML = `
-
-        <div class="agent-card-header">
-
-            <div class="agent-avatar ${avatarClassMap[type]}">
-                ${iconMap[type]}
-            </div>
-
-            <div class="agent-title">
-
-                <h4>${escapeHTML(name)}</h4>
-
-                <span class="status draft-status">
-                    <i></i>
-                    Draft
-                </span>
-
-            </div>
-
-            <button
-                class="more-button"
-                data-menu="new"
-            >
-                ⋮
-            </button>
-
-        </div>
+    if (!agent) return;
 
 
-        <p class="agent-description">
-            ${escapeHTML(objective)}
-        </p>
+    if (agent.status === "paused") {
+
+        agent.status = "idle";
+
+        addActivity(
+            "▶",
+            "",
+            `${agent.name} resumed`,
+            "Agent is available for new tasks."
+        );
+
+        showToast(
+            "Agent resumed",
+            `${agent.name} is available again.`,
+            "success"
+        );
+
+    } else {
+
+        agent.status = "paused";
+
+        if (
+            activeExecution &&
+            activeExecution.agentId === agentId
+        ) {
+            stopExecution();
+        }
+
+        addActivity(
+            "Ⅱ",
+            "warning",
+            `${agent.name} paused`,
+            "Agent execution has been paused."
+        );
+
+        showToast(
+            "Agent paused",
+            `${agent.name} has been paused.`,
+            "warning"
+        );
+
+    }
+
+    saveState();
+
+    renderAll();
+
+}
 
 
-        <div class="agent-stats">
+/* =========================================================
+   DELETE AGENT
+========================================================= */
 
-            <div>
-                <span>Tasks</span>
-                <strong class="task-count">0</strong>
-            </div>
+function deleteAgent(agentId) {
 
-            <div>
-                <span>Success</span>
-                <strong>—</strong>
-            </div>
+    const agent =
+        state.agents.find(
+            (item) => item.id === agentId
+        );
 
-            <div>
-                <span>Autonomy</span>
-                <strong>${autonomy}/5</strong>
-            </div>
-
-        </div>
+    if (!agent) return;
 
 
-        <div class="progress-wrapper">
-
-            <div class="progress-label">
-
-                <span>Current task</span>
-
-                <span class="current-task">
-                    Ready to deploy
-                </span>
-
-            </div>
-
-            <div class="progress-bar muted">
-
-                <span style="width:0%"></span>
-
-            </div>
-
-        </div>
-
-
-        <div class="agent-card-footer">
-
-            <span class="last-run">
-                Never run
-            </span>
-
-            <button
-                class="run-button"
-                data-agent="${escapeHTML(name)}"
-            >
-                ▶ Run
-            </button>
-
-        </div>
-
-    `;
-
-
-    grid.appendChild(card);
-
-
-    attachRunButton(
-        card.querySelector(".run-button")
+    const confirmed = window.confirm(
+        `Delete "${agent.name}" from Agent Hub?`
     );
 
-
-    attachMoreButton(
-        card.querySelector(".more-button")
-    );
+    if (!confirmed) return;
 
 
-    agents.push({
+    if (
+        activeExecution &&
+        activeExecution.agentId === agentId
+    ) {
+        stopExecution();
+    }
 
-        name,
-        status: "draft",
-        tasks: 0
 
-    });
+    state.agents =
+        state.agents.filter(
+            (item) => item.id !== agentId
+        );
 
 
-    updateCounts();
+    if (state.agents.length > 0) {
 
-    closeCreateModal();
+        if (state.selectedAgentId === agentId) {
 
-    $("#agentForm").reset();
+            state.selectedAgentId =
+                state.agents[0].id;
 
-    $("#autonomyRange").value = 3;
+        }
 
-    updateAutonomy();
+    } else {
+
+        state.selectedAgentId = null;
+
+    }
 
 
     addActivity(
-
-        "purple",
-
-        `${name} was created`,
-
-        `Autonomy level ${autonomy}/5 configured.`
-
+        "×",
+        "warning",
+        `${agent.name} deleted`,
+        "Agent was removed from this workspace."
     );
+
+
+    saveState();
+
+    renderAll();
 
 
     showToast(
-
-        "Agent created",
-
-        `${name} has been added to your Agent Hub.`
-
-    );
-
-}
-
-
-/* =========================================================
-   ESCAPE HTML
-   ========================================================= */
-
-function escapeHTML(value) {
-
-    return value
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
-
-}
-
-
-/* =========================================================
-   FILTERS
-   ========================================================= */
-
-function setupAgentFilters() {
-
-    $$(".tab").forEach(tab => {
-
-        tab.addEventListener("click", () => {
-
-            $$(".tab").forEach(item => {
-                item.classList.remove("active");
-            });
-
-            tab.classList.add("active");
-
-            const filter =
-                tab.dataset.filter;
-
-            filterAgents(filter);
-
-        });
-
-    });
-
-}
-
-
-function filterAgents(filter) {
-
-    $$(".agent-card").forEach(card => {
-
-        const status =
-            card.dataset.status;
-
-        if (
-            filter === "all" ||
-            status === filter
-        ) {
-
-            card.classList.remove("hidden");
-
-        } else {
-
-            card.classList.add("hidden");
-
-        }
-
-    });
-
-}
-
-
-/* =========================================================
-   SEARCH
-   ========================================================= */
-
-function setupAgentSearch() {
-
-    $("#agentSearch").addEventListener(
-        "input",
-        event => {
-
-            const query =
-                event.target.value
-                    .toLowerCase()
-                    .trim();
-
-
-            $$(".agent-card").forEach(card => {
-
-                const name =
-                    card.dataset.name
-                        .toLowerCase();
-
-
-                if (
-                    name.includes(query)
-                ) {
-
-                    card.classList.remove("hidden");
-
-                } else {
-
-                    card.classList.add("hidden");
-
-                }
-
-            });
-
-        }
+        "Agent deleted",
+        `${agent.name} has been removed.`,
+        "success"
     );
 
 }
@@ -552,1098 +1128,1377 @@ function setupAgentSearch() {
 
 /* =========================================================
    RUN AGENT
-   ========================================================= */
+========================================================= */
 
-function setupAgentRunButtons() {
+function runAgent(agentId) {
 
-    $$(".run-button").forEach(button => {
+    const agent =
+        state.agents.find(
+            (item) => item.id === agentId
+        );
 
-        attachRunButton(button);
+    if (!agent) {
 
-    });
+        showToast(
+            "Agent unavailable",
+            "The selected agent could not be found.",
+            "warning"
+        );
 
-}
+        return;
 
-
-function attachRunButton(button) {
-
-    if (!button) return;
-
-
-    button.addEventListener(
-        "click",
-        () => runAgent(button)
-    );
-
-}
+    }
 
 
-function runAgent(button) {
+    if (agent.status === "paused") {
 
-    const card =
-        button.closest(".agent-card");
+        showToast(
+            "Agent is paused",
+            "Resume this agent before running it.",
+            "warning"
+        );
 
+        return;
 
-    const agentName =
-        button.dataset.agent ||
-        card.dataset.name;
-
-
-    const status =
-        card.querySelector(".status");
+    }
 
 
-    const statusText =
-        status.lastChild;
+    selectAgent(agentId);
 
 
-    const progress =
-        card.querySelector(".progress-bar span");
+    /* Stop previous execution */
+    if (executionTimer) {
+
+        clearInterval(executionTimer);
+
+        executionTimer = null;
+
+    }
 
 
-    const currentTask =
-        card.querySelector(".current-task");
+    agent.status = "running";
+
+    agent.progress =
+        Math.max(
+            8,
+            Math.min(35, Number(agent.progress) || 10)
+        );
 
 
-    const lastRun =
-        card.querySelector(".last-run");
+    agent.lastRun = "Just now";
 
-
-    button.disabled = true;
-
-    button.textContent = "⟳ Running";
-
-
-    card.dataset.status = "active";
-
-
-    status.className =
-        "status active-status";
-
-
-    status.innerHTML =
-        "<i></i> Running";
-
-
-    currentTask.textContent =
-        "Agent is executing...";
-
-
-    progress.style.width = "12%";
+    activeExecution = {
+        agentId,
+        progress: agent.progress,
+        startedAt: Date.now()
+    };
 
 
     addActivity(
-
-        "purple",
-
-        `${agentName} started execution`,
-
-        "Agent execution has been initiated."
-
+        "▶",
+        "",
+        `${agent.name} started execution`,
+        `Using ${agent.model || "NEXUS Core"} intelligence.`
     );
+
+
+    saveState();
+
+    renderAll();
 
 
     showToast(
-
-        "Agent running",
-
-        `${agentName} has started a new execution.`
-
+        "Execution started",
+        `${agent.name} is now processing.`,
+        "success"
     );
 
 
-    let progressValue = 12;
+    executionTimer = setInterval(
+        () => {
+
+            const current =
+                state.agents.find(
+                    (item) =>
+                        item.id === agentId
+                );
+
+            if (!current) {
+
+                stopExecution();
+
+                return;
+
+            }
 
 
-    const interval = setInterval(() => {
-
-        progressValue +=
-            Math.floor(Math.random() * 16) + 7;
+            activeExecution.progress +=
+                Math.floor(Math.random() * 11) + 5;
 
 
-        if (progressValue >= 100) {
-
-            progressValue = 100;
-
-        }
-
-
-        progress.style.width =
-            `${progressValue}%`;
+            current.progress =
+                Math.min(
+                    activeExecution.progress,
+                    100
+                );
 
 
-        if (progressValue >= 100) {
+            renderExecution();
 
-            clearInterval(interval);
 
-            finishAgentRun(
-                card,
-                button,
-                agentName
-            );
+            if (
+                activeExecution.progress >= 100
+            ) {
 
-        }
+                completeExecution(current);
 
-    }, 500);
+            }
+
+        },
+        850
+    );
 
 }
 
 
-function finishAgentRun(
-    card,
-    button,
-    agentName
-) {
+/* =========================================================
+   COMPLETE EXECUTION
+========================================================= */
 
-    const status =
-        card.querySelector(".status");
+function completeExecution(agent) {
 
+    if (executionTimer) {
 
-    const progress =
-        card.querySelector(".progress-bar span");
+        clearInterval(executionTimer);
 
+        executionTimer = null;
 
-    const currentTask =
-        card.querySelector(".current-task");
+    }
 
 
-    const lastRun =
-        card.querySelector(".last-run");
+    agent.progress = 100;
+
+    agent.tasks =
+        Number(agent.tasks || 0) + 1;
+
+    agent.success =
+        Math.min(
+            100,
+            Number(agent.success || 0) +
+                (Math.random() > 0.5 ? 1 : 0)
+        );
+
+    agent.lastRun = "Just now";
+
+    state.completedTasks =
+        Number(state.completedTasks || 0) + 1;
 
 
-    const taskCount =
-        card.querySelector(".task-count");
+    agent.history =
+        Array.isArray(agent.history)
+            ? agent.history
+            : [];
+
+    agent.history.push(
+        Math.floor(
+            88 + Math.random() * 12
+        )
+    );
+
+    if (agent.history.length > 14) {
+
+        agent.history.shift();
+
+    }
 
 
-    let tasks =
-        parseInt(taskCount.textContent) || 0;
-
-
-    tasks++;
-
-    completedTasks++;
-
-
-    taskCount.textContent =
-        tasks.toLocaleString();
-
-
-    $("#completedCount").textContent =
-        completedTasks.toLocaleString();
-
-
-    status.className =
-        "status active-status";
-
-
-    status.innerHTML =
-        "<i></i> Active";
-
-
-    currentTask.textContent =
-        "Execution completed";
-
-
-    progress.style.width =
-        "100%";
-
-
-    lastRun.textContent =
-        "Last run just now";
-
-
-    button.disabled = false;
-
-    button.textContent = "▶ Run";
+    activeExecution = null;
 
 
     addActivity(
-
+        "✓",
         "success",
+        `${agent.name} completed execution`,
+        "Task completed successfully."
+    );
 
-        `${agentName} completed successfully`,
 
-        "Execution finished without errors."
+    saveState();
 
+    renderAll();
+
+
+    showToast(
+        "Execution completed",
+        `${agent.name} finished successfully.`,
+        "success"
+    );
+
+}
+
+
+/* =========================================================
+   STOP EXECUTION
+========================================================= */
+
+function stopExecution() {
+
+    if (executionTimer) {
+
+        clearInterval(executionTimer);
+
+        executionTimer = null;
+
+    }
+
+    activeExecution = null;
+
+    renderExecution();
+
+}
+
+
+/* =========================================================
+   EXECUTION MONITOR
+========================================================= */
+
+function renderExecution() {
+
+    const container = $("#executionMain");
+
+    if (!container) return;
+
+
+    const agent = getSelectedAgent();
+
+
+    if (!agent) {
+
+        container.innerHTML = `
+            <div class="execution-empty">
+                <div class="execution-icon">✦</div>
+
+                <h3>No agents available</h3>
+
+                <p>
+                    Create an agent to start managing AI executions.
+                </p>
+            </div>
+        `;
+
+        return;
+
+    }
+
+
+    const isActive =
+        activeExecution &&
+        activeExecution.agentId === agent.id;
+
+
+    const progress =
+        isActive
+            ? activeExecution.progress
+            : agent.progress;
+
+
+    container.innerHTML = `
+        <div class="execution-active">
+
+            <div class="execution-agent-header">
+
+                <div class="execution-agent-avatar">
+                    ${getInitials(agent.name)}
+                </div>
+
+                <div>
+                    <h3>${escapeHTML(agent.name)}</h3>
+                    <p>
+                        ${
+                            isActive
+                                ? "Processing current task..."
+                                : `${capitalize(agent.status)} · ${agent.model}`
+                        }
+                    </p>
+                </div>
+
+            </div>
+
+
+            <div class="execution-progress">
+
+                <div class="execution-progress-header">
+                    <span>
+                        ${
+                            isActive
+                                ? "Execution progress"
+                                : "Current workload"
+                        }
+                    </span>
+
+                    <strong>
+                        ${clamp(progress, 0, 100)}%
+                    </strong>
+                </div>
+
+                <div class="big-progress">
+                    <span style="width:${clamp(progress, 0, 100)}%"></span>
+                </div>
+
+            </div>
+
+
+            <div class="execution-stats">
+
+                <div class="execution-stat">
+                    <span>Tasks completed</span>
+                    <strong>${agent.tasks}</strong>
+                </div>
+
+                <div class="execution-stat">
+                    <span>Success rate</span>
+                    <strong>${agent.success}%</strong>
+                </div>
+
+                <div class="execution-stat">
+                    <span>Last execution</span>
+                    <strong>${escapeHTML(agent.lastRun)}</strong>
+                </div>
+
+            </div>
+
+
+            <div class="execution-controls">
+
+                <button
+                    class="primary-button"
+                    type="button"
+                    id="executionRunButton"
+                >
+                    ▶ Run Agent
+                </button>
+
+                <button
+                    class="secondary-button"
+                    type="button"
+                    id="executionDetailsButton"
+                >
+                    View Details
+                </button>
+
+            </div>
+
+        </div>
+    `;
+
+
+    $("#executionRunButton")?.addEventListener(
+        "click",
+        () => runAgent(agent.id)
+    );
+
+
+    $("#executionDetailsButton")?.addEventListener(
+        "click",
+        () => {
+
+            updateDetailsModal(agent.id);
+
+            openModal("detailsModal");
+
+        }
+    );
+
+}
+
+
+/* =========================================================
+   CREATE AGENT
+========================================================= */
+
+function handleCreateAgent(event) {
+
+    event.preventDefault();
+
+
+    const form = event.currentTarget;
+
+
+    const name =
+        $("#agentName").value.trim();
+
+    const role =
+        $("#agentRole").value;
+
+    const description =
+        $("#agentDescription").value.trim();
+
+    const model =
+        $("#agentModel").value;
+
+    const autoRun =
+        $("#agentAutoRun").checked;
+
+
+    if (!name) {
+
+        showToast(
+            "Agent name required",
+            "Enter a name for your new agent.",
+            "warning"
+        );
+
+        $("#agentName").focus();
+
+        return;
+
+    }
+
+
+    if (!description) {
+
+        showToast(
+            "Description required",
+            "Describe what this agent should specialize in.",
+            "warning"
+        );
+
+        $("#agentDescription").focus();
+
+        return;
+
+    }
+
+
+    const id =
+        `agent-${Date.now()}-${Math.random()
+            .toString(36)
+            .slice(2, 7)}`;
+
+
+    const colorMap = {
+        Research: "cyan",
+        Analysis: "purple",
+        Automation: "green",
+        Content: "orange",
+        Support: "cyan"
+    };
+
+
+    const newAgent = {
+
+        id,
+
+        name,
+
+        role,
+
+        description,
+
+        model,
+
+        status: autoRun
+            ? "running"
+            : "idle",
+
+        progress: autoRun
+            ? 12
+            : 0,
+
+        tasks: 0,
+
+        success: 100,
+
+        lastRun: "Never",
+
+        activity: 50,
+
+        color:
+            colorMap[role] || "cyan",
+
+        capabilities:
+            getCapabilitiesForRole(role),
+
+        history: [
+            76,
+            82,
+            74,
+            88,
+            80,
+            92
+        ]
+
+    };
+
+
+    state.agents.unshift(newAgent);
+
+    state.selectedAgentId = id;
+
+
+    addActivity(
+        "✦",
+        "",
+        `${name} created`,
+        `${role} Agent configured with ${model}.`
+    );
+
+
+    saveState();
+
+    renderAll();
+
+    form.reset();
+
+    closeModal("createModal");
+
+
+    showToast(
+        "Agent created",
+        `${name} is now part of your AI workforce.`,
+        "success"
+    );
+
+
+    if (autoRun) {
+
+        setTimeout(
+            () => runAgent(id),
+            250
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   ROLE CAPABILITIES
+========================================================= */
+
+function getCapabilitiesForRole(role) {
+
+    const capabilities = {
+
+        Research: [
+            "Web Research",
+            "Summarization",
+            "Source Analysis",
+            "Report Generation"
+        ],
+
+        Analysis: [
+            "Data Analysis",
+            "Pattern Detection",
+            "Insights",
+            "Visualization"
+        ],
+
+        Automation: [
+            "Task Execution",
+            "Scheduling",
+            "Workflow Actions",
+            "Notifications"
+        ],
+
+        Content: [
+            "Drafting",
+            "Summarization",
+            "Content Planning",
+            "Formatting"
+        ],
+
+        Support: [
+            "Question Answering",
+            "Classification",
+            "Knowledge Search",
+            "Response Generation"
+        ]
+
+    };
+
+
+    return capabilities[role] || [
+        "Reasoning",
+        "Task Execution",
+        "Analysis"
+    ];
+
+}
+
+
+/* =========================================================
+   DETAILS MODAL
+========================================================= */
+
+function updateDetailsModal(agentId) {
+
+    const agent =
+        state.agents.find(
+            (item) => item.id === agentId
+        );
+
+    if (!agent) return;
+
+
+    state.selectedAgentId = agentId;
+
+
+    $("#detailsAvatar").textContent =
+        getInitials(agent.name);
+
+    $("#detailsRole").textContent =
+        `${agent.role.toUpperCase()} AGENT`;
+
+    $("#detailsTitle").textContent =
+        agent.name;
+
+    $("#detailsDescription").textContent =
+        agent.description;
+
+    $("#detailsStatus").textContent =
+        capitalize(agent.status);
+
+    $("#detailsTasks").textContent =
+        agent.tasks;
+
+    $("#detailsSuccess").textContent =
+        `${agent.success}%`;
+
+    $("#detailsModel").textContent =
+        agent.model;
+
+    $("#detailsLastRun").textContent =
+        `Last run: ${agent.lastRun}`;
+
+
+    const bars = $("#historyBars");
+
+    const history =
+        Array.isArray(agent.history)
+            ? agent.history
+            : [60, 70, 80];
+
+
+    bars.innerHTML =
+        history
+            .map(
+                (value) => `
+                    <div
+                        class="history-bar"
+                        style="height:${clamp(value, 15, 100)}%"
+                        title="${value}% success"
+                    ></div>
+                `
+            )
+            .join("");
+
+
+    const capabilities =
+        $("#capabilityList");
+
+    capabilities.innerHTML =
+        (agent.capabilities || [])
+            .map(
+                (capability) =>
+                    `<span class="capability">
+                        ${escapeHTML(capability)}
+                    </span>`
+            )
+            .join("");
+
+
+    const pauseButton =
+        $("#detailsPauseButton");
+
+    if (agent.status === "paused") {
+
+        pauseButton.textContent =
+            "Resume Agent";
+
+    } else {
+
+        pauseButton.textContent =
+            "Pause Agent";
+
+    }
+
+
+    const runButton =
+        $("#detailsRunButton");
+
+    runButton.textContent =
+        agent.status === "paused"
+            ? "Resume & Run"
+            : "Run Agent";
+
+}
+
+
+/* =========================================================
+   CONSOLE
+========================================================= */
+
+function renderConsole() {
+
+    const agent = getSelectedAgent();
+
+    const greeting = $("#consoleGreeting");
+
+    if (!greeting) return;
+
+
+    if (!agent) {
+
+        greeting.textContent =
+            "Create an agent and give it a task.";
+
+        return;
+
+    }
+
+
+    greeting.textContent =
+        `${agent.name} is selected. Describe a task and send it to the agent.`;
+
+}
+
+
+function sendAgentPrompt() {
+
+    const input = $("#agentPrompt");
+
+    if (!input) return;
+
+
+    const prompt =
+        input.value.trim();
+
+
+    if (!prompt) {
+
+        showToast(
+            "Task required",
+            "Describe what you want your selected agent to do.",
+            "warning"
+        );
+
+        input.focus();
+
+        return;
+
+    }
+
+
+    const agent = getSelectedAgent();
+
+
+    if (!agent) {
+
+        showToast(
+            "No agent selected",
+            "Select an agent before sending a task.",
+            "warning"
+        );
+
+        return;
+
+    }
+
+
+    if (agent.status === "paused") {
+
+        showToast(
+            "Agent is paused",
+            "Resume the agent before sending a task.",
+            "warning"
+        );
+
+        return;
+
+    }
+
+
+    input.value = "";
+
+
+    addActivity(
+        "➤",
+        "",
+        `Task sent to ${agent.name}`,
+        shorten(prompt, 90)
     );
 
 
     showToast(
-
-        "Execution complete",
-
-        `${agentName} completed its task successfully.`
-
+        "Task submitted",
+        `${agent.name} received your instruction.`,
+        "success"
     );
 
 
-    setTimeout(() => {
-
-        currentTask.textContent =
-            "Waiting for next task";
-
-        progress.style.width =
-            "72%";
-
-    }, 1800);
+    runAgent(agent.id);
 
 }
 
 
 /* =========================================================
    ACTIVITY
-   ========================================================= */
+========================================================= */
+
+function renderActivities() {
+
+    const list = $("#activityList");
+
+    if (!list) return;
+
+
+    if (!state.activities.length) {
+
+        list.innerHTML = `
+            <div class="execution-empty">
+                <div class="execution-icon">◷</div>
+                <h3>No activity yet</h3>
+                <p>Agent actions will appear here.</p>
+            </div>
+        `;
+
+        return;
+
+    }
+
+
+    list.innerHTML =
+        state.activities
+            .slice(0, 12)
+            .map(
+                (activity) => `
+                    <div class="activity-item">
+
+                        <div class="activity-icon ${escapeAttribute(activity.type || "")}">
+                            ${escapeHTML(activity.icon || "•")}
+                        </div>
+
+                        <div class="activity-text">
+
+                            <strong>
+                                ${escapeHTML(activity.title)}
+                            </strong>
+
+                            <span>
+                                ${escapeHTML(activity.description)}
+                            </span>
+
+                        </div>
+
+                        <span class="activity-time">
+                            ${escapeHTML(activity.time)}
+                        </span>
+
+                    </div>
+                `
+            )
+            .join("");
+
+}
+
 
 function addActivity(
-    iconType,
+    icon,
+    type,
     title,
     description
 ) {
 
-    const panel =
-        $("#activityPanel");
+    state.activities.unshift({
+
+        id:
+            `activity-${Date.now()}-${Math.random()
+                .toString(36)
+                .slice(2, 6)}`,
+
+        icon,
+
+        type,
+
+        title,
+
+        description,
+
+        time: "Just now"
+
+    });
 
 
-    const item =
-        document.createElement("div");
+    state.activities =
+        state.activities.slice(0, 20);
+
+}
 
 
-    item.className =
-        "activity-item";
+function clearActivity() {
 
+    if (!state.activities.length) {
 
-    const iconMap = {
-
-        success: "✓",
-        purple: "✦",
-        warning: "!"
-
-    };
-
-
-    item.innerHTML = `
-
-        <div class="activity-icon ${iconType}">
-            ${iconMap[iconType]}
-        </div>
-
-        <div class="activity-content">
-
-            <strong>
-                ${escapeHTML(title)}
-            </strong>
-
-            <span>
-                ${escapeHTML(description)}
-            </span>
-
-        </div>
-
-        <time>
-            just now
-        </time>
-
-    `;
-
-
-    panel.prepend(item);
-
-
-    while (panel.children.length > 7) {
-
-        panel.removeChild(
-            panel.lastElementChild
+        showToast(
+            "Activity already clear",
+            "There are no activity items to remove.",
+            "info"
         );
+
+        return;
 
     }
 
-}
+
+    state.activities = [];
+
+    saveState();
+
+    renderActivities();
 
 
-function setupActivityControls() {
-
-    $("#clearActivityBtn")
-        .addEventListener(
-            "click",
-            () => {
-
-                $("#activityPanel").innerHTML = "";
-
-                showToast(
-                    "Activity cleared",
-                    "The activity timeline has been cleared."
-                );
-
-            }
-        );
-
-
-    $("#refreshBtn")
-        .addEventListener(
-            "click",
-            refreshAgents
-        );
-
-}
-
-
-function refreshAgents() {
-
-    const button =
-        $("#refreshBtn");
-
-
-    button.textContent =
-        "⟳ Refreshing...";
-
-
-    setTimeout(() => {
-
-        button.textContent =
-            "↻ Refresh";
-
-
-        addActivity(
-
-            "success",
-
-            "Agent Hub refreshed",
-
-            "All agent statuses are up to date."
-
-        );
-
-
-        showToast(
-
-            "Refreshed",
-
-            "Agent Hub data has been refreshed."
-
-        );
-
-    }, 900);
+    showToast(
+        "Activity cleared",
+        "The activity feed has been cleared.",
+        "success"
+    );
 
 }
 
 
 /* =========================================================
-   COUNTS
-   ========================================================= */
+   STATS
+========================================================= */
 
-function updateCounts() {
+function renderStats() {
 
-    const active =
-        agents.filter(
-            agent =>
-                agent.status === "active"
+    const total =
+        state.agents.length;
+
+    const running =
+        state.agents.filter(
+            (agent) =>
+                agent.status === "running"
         ).length;
 
 
-    $("#activeCount").textContent =
-        active;
-
-}
-
-
-/* =========================================================
-   SORT
-   ========================================================= */
-
-function setupSort() {
-
-    $("#sortBtn").addEventListener(
-        "click",
-        () => {
-
-            const grid =
-                $("#agentsGrid");
-
-
-            const cards =
-                Array.from(
-                    grid.querySelectorAll(".agent-card")
-                );
-
-
-            cards.sort((a,b) => {
-
-                const nameA =
-                    a.dataset.name.toLowerCase();
-
-                const nameB =
-                    b.dataset.name.toLowerCase();
-
-                return nameA.localeCompare(nameB);
-
-            });
-
-
-            cards.forEach(card =>
-                grid.appendChild(card)
-            );
-
-
-            showToast(
-                "Sorted",
-                "Agents sorted alphabetically."
-            );
-
-        }
-    );
-
-}
-
-
-/* =========================================================
-   FILTER BUTTON
-   ========================================================= */
-
-function setupFilterButton() {
-
-    $("#filterBtn").addEventListener(
-        "click",
-        () => {
-
-            const cards =
-                Array.from(
-                    document.querySelectorAll(".agent-card")
-                );
-
-
-            const activeCards =
-                cards.filter(
-                    card =>
-                        card.dataset.status === "active"
-                );
-
-
-            cards.forEach(card => {
-
-                card.classList.add("hidden");
-
-            });
-
-
-            activeCards.forEach(card => {
-
-                card.classList.remove("hidden");
-
-            });
-
-
-            $$(".tab").forEach(tab => {
-
-                tab.classList.remove("active");
-
-            });
-
-
-            const activeTab =
-                document.querySelector(
-                    '.tab[data-filter="active"]'
-                );
-
-
-            if (activeTab) {
-                activeTab.classList.add("active");
-            }
-
-
-            showToast(
-                "Filter applied",
-                "Showing active agents only."
-            );
-
-        }
-    );
-
-}
-
-
-/* =========================================================
-   MORE MENUS
-   ========================================================= */
-
-function attachMoreButton(button) {
-
-    if (!button) return;
-
-
-    button.addEventListener(
-        "click",
-        () => {
-
-            const card =
-                button.closest(".agent-card");
-
-
-            const agentName =
-                card.dataset.name;
-
-
-            const choice =
-                window.confirm(
-                    `${agentName}\n\n` +
-                    `OK = Pause / Resume\n` +
-                    `Cancel = Delete`
-                );
-
-
-            if (choice) {
-
-                toggleAgentStatus(card);
-
-            } else {
-
-                deleteAgent(card);
-
-            }
-
-        }
-    );
-
-}
-
-
-function setupMoreButtons() {
-
-    $$(".more-button").forEach(
-        attachMoreButton
-    );
-
-}
-
-
-function toggleAgentStatus(card) {
-
-    const agentName =
-        card.dataset.name;
-
-
-    const status =
-        card.querySelector(".status");
-
-
-    if (card.dataset.status === "paused") {
-
-        card.dataset.status = "active";
-
-        status.className =
-            "status active-status";
-
-        status.innerHTML =
-            "<i></i> Active";
-
-
-        addActivity(
-            "success",
-            `${agentName} resumed`,
-            "Agent is now active."
+    const successfulTasks =
+        state.agents.reduce(
+            (totalTasks, agent) =>
+                totalTasks +
+                Number(agent.tasks || 0),
+            0
         );
 
 
-        showToast(
-            "Agent resumed",
-            `${agentName} is now active.`
+    const successValues =
+        state.agents.map(
+            (agent) =>
+                Number(agent.success || 0)
         );
 
 
-    } else {
-
-        card.dataset.status = "paused";
-
-        status.className =
-            "status paused-status";
-
-        status.innerHTML =
-            "<i></i> Paused";
-
-
-        addActivity(
-            "warning",
-            `${agentName} paused`,
-            "Agent execution has been paused."
-        );
+    const averageSuccess =
+        successValues.length
+            ? (
+                successValues.reduce(
+                    (a, b) => a + b,
+                    0
+                ) / successValues.length
+            ).toFixed(1)
+            : "0.0";
 
 
-        showToast(
-            "Agent paused",
-            `${agentName} has been paused.`
-        );
+    $("#totalAgents").textContent =
+        total;
 
-    }
+    $("#runningAgents").textContent =
+        running;
+
+    $("#completedTasks").textContent =
+        Number(state.completedTasks || 0);
+
+    $("#successRate").textContent =
+        `${averageSuccess}%`;
 
 }
-
-
-function deleteAgent(card) {
-
-    const agentName =
-        card.dataset.name;
-
-
-    const confirmed =
-        window.confirm(
-            `Delete "${agentName}"?`
-        );
-
-
-    if (!confirmed) return;
-
-
-    card.style.transform =
-        "scale(.95)";
-
-    card.style.opacity =
-        "0";
-
-
-    setTimeout(() => {
-
-        card.remove();
-
-
-        agents =
-            agents.filter(
-                agent =>
-                    agent.name !== agentName
-            );
-
-
-        updateCounts();
-
-
-        addActivity(
-            "warning",
-            `${agentName} deleted`,
-            "The agent was removed from Agent Hub."
-        );
-
-
-        showToast(
-            "Agent deleted",
-            `${agentName} has been removed.`
-        );
-
-    }, 250);
-
-}
-
-
-setupMoreButtons();
 
 
 /* =========================================================
    NOTIFICATIONS
-   ========================================================= */
+========================================================= */
 
-function setupNotifications() {
+function updateNotificationBadge() {
 
-    $("#notificationBtn")
-        .addEventListener(
-            "click",
-            () => {
+    const badge =
+        $("#notificationBadge");
 
-                showToast(
-
-                    "Notifications",
-
-                    "Research Agent completed a task 2 minutes ago."
-
-                );
-
-            }
-        );
-
-}
+    if (!badge) return;
 
 
-/* =========================================================
-   GLOBAL SEARCH
-   ========================================================= */
+    const count =
+        Number(state.notifications || 0);
 
-function setupGlobalSearch() {
 
-    $("#searchBtn")
-        .addEventListener(
-            "click",
-            () => {
+    badge.textContent = count;
 
-                $("#agentSearch").focus();
 
-                $("#agentSearch").scrollIntoView({
-                    behavior: "smooth",
-                    block: "center"
-                });
-
-            }
-        );
+    badge.style.display =
+        count > 0
+            ? "grid"
+            : "none";
 
 }
 
 
-/* =========================================================
-   CHATBOT
-   ========================================================= */
+function markNotificationsRead() {
 
-function setupChat() {
+    state.notifications = 0;
 
-    const toggle =
-        $("#chatToggle");
+    saveState();
 
-    const windowElement =
-        $("#chatWindow");
+    updateNotificationBadge();
 
-
-    toggle.addEventListener(
-        "click",
-        () => {
-
-            windowElement.classList.toggle("show");
-
-        }
+    $$(".notification-item").forEach(
+        (item) =>
+            item.classList.remove("unread")
     );
 
 
-    $("#closeChat")
-        .addEventListener(
-            "click",
-            () => {
-
-                windowElement.classList.remove("show");
-
-            }
-        );
-
-
-    $("#sendChat")
-        .addEventListener(
-            "click",
-            sendChatMessage
-        );
-
-
-    $("#chatInput")
-        .addEventListener(
-            "keydown",
-            event => {
-
-                if (event.key === "Enter") {
-
-                    sendChatMessage();
-
-                }
-
-            }
-        );
+    showToast(
+        "Notifications cleared",
+        "All notifications have been marked as read.",
+        "success"
+    );
 
 }
 
 
-function sendChatMessage() {
+/* =========================================================
+   MODALS
+========================================================= */
 
-    const input =
-        $("#chatInput");
+function openModal(id) {
+
+    const modal = $(`#${id}`);
+
+    if (!modal) return;
+
+    modal.classList.remove("hidden");
+
+    document.body.style.overflow = "hidden";
 
 
-    const text =
-        input.value.trim();
+    const firstInput =
+        modal.querySelector(
+            "input, textarea, select"
+        );
+
+    if (firstInput) {
+
+        setTimeout(
+            () => firstInput.focus(),
+            80
+        );
+
+    }
+
+}
 
 
-    if (!text) return;
+function closeModal(id) {
+
+    const modal = $(`#${id}`);
+
+    if (!modal) return;
+
+    modal.classList.add("hidden");
+
+    if (
+        $$(".modal-backdrop:not(.hidden)").length === 0
+    ) {
+        document.body.style.overflow = "";
+    }
+
+}
 
 
-    addChatMessage(
-        text,
-        "user"
+function closeAllModals() {
+
+    $$(".modal-backdrop").forEach(
+        (modal) =>
+            modal.classList.add("hidden")
+    );
+
+    document.body.style.overflow = "";
+
+}
+
+
+/* =========================================================
+   THEME
+========================================================= */
+
+function applyTheme() {
+
+    document.body.classList.toggle(
+        "light-mode",
+        Boolean(state.lightMode)
+    );
+
+}
+
+
+function toggleTheme() {
+
+    state.lightMode =
+        !Boolean(state.lightMode);
+
+    applyTheme();
+
+    saveState();
+
+
+    showToast(
+        "Appearance updated",
+        state.lightMode
+            ? "Light appearance enabled."
+            : "Dark NEXUS appearance enabled.",
+        "info"
+    );
+
+}
+
+
+/* =========================================================
+   NAVIGATION
+========================================================= */
+
+function handleNavigation(destination) {
+
+    $$(".nav-item").forEach(
+        (button) =>
+            button.classList.toggle(
+                "active",
+                button.dataset.nav === destination
+            )
     );
 
 
-    input.value = "";
+    if (destination === "agents") {
 
+        $("#agentsSection")?.scrollIntoView({
+            behavior: "smooth",
+            block: "start"
+        });
 
-    setTimeout(() => {
-
-        const response =
-            generateChatResponse(text);
-
-
-        addChatMessage(
-            response,
-            "bot"
-        );
-
-    }, 600);
-
-}
-
-
-function addChatMessage(
-    text,
-    type
-) {
-
-    const messages =
-        $("#chatMessages");
-
-
-    const message =
-        document.createElement("div");
-
-
-    message.className =
-        `message ${type}`;
-
-
-    message.textContent =
-        text;
-
-
-    messages.appendChild(message);
-
-
-    messages.scrollTop =
-        messages.scrollHeight;
-
-}
-
-
-function generateChatResponse(text) {
-
-    const query =
-        text.toLowerCase();
-
-
-    if (
-        query.includes("active") ||
-        query.includes("agents")
-    ) {
-
-        const active =
-            agents.filter(
-                agent =>
-                    agent.status === "active"
-            ).length;
-
-
-        return `You currently have ${active} active agent(s) in the workspace.`;
+        return;
 
     }
 
 
-    if (
-        query.includes("research")
-    ) {
+    const messages = {
 
-        return "The Research Agent is configured for information gathering, analysis and summarization.";
+        command:
+            "Command Center belongs to the main workspace. This Agent Hub keeps agent operations focused.",
 
-    }
+        workflows:
+            "Workflow Builder is the automation module for connecting agents and tasks.",
 
+        insights:
+            "AI Insights will provide analytics and performance intelligence.",
 
-    if (
-        query.includes("run")
-    ) {
+        tasks:
+            "Tasks are managed through the Command Center and agent execution layer.",
 
-        return "You can run an agent using the ▶ Run button on its agent card.";
+        activity:
+            "Showing the latest Agent Hub system activity.",
 
-    }
+        settings:
+            "Agent Hub settings are ready for backend integration."
 
-
-    if (
-        query.includes("pause")
-    ) {
-
-        return "Use the ⋮ menu on an agent card to pause or resume that agent.";
-
-    }
+    };
 
 
-    if (
-        query.includes("help")
-    ) {
-
-        return "I can help you understand agent status, executions, research agents, and workspace controls.";
-
-    }
-
-
-    return "I understand. Once the NEXUS backend is connected, I'll be able to interact with real AI agents and execution data.";
-
-}
-
-
-/* =========================================================
-   MOBILE MENU
-   ========================================================= */
-
-function setupMobileMenu() {
-
-    $("#mobileMenuBtn")
-        .addEventListener(
-            "click",
-            () => {
-
-                $("#sidebar")
-                    .classList
-                    .toggle("open");
-
-            }
-        );
-
-}
-
-
-/* =========================================================
-   SETTINGS
-   ========================================================= */
-
-function setupSettings() {
-
-    $("#settingsBtn")
-        .addEventListener(
-            "click",
-            () => {
-
-                showToast(
-                    "Settings",
-                    "Agent preferences panel will be connected here."
-                );
-
-            }
-        );
-
-
-    $("#userMenuBtn")
-        .addEventListener(
-            "click",
-            () => {
-
-                showToast(
-                    "Account",
-                    "Profile and workspace controls opened."
-                );
-
-            }
-        );
-
-}
-
-
-/* =========================================================
-   INTEGRATIONS
-   ========================================================= */
-
-function setupIntegrations() {
-
-    $("#integrationsBtn")
-        .addEventListener(
-            "click",
-            () => {
-
-                showToast(
-                    "Integrations",
-                    "Connect services such as GitHub, Slack and Google."
-                );
-
-            }
-        );
+    showToast(
+        capitalize(destination),
+        messages[destination] ||
+            "This workspace module is available.",
+        "info"
+    );
 
 }
 
 
 /* =========================================================
    TOAST
-   ========================================================= */
+========================================================= */
 
 function showToast(
     title,
-    message
+    message,
+    type = "success"
 ) {
 
     const container =
         $("#toastContainer");
 
+    if (!container) return;
+
+
+    const icon =
+        type === "warning"
+            ? "!"
+            : type === "info"
+                ? "i"
+                : "✓";
+
 
     const toast =
         document.createElement("div");
 
-
-    toast.className =
-        "toast";
+    toast.className = "toast";
 
 
     toast.innerHTML = `
+        <div class="toast-icon">
+            ${icon}
+        </div>
 
-        <strong>
-            ${escapeHTML(title)}
-        </strong>
-
-        <span>
-            ${escapeHTML(message)}
-        </span>
-
+        <div>
+            <strong>${escapeHTML(title)}</strong>
+            <span>${escapeHTML(message)}</span>
+        </div>
     `;
 
 
     container.appendChild(toast);
 
 
-    setTimeout(() => {
+    setTimeout(
+        () => {
 
-        toast.style.opacity = "0";
+            toast.style.opacity = "0";
+            toast.style.transform = "translateX(12px)";
 
-        toast.style.transform =
-            "translateX(20px)";
+            setTimeout(
+                () => toast.remove(),
+                200
+            );
 
-        toast.style.transition =
-            ".25s";
-
-        setTimeout(
-            () => toast.remove(),
-            250
-        );
-
-    }, 3000);
+        },
+        3200
+    );
 
 }
 
 
 /* =========================================================
-   KEYBOARD SHORTCUTS
-   ========================================================= */
+   UTILITIES
+========================================================= */
 
-document.addEventListener(
-    "keydown",
-    event => {
+function capitalize(value) {
 
-        /* CTRL + K */
+    if (!value) return "";
 
-        if (
-            (event.ctrlKey || event.metaKey) &&
-            event.key.toLowerCase() === "k"
-        ) {
+    return (
+        value.charAt(0).toUpperCase() +
+        value.slice(1)
+    );
 
-            event.preventDefault();
-
-            $("#agentSearch").focus();
-
-        }
+}
 
 
-        /* ESC */
+function getInitials(name) {
 
-        if (event.key === "Escape") {
+    if (!name) return "AI";
 
-            $("#createModal")
-                .classList
-                .remove("show");
 
-            $("#chatWindow")
-                .classList
-                .remove("show");
+    const words =
+        name
+            .trim()
+            .split(/\s+/)
+            .filter(Boolean);
 
-        }
+
+    if (words.length === 1) {
+
+        return words[0]
+            .slice(0, 2)
+            .toUpperCase();
 
     }
-);
+
+
+    return (
+        words[0][0] +
+        words[1][0]
+    ).toUpperCase();
+
+}
+
+
+function getStatusDotClass(status) {
+
+    if (status === "running") {
+        return "online";
+    }
+
+    if (status === "paused") {
+        return "paused";
+    }
+
+    return "";
+
+}
+
+
+function clamp(value, min, max) {
+
+    const number = Number(value);
+
+    if (Number.isNaN(number)) {
+        return min;
+    }
+
+    return Math.min(
+        max,
+        Math.max(min, number)
+    );
+
+}
+
+
+function shorten(text, length) {
+
+    if (!text) return "";
+
+    return text.length > length
+        ? `${text.slice(0, length - 1)}…`
+        : text;
+
+}
+
+
+/* =========================================================
+   SECURITY / HTML ESCAPING
+========================================================= */
+
+function escapeHTML(value) {
+
+    return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+
+}
+
+
+function escapeAttribute(value) {
+
+    return escapeHTML(value);
+
+}
