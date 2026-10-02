@@ -1,2496 +1,1694 @@
-/* =========================================================
-   NEXUS AI — AGENT HUB
-   Complete frontend interaction layer
-========================================================= */
+(() => {
+  "use strict";
 
-"use strict";
+  const STORAGE_KEY = "nexus-ai-insights-state-v1";
+  const THEME_KEY = "nexus-ai-insights-theme";
 
-/* =========================================================
-   STORAGE
-========================================================= */
-
-const STORAGE_KEY = "nexus_agent_hub_state_v1";
-
-function syncNexusProfile() {
-    try {
-        const raw = localStorage.getItem("nexus_ai_command_center_v4");
-        const state = raw ? JSON.parse(raw) : {};
-        const name = state?.user?.name || "NEXUS User";
-        const email = state?.user?.email || "user@example.com";
-        const avatar = name.trim().charAt(0).toUpperCase() || "N";
-        document.getElementById("profileName")?.replaceChildren(document.createTextNode(name));
-        document.getElementById("profileEmail")?.replaceChildren(document.createTextNode(email));
-        document.getElementById("profileAvatar")?.replaceChildren(document.createTextNode(avatar));
-    } catch (_) {}
-}
-
-
-
-/* =========================================================
-   DEFAULT AGENTS
-========================================================= */
-
-const defaultAgents = [
+  const seedAgents = [
     {
-        id: "research-001",
-        name: "Research Agent",
-        role: "Research",
-        description:
-            "Researches information, compares sources and produces structured summaries.",
-        model: "NEXUS Reasoner",
-        status: "running",
-        progress: 72,
-        tasks: 42,
-        success: 98,
-        lastRun: "2 min ago",
-        activity: 94,
-        color: "cyan",
-        capabilities: [
-            "Web Research",
-            "Summarization",
-            "Source Analysis",
-            "Report Generation"
-        ],
-        history: [62, 75, 69, 88, 74, 91, 82, 96, 84, 93, 87, 98]
+      id: "research",
+      name: "Research Agent",
+      status: "active",
+      runs: 186,
+      success: 178,
+      avg: 18,
+      specialty: "Research & synthesis"
     },
-
     {
-        id: "analysis-002",
-        name: "Data Analyst",
-        role: "Analysis",
-        description:
-            "Analyzes structured information and converts complex data into useful insights.",
-        model: "NEXUS Reasoner",
-        status: "running",
-        progress: 56,
-        tasks: 36,
-        success: 97,
-        lastRun: "8 min ago",
-        activity: 87,
-        color: "purple",
-        capabilities: [
-            "Data Analysis",
-            "Pattern Detection",
-            "Insights",
-            "Visualization"
-        ],
-        history: [70, 78, 73, 84, 81, 88, 91, 86, 89, 94, 90, 97]
+      id: "data",
+      name: "Data Analyst",
+      status: "active",
+      runs: 154,
+      success: 149,
+      avg: 24,
+      specialty: "Data analysis & reporting"
     },
-
     {
-        id: "automation-003",
-        name: "Task Automator",
-        role: "Automation",
-        description:
-            "Handles repeatable work, task preparation and automated workflow operations.",
-        model: "NEXUS Core",
-        status: "idle",
-        progress: 31,
-        tasks: 29,
-        success: 95,
-        lastRun: "21 min ago",
-        activity: 63,
-        color: "green",
-        capabilities: [
-            "Task Execution",
-            "Scheduling",
-            "Workflow Actions",
-            "Notifications"
-        ],
-        history: [52, 63, 70, 66, 76, 81, 73, 87, 79, 84, 91, 95]
+      id: "content",
+      name: "Content Agent",
+      status: "idle",
+      runs: 128,
+      success: 119,
+      avg: 15,
+      specialty: "Content generation"
     },
-
     {
-        id: "content-004",
-        name: "Content Agent",
-        role: "Content",
-        description:
-            "Creates structured drafts, summaries and content concepts from instructions.",
-        model: "NEXUS Fast",
-        status: "paused",
-        progress: 18,
-        tasks: 21,
-        success: 94,
-        lastRun: "1 hr ago",
-        activity: 42,
-        color: "orange",
-        capabilities: [
-            "Drafting",
-            "Summarization",
-            "Content Planning",
-            "Formatting"
-        ],
-        history: [60, 58, 72, 64, 75, 70, 81, 77, 86, 82, 91, 94]
+      id: "monitor",
+      name: "Monitor Agent",
+      status: "active",
+      runs: 212,
+      success: 207,
+      avg: 9,
+      specialty: "System monitoring"
+    },
+    {
+      id: "planner",
+      name: "Task Planner",
+      status: "paused",
+      runs: 96,
+      success: 88,
+      avg: 21,
+      specialty: "Task planning & routing"
+    },
+    {
+      id: "support",
+      name: "Support Agent",
+      status: "idle",
+      runs: 117,
+      success: 111,
+      avg: 13,
+      specialty: "Support automation"
     }
-];
+  ];
 
 
-/* =========================================================
-   DEFAULT STATE
-========================================================= */
-
-const defaultState = {
-    agents: defaultAgents,
-    selectedAgentId: "research-001",
-
-    completedTasks: 128,
-
-    activities: [
-        {
-            id: "a1",
-            icon: "✓",
-            type: "success",
-            title: "Research Agent completed a task",
-            description: "Research summary generated successfully.",
-            time: "2 min ago"
-        },
-        {
-            id: "a2",
-            icon: "▶",
-            type: "",
-            title: "Data Analyst started execution",
-            description: "Workspace analytics task is running.",
-            time: "8 min ago"
-        },
-        {
-            id: "a3",
-            icon: "!",
-            type: "warning",
-            title: "Content Agent paused",
-            description: "Agent is waiting for new configuration.",
-            time: "1 hr ago"
-        },
-        {
-            id: "a4",
-            icon: "✦",
-            type: "",
-            title: "Agent Hub synchronized",
-            description: "All local agent configurations are ready.",
-            time: "2 hr ago"
-        }
-    ],
-
-    notifications: 3,
-
-    lightMode: false
-};
+  const seedActivity = [
+    {
+      agent: "Monitor Agent",
+      type: "success",
+      message: "Health check workflow completed",
+      time: "Just now",
+      duration: 8
+    },
+    {
+      agent: "Research Agent",
+      type: "success",
+      message: "Research summary generated",
+      time: "2 min ago",
+      duration: 17
+    },
+    {
+      agent: "Data Analyst",
+      type: "running",
+      message: "Quarterly metrics analysis running",
+      time: "5 min ago",
+      duration: 28
+    },
+    {
+      agent: "Content Agent",
+      type: "failed",
+      message: "Draft generation timed out",
+      time: "11 min ago",
+      duration: 42
+    },
+    {
+      agent: "Support Agent",
+      type: "success",
+      message: "Support queue classified",
+      time: "18 min ago",
+      duration: 12
+    },
+    {
+      agent: "Task Planner",
+      type: "success",
+      message: "Workflow plan prepared",
+      time: "27 min ago",
+      duration: 20
+    }
+  ];
 
 
-/* =========================================================
-   STATE
-========================================================= */
-
-let state = loadState();
-
-let activeExecution = null;
-let executionTimer = null;
-let toastTimer = null;
-
-
-/* =========================================================
-   DOM HELPERS
-========================================================= */
-
-const $ = (selector) => document.querySelector(selector);
-
-const $$ = (selector) => Array.from(document.querySelectorAll(selector));
-
-
-/* =========================================================
-   LOAD / SAVE
-========================================================= */
-
-function cloneDefaultState() {
-    return JSON.parse(JSON.stringify(defaultState));
-}
-
-
-function loadState() {
+  const $ = (id) => document.getElementById(id);
+  function syncNexusProfile() {
     try {
-        const saved = localStorage.getItem(STORAGE_KEY);
+      const raw = localStorage.getItem("nexus_ai_command_center_v4");
+      const state = raw ? JSON.parse(raw) : {};
+      const name = state?.user?.name || "NEXUS User";
+      const email = state?.user?.email || "user@example.com";
+      const avatar = name.trim().charAt(0).toUpperCase() || "N";
+      $("profileName")?.replaceChildren(document.createTextNode(name));
+      $("profileEmail")?.replaceChildren(document.createTextNode(email));
+      $("profileAvatar")?.replaceChildren(document.createTextNode(avatar));
+    } catch (_) {}
+  }
 
-        if (!saved) {
-            return cloneDefaultState();
-        }
 
-        const parsed = JSON.parse(saved);
 
-        if (
-            !parsed ||
-            !Array.isArray(parsed.agents) ||
-            parsed.agents.length === 0
-        ) {
-            return cloneDefaultState();
-        }
+  const clone = (value) =>
+    JSON.parse(JSON.stringify(value));
+
+
+  const state = loadState();
+
+
+  function loadState() {
+    try {
+      const saved = JSON.parse(
+        localStorage.getItem(STORAGE_KEY) || "null"
+      );
+
+      if (!saved) {
+        return {
+          agents: clone(seedAgents),
+          activity: clone(seedActivity)
+        };
+      }
+
+      return {
+        agents:
+          Array.isArray(saved.agents) && saved.agents.length
+            ? saved.agents
+            : clone(seedAgents),
+
+        activity:
+          Array.isArray(saved.activity)
+            ? saved.activity
+            : clone(seedActivity)
+      };
+
+    } catch (error) {
+      console.warn("Could not load saved AI Insights state.", error);
+
+      return {
+        agents: clone(seedAgents),
+        activity: clone(seedActivity)
+      };
+    }
+  }
+
+
+  function saveState() {
+    try {
+      localStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify(state)
+      );
+    } catch (error) {
+      console.warn("Could not save AI Insights state.", error);
+    }
+  }
+
+
+  function escapeHtml(value) {
+    return String(value).replace(
+      /[&<>'"]/g,
+      (character) => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        "'": "&#39;",
+        '"': "&quot;"
+      })[character]
+    );
+  }
+
+
+  function clamp(value, min, max) {
+    return Math.min(
+      max,
+      Math.max(min, value)
+    );
+  }
+
+
+  function periodFactor() {
+    const select = $("rangeSelect");
+
+    if (!select) {
+      return 1;
+    }
+
+    const days = Number(select.value);
+
+    return days / 30;
+  }
+
+
+  function totals() {
+    const factor = periodFactor();
+
+    const runs = Math.round(
+      state.agents.reduce(
+        (sum, agent) => sum + agent.runs,
+        0
+      ) * factor
+    );
+
+
+    const success = Math.round(
+      state.agents.reduce(
+        (sum, agent) => sum + agent.success,
+        0
+      ) * factor
+    );
+
+
+    const failed = Math.max(
+      0,
+      runs - success
+    );
+
+
+    const avg = state.agents.length
+      ? Math.round(
+          state.agents.reduce(
+            (sum, agent) => sum + agent.avg,
+            0
+          ) / state.agents.length
+        )
+      : 0;
+
+
+    const active = state.agents.filter(
+      (agent) => agent.status === "active"
+    ).length;
+
+
+    const successRate = runs
+      ? (success / runs) * 100
+      : 0;
+
+
+    return {
+      runs,
+      success,
+      failed,
+      avg,
+      active,
+      successRate
+    };
+  }
+
+
+  function renderKpis() {
+    const total = totals();
+
+    $("totalRuns").textContent =
+      total.runs.toLocaleString();
+
+
+    $("successRate").textContent =
+      `${total.successRate.toFixed(1)}%`;
+
+
+    $("activeAgents").textContent =
+      total.active;
+
+
+    $("avgRuntime").textContent =
+      `${total.avg}s`;
+
+
+    $("runsTrend").textContent =
+      "+8.4%";
+
+
+    $("successTrend").textContent =
+      total.successRate >= 90
+        ? "+2.1%"
+        : "-1.3%";
+
+
+    $("successTrend").className =
+      `trend ${
+        total.successRate >= 90
+          ? "positive"
+          : "negative"
+      }`;
+
+
+    $("agentTrend").textContent =
+      `${total.active}`;
+
+
+    $("runtimeTrend").textContent =
+      "-4.8%";
+
+
+    $("runtimeTrend").className =
+      "trend positive";
+
+
+    $("successfulRuns").textContent =
+      total.success.toLocaleString();
+
+
+    $("failedRuns").textContent =
+      total.failed.toLocaleString();
+
+
+    $("otherRuns").textContent =
+      "0";
+
+
+    $("donutValue").textContent =
+      `${Math.round(total.successRate)}%`;
+
+
+    const successDegrees =
+      total.successRate * 3.6;
+
+
+    const failedDegrees =
+      (100 - total.successRate) * 3.6;
+
+
+    $("donutChart").style.background =
+      `conic-gradient(
+        var(--success) 0deg ${successDegrees}deg,
+        var(--danger) ${successDegrees}deg ${successDegrees + failedDegrees}deg,
+        var(--warning) ${successDegrees + failedDegrees}deg 360deg
+      )`;
+  }
+
+
+  function buildChartData(days) {
+    const points = Math.min(
+      days,
+      14
+    );
+
+
+    const base = Math.max(
+      5,
+      Math.round(
+        state.agents.reduce(
+          (sum, agent) => sum + agent.runs,
+          0
+        ) / 30
+      )
+    );
+
+
+    return Array.from(
+      { length: points },
+      (_, index) => {
+
+        const wave =
+          Math.sin(index * 1.13) *
+          base *
+          0.18;
+
+
+        const growth =
+          index *
+          base *
+          0.012;
+
+
+        const runs =
+          Math.max(
+            2,
+            Math.round(
+              base +
+              wave +
+              growth
+            )
+          );
+
+
+        const success =
+          Math.max(
+            1,
+            Math.round(
+              runs *
+              (
+                0.91 +
+                Math.sin(index * 0.8) *
+                0.025
+              )
+            )
+          );
+
 
         return {
-            ...cloneDefaultState(),
-            ...parsed
+          label: `${index + 1}`,
+          runs,
+          success
         };
-
-    } catch (error) {
-        console.warn("NEXUS Agent Hub: Could not load saved state.", error);
-        return cloneDefaultState();
-    }
-}
-
-
-function saveState() {
-    try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-    } catch (error) {
-        console.warn("NEXUS Agent Hub: Could not save state.", error);
-    }
-}
-
-
-/* =========================================================
-   INITIALIZATION
-========================================================= */
-
-document.addEventListener("DOMContentLoaded", () => {
-    syncNexusProfile();
-
-    applyTheme();
-
-    bindEvents();
-
-    renderAll();
-
-    showToast(
-        "Agent Hub ready",
-        "Your AI workforce is connected and ready.",
-        "success"
+      }
     );
+  }
 
-});
+
+  function renderRunsChart() {
+    const host = $("runsChart");
+
+    const days =
+      Number($("rangeSelect").value);
 
 
-/* =========================================================
-   EVENT BINDING
-========================================================= */
+    const data =
+      buildChartData(days);
 
-function bindEvents() {
 
-    /* Create agent */
-    $("#headerCreateButton")?.addEventListener(
-        "click",
-        () => openModal("createModal")
-    );
+    const width = 760;
 
-    $("#heroCreateButton")?.addEventListener(
-        "click",
-        () => openModal("createModal")
-    );
+    const height = 225;
 
-    $("#emptyCreateButton")?.addEventListener(
-        "click",
-        () => openModal("createModal")
+    const padding = {
+      left: 12,
+      right: 12,
+      top: 10,
+      bottom: 25
+    };
+
+
+    const max = Math.max(
+      ...data.map(
+        (item) => item.runs
+      ),
+      1
     );
 
 
-    /* Hero run */
-    $("#heroRunButton")?.addEventListener(
-        "click",
-        () => {
-            const agent = getSelectedAgent();
+    const x = (index) =>
+      padding.left +
+      (
+        index *
+        (
+          width -
+          padding.left -
+          padding.right
+        )
+      ) /
+      Math.max(
+        1,
+        data.length - 1
+      );
 
-            if (!agent) {
-                showToast(
-                    "No agent selected",
-                    "Select an agent before starting an execution.",
-                    "warning"
-                );
 
-                return;
-            }
+    const y = (value) =>
+      padding.top +
+      (
+        height -
+        padding.top -
+        padding.bottom
+      ) *
+      (
+        1 -
+        value / max
+      );
 
-            runAgent(agent.id);
+
+    const linePath = (key) =>
+      data
+        .map(
+          (item, index) =>
+            `${
+              index ? "L" : "M"
+            } ${x(index).toFixed(1)} ${y(
+              item[key]
+            ).toFixed(1)}`
+        )
+        .join(" ");
+
+
+    const areaPath =
+      `${linePath("runs")}
+       L ${x(data.length - 1).toFixed(1)} ${
+         height - padding.bottom
+       }
+       L ${x(0).toFixed(1)} ${
+         height - padding.bottom
+       }
+       Z`;
+
+
+    const grid = [0, 0.25, 0.5, 0.75, 1]
+      .map(
+        (value) =>
+          `<line
+            class="chart-grid-line"
+            x1="${padding.left}"
+            y1="${y(max * value)}"
+            x2="${width - padding.right}"
+            y2="${y(max * value)}"
+          />`
+      )
+      .join("");
+
+
+    const labels = data
+      .map(
+        (item, index) =>
+          index %
+            Math.max(
+              1,
+              Math.ceil(data.length / 7)
+            ) ===
+          0
+            ? `<text
+                class="chart-axis-label"
+                x="${x(index)}"
+                y="${height - 5}"
+                text-anchor="middle"
+              >
+                ${index + 1}
+              </text>`
+            : ""
+      )
+      .join("");
+
+
+    const points = data
+      .map(
+        (item, index) =>
+          `<circle
+            class="chart-point"
+            cx="${x(index)}"
+            cy="${y(item.runs)}"
+            r="3"
+          />`
+      )
+      .join("");
+
+
+    host.innerHTML = `
+      <svg
+        class="chart-svg"
+        viewBox="0 0 ${width} ${height}"
+        role="img"
+        aria-label="Runs over time"
+      >
+
+        <defs>
+
+          <linearGradient
+            id="areaGradient"
+            x1="0"
+            x2="0"
+            y1="0"
+            y2="1"
+          >
+
+            <stop
+              offset="0%"
+              stop-color="var(--accent)"
+            />
+
+            <stop
+              offset="100%"
+              stop-color="var(--accent)"
+              stop-opacity="0"
+            />
+
+          </linearGradient>
+
+        </defs>
+
+        ${grid}
+
+        <path
+          class="chart-area"
+          d="${areaPath}"
+        />
+
+        <path
+          class="chart-line"
+          d="${linePath("runs")}"
+        />
+
+        <path
+          class="chart-line success-line"
+          d="${linePath("success")}"
+        />
+
+        ${points}
+
+        ${labels}
+
+      </svg>
+    `;
+  }
+
+
+  function renderRuntimeChart() {
+    const host = $("runtimeChart");
+
+
+    const data = [...state.agents]
+      .sort(
+        (a, b) =>
+          b.avg - a.avg
+      );
+
+
+    const max = Math.max(
+      ...data.map(
+        (agent) => agent.avg
+      ),
+      1
+    );
+
+
+    host.innerHTML = data
+      .map((agent) => {
+
+        const percentage =
+          clamp(
+            (agent.avg / max) * 100,
+            3,
+            100
+          );
+
+
+        return `
+          <div
+            class="bar-group"
+            title="${escapeHtml(agent.name)}: ${agent.avg}s"
+          >
+
+            <div
+              class="bar"
+              style="height:${percentage}%"
+            >
+
+              <span class="bar-value">
+                ${agent.avg}s
+              </span>
+
+            </div>
+
+            <span class="bar-label">
+              ${escapeHtml(
+                agent.name.replace(
+                  " Agent",
+                  ""
+                )
+              )}
+            </span>
+
+          </div>
+        `;
+      })
+      .join("");
+  }
+
+
+  function reliability(agent) {
+    return agent.runs
+      ? (agent.success / agent.runs) * 100
+      : 0;
+  }
+
+
+  function renderTable() {
+    const query =
+      $("agentSearch").value
+        .trim()
+        .toLowerCase();
+
+
+    const filter =
+      $("statusFilter").value;
+
+
+    const filtered =
+      state.agents.filter(
+        (agent) => {
+
+          const matchesQuery =
+            !query ||
+            agent.name
+              .toLowerCase()
+              .includes(query) ||
+            agent.specialty
+              .toLowerCase()
+              .includes(query);
+
+
+          const matchesStatus =
+            filter === "all" ||
+            agent.status === filter;
+
+
+          return (
+            matchesQuery &&
+            matchesStatus
+          );
         }
-    );
+      );
 
 
-    /* Search */
-    $("#agentSearch")?.addEventListener(
-        "input",
-        renderAgents
-    );
+    $("emptyTable")
+      .classList.toggle(
+        "hidden",
+        filtered.length !== 0
+      );
 
 
-    /* Filters */
-    $("#statusFilter")?.addEventListener(
-        "change",
-        renderAgents
-    );
+    $("agentTableBody").innerHTML =
+      filtered
+        .map((agent) => {
 
-    $("#sortAgents")?.addEventListener(
-        "change",
-        renderAgents
-    );
+          const rate =
+            reliability(agent);
 
 
-    /* Refresh */
-    $("#refreshButton")?.addEventListener(
-        "click",
-        () => {
+          const initials =
+            agent.name
+              .split(" ")
+              .map(
+                (word) => word[0]
+              )
+              .join("")
+              .slice(0, 2);
 
-            renderAll();
 
-            showToast(
-                "Dashboard refreshed",
-                "Agent Hub data has been synchronized.",
-                "success"
-            );
-        }
-    );
+          return `
+            <tr>
 
+              <td>
 
-    /* Theme */
-    $("#themeButton")?.addEventListener(
-        "click",
-        toggleTheme
-    );
+                <div class="agent-cell">
 
+                  <span class="agent-avatar">
+                    ${escapeHtml(initials)}
+                  </span>
 
-    /* Notifications */
-    $("#notificationButton")?.addEventListener(
-        "click",
-        (event) => {
-
-            event.stopPropagation();
-
-            const panel = $("#notificationPanel");
-
-            panel.classList.toggle("hidden");
-        }
-    );
-
-
-    $("#markNotificationsButton")?.addEventListener(
-        "click",
-        markNotificationsRead
-    );
-
-
-    /* Activity */
-    $("#clearActivityButton")?.addEventListener(
-        "click",
-        clearActivity
-    );
-
-
-    /* Create form */
-    $("#createAgentForm")?.addEventListener(
-        "submit",
-        handleCreateAgent
-    );
-
-
-    /* Console */
-    $("#sendAgentButton")?.addEventListener(
-        "click",
-        sendAgentPrompt
-    );
-
-
-    $("#agentPrompt")?.addEventListener(
-        "keydown",
-        (event) => {
-
-            if (
-                event.key === "Enter" &&
-                !event.shiftKey
-            ) {
-                event.preventDefault();
-
-                sendAgentPrompt();
-            }
-        }
-    );
-
-
-    /* Suggestions */
-    $$(".suggestion-button").forEach((button) => {
-
-        button.addEventListener(
-            "click",
-            () => {
-
-                const prompt = button.dataset.prompt || "";
-
-                $("#agentPrompt").value = prompt;
-
-                $("#agentPrompt").focus();
-            }
-        );
-
-    });
-
-
-    /* Details controls */
-    $("#detailsRunButton")?.addEventListener(
-        "click",
-        () => {
-
-            const agent = getSelectedAgent();
-
-            if (!agent) return;
-
-            closeModal("detailsModal");
-
-            runAgent(agent.id);
-        }
-    );
-
-
-    $("#detailsPauseButton")?.addEventListener(
-        "click",
-        () => {
-
-            const agent = getSelectedAgent();
-
-            if (!agent) return;
-
-            toggleAgentStatus(agent.id);
-
-            renderAll();
-
-            updateDetailsModal(agent.id);
-        }
-    );
-
-
-    /* Mobile menu */
-    $("#mobileMenuButton")?.addEventListener(
-        "click",
-        () => {
-
-            $("#sidebar")?.classList.toggle("mobile-open");
-        }
-    );
-
-
-    /* Workspace */
-    $("#workspaceButton")?.addEventListener(
-        "click",
-        () => {
-
-            showToast(
-                "Workspace",
-                "NEXUS Workspace is currently active.",
-                "info"
-            );
-        }
-    );
-
-
-    /* Profile */
-    $("#profileButton")?.addEventListener(
-        "click",
-        () => {
-
-            showToast(
-                "Member profile",
-                "Agent Engineer workspace profile.",
-                "info"
-            );
-        }
-    );
-
-
-    /* Navigation */
-    $$(".nav-item").forEach((button) => {
-
-        button.addEventListener(
-            "click",
-            () => {
-
-                handleNavigation(button.dataset.nav);
-
-            }
-        );
-
-    });
-
-
-    /* Modal close buttons */
-    $$("[data-close-modal]").forEach((button) => {
-
-        button.addEventListener(
-            "click",
-            () => {
-
-                closeModal(button.dataset.closeModal);
-
-            }
-        );
-
-    });
-
-
-    /* Backdrop close */
-    $$(".modal-backdrop").forEach((backdrop) => {
-
-        backdrop.addEventListener(
-            "click",
-            (event) => {
-
-                if (event.target === backdrop) {
-
-                    backdrop.classList.add("hidden");
-
-                }
-
-            }
-        );
-
-    });
-
-
-    /* Escape */
-    document.addEventListener(
-        "keydown",
-        (event) => {
-
-            if (event.key === "Escape") {
-
-                closeAllModals();
-
-                $("#notificationPanel")?.classList.add("hidden");
-
-            }
-
-        }
-    );
-
-
-    /* Outside notification click */
-    document.addEventListener(
-        "click",
-        (event) => {
-
-            const panel = $("#notificationPanel");
-            const button = $("#notificationButton");
-
-            if (
-                panel &&
-                !panel.classList.contains("hidden") &&
-                !panel.contains(event.target) &&
-                !button.contains(event.target)
-            ) {
-                panel.classList.add("hidden");
-            }
-
-        }
-    );
-}
-
-
-/* =========================================================
-   RENDER ALL
-========================================================= */
-
-function renderAll() {
-
-    renderAgents();
-
-    renderStats();
-
-    renderActivities();
-
-    renderExecution();
-
-    renderConsole();
-
-    updateNotificationBadge();
-
-    $("#navAgentCount").textContent = state.agents.length;
-
-}
-
-
-/* =========================================================
-   AGENTS
-========================================================= */
-
-function renderAgents() {
-
-    const grid = $("#agentsGrid");
-    const empty = $("#emptyAgents");
-
-    if (!grid || !empty) return;
-
-    const searchValue =
-        ($("#agentSearch")?.value || "")
-            .trim()
-            .toLowerCase();
-
-    const status =
-        $("#statusFilter")?.value || "all";
-
-    const sort =
-        $("#sortAgents")?.value || "name";
-
-    let agents = [...state.agents];
-
-
-    /* Search */
-    if (searchValue) {
-
-        agents = agents.filter((agent) => {
-
-            const searchable =
-                `${agent.name} ${agent.role} ${agent.description}`
-                    .toLowerCase();
-
-            return searchable.includes(searchValue);
-
-        });
-
-    }
-
-
-    /* Status */
-    if (status !== "all") {
-
-        agents = agents.filter(
-            (agent) => agent.status === status
-        );
-
-    }
-
-
-    /* Sort */
-    if (sort === "name") {
-
-        agents.sort((a, b) =>
-            a.name.localeCompare(b.name)
-        );
-
-    } else if (sort === "status") {
-
-        const order = {
-            running: 1,
-            idle: 2,
-            paused: 3
-        };
-
-        agents.sort(
-            (a, b) =>
-                (order[a.status] || 9) -
-                (order[b.status] || 9)
-        );
-
-    } else if (sort === "activity") {
-
-        agents.sort(
-            (a, b) =>
-                Number(b.activity || 0) -
-                Number(a.activity || 0)
-        );
-
-    }
-
-
-    if (agents.length === 0) {
-
-        grid.innerHTML = "";
-
-        empty.classList.remove("hidden");
-
-        return;
-
-    }
-
-
-    empty.classList.add("hidden");
-
-
-    grid.innerHTML = agents
-        .map(createAgentCard)
-        .join("");
-
-
-    $$(".agent-card").forEach((card) => {
-
-        card.addEventListener(
-            "click",
-            () => {
-
-                selectAgent(card.dataset.agentId);
-
-            }
-        );
-
-    });
-
-
-    $$(".agent-run").forEach((button) => {
-
-        button.addEventListener(
-            "click",
-            (event) => {
-
-                event.stopPropagation();
-
-                runAgent(button.dataset.agentId);
-
-            }
-        );
-
-    });
-
-
-    $$(".agent-secondary").forEach((button) => {
-
-        button.addEventListener(
-            "click",
-            (event) => {
-
-                event.stopPropagation();
-
-                handleAgentSecondaryAction(
-                    button.dataset.action,
-                    button.dataset.agentId
-                );
-
-            }
-        );
-
-    });
-
-}
-
-
-/* =========================================================
-   AGENT CARD
-========================================================= */
-
-function createAgentCard(agent) {
-
-    const selected =
-        state.selectedAgentId === agent.id
-            ? "selected"
-            : "";
-
-    const statusClass =
-        agent.status || "idle";
-
-    const statusLabel =
-        capitalize(agent.status || "idle");
-
-    const color =
-        agent.color || "cyan";
-
-    const actionText =
-        agent.status === "running"
-            ? "Run Again"
-            : "Run Agent";
-
-    return `
-        <article
-            class="agent-card ${selected}"
-            data-agent-id="${escapeAttribute(agent.id)}"
-        >
-
-            <div class="agent-top">
-
-                <div class="agent-identity">
-
-                    <div class="agent-avatar ${escapeAttribute(color)}">
-                        ${getInitials(agent.name)}
-                    </div>
-
-                    <div>
-                        <h3 title="${escapeAttribute(agent.name)}">
-                            ${escapeHTML(agent.name)}
-                        </h3>
-
-                        <span class="agent-role">
-                            ${escapeHTML(agent.role)} Agent
-                        </span>
-                    </div>
+                  <span>
+                    ${escapeHtml(
+                      agent.name
+                    )}
+                  </span>
 
                 </div>
 
-                <span class="status-chip ${statusClass}">
-                    <span class="status-dot ${getStatusDotClass(agent.status)}"></span>
-                    ${statusLabel}
+              </td>
+
+
+              <td>
+
+                <span
+                  class="status-pill ${escapeHtml(
+                    agent.status
+                  )}"
+                >
+                  ${escapeHtml(
+                    agent.status
+                  )}
                 </span>
 
-            </div>
+              </td>
 
 
-            <p class="agent-description">
-                ${escapeHTML(agent.description)}
-            </p>
+              <td>
+                ${agent.runs}
+              </td>
 
 
-            <div class="agent-progress">
+              <td>
+                ${agent.success}
+              </td>
 
-                <div class="progress-header">
-                    <span>Current workload</span>
-                    <strong>${Number(agent.progress) || 0}%</strong>
+
+              <td>
+                ${agent.avg}s
+              </td>
+
+
+              <td>
+
+                <div class="reliability">
+
+                  <span>
+                    ${rate.toFixed(1)}%
+                  </span>
+
+                  <span class="progress">
+                    <span
+                      style="width:${rate}%"
+                    ></span>
+                  </span>
+
                 </div>
 
-                <div class="progress-track">
-                    <div
-                        class="progress-fill"
-                        style="width: ${clamp(agent.progress, 0, 100)}%"
-                    ></div>
-                </div>
-
-            </div>
+              </td>
 
 
-            <div class="agent-meta">
-
-                <div class="agent-meta-item">
-                    <span>Tasks</span>
-                    <strong>${Number(agent.tasks) || 0}</strong>
-                </div>
-
-                <div class="agent-meta-item">
-                    <span>Success</span>
-                    <strong>${Number(agent.success) || 0}%</strong>
-                </div>
-
-                <div class="agent-meta-item">
-                    <span>Last run</span>
-                    <strong>${escapeHTML(agent.lastRun || "Never")}</strong>
-                </div>
-
-            </div>
-
-
-            <div class="agent-actions">
+              <td>
 
                 <button
-                    class="agent-run"
-                    type="button"
-                    data-agent-id="${escapeAttribute(agent.id)}"
+                  class="row-button details-btn"
+                  data-id="${escapeHtml(agent.id)}"
+                  type="button"
                 >
-                    ▶ ${actionText}
+                  Details →
                 </button>
 
-                <button
-                    class="agent-secondary"
-                    type="button"
-                    title="View agent details"
-                    data-action="details"
-                    data-agent-id="${escapeAttribute(agent.id)}"
-                >
-                    ◉
-                </button>
+              </td>
 
-                <button
-                    class="agent-secondary"
-                    type="button"
-                    title="${agent.status === "paused" ? "Resume agent" : "Pause agent"}"
-                    data-action="toggle"
-                    data-agent-id="${escapeAttribute(agent.id)}"
-                >
-                    ${agent.status === "paused" ? "▶" : "Ⅱ"}
-                </button>
+            </tr>
+          `;
+        })
+        .join("");
+  }
 
-                <button
-                    class="agent-secondary"
-                    type="button"
-                    title="Delete agent"
-                    data-action="delete"
-                    data-agent-id="${escapeAttribute(agent.id)}"
-                >
-                    ×
-                </button>
 
-            </div>
+  function renderInsights() {
+    const sorted =
+      [...state.agents].sort(
+        (a, b) =>
+          reliability(b) -
+          reliability(a)
+      );
 
-        </article>
-    `;
-}
 
+    const fastest =
+      [...state.agents].sort(
+        (a, b) =>
+          a.avg - b.avg
+      )[0];
 
-/* =========================================================
-   SELECT AGENT
-========================================================= */
 
-function selectAgent(agentId) {
+    const slowest =
+      [...state.agents].sort(
+        (a, b) =>
+          b.avg - a.avg
+      )[0];
 
-    const agent = state.agents.find(
-        (item) => item.id === agentId
-    );
 
-    if (!agent) return;
-
-    state.selectedAgentId = agentId;
-
-    saveState();
-
-    renderAgents();
-
-    renderExecution();
-
-    renderConsole();
-
-}
-
-
-/* =========================================================
-   GET SELECTED
-========================================================= */
-
-function getSelectedAgent() {
-
-    return state.agents.find(
-        (agent) =>
-            agent.id === state.selectedAgentId
-    ) || null;
-
-}
-
-
-/* =========================================================
-   AGENT ACTIONS
-========================================================= */
-
-function handleAgentSecondaryAction(action, agentId) {
-
-    const agent =
-        state.agents.find(
-            (item) => item.id === agentId
-        );
-
-    if (!agent) {
-
-        showToast(
-            "Agent unavailable",
-            "The selected agent could not be found.",
-            "warning"
-        );
-
-        return;
-
-    }
-
-
-    if (action === "details") {
-
-        selectAgent(agentId);
-
-        updateDetailsModal(agentId);
-
-        openModal("detailsModal");
-
-        return;
-
-    }
-
-
-    if (action === "toggle") {
-
-        toggleAgentStatus(agentId);
-
-        return;
-
-    }
-
-
-    if (action === "delete") {
-
-        deleteAgent(agentId);
-
-    }
-
-}
-
-
-/* =========================================================
-   TOGGLE STATUS
-========================================================= */
-
-function toggleAgentStatus(agentId) {
-
-    const agent =
-        state.agents.find(
-            (item) => item.id === agentId
-        );
-
-    if (!agent) return;
-
-
-    if (agent.status === "paused") {
-
-        agent.status = "idle";
-
-        addActivity(
-            "▶",
-            "",
-            `${agent.name} resumed`,
-            "Agent is available for new tasks."
-        );
-
-        showToast(
-            "Agent resumed",
-            `${agent.name} is available again.`,
-            "success"
-        );
-
-    } else {
-
-        agent.status = "paused";
-
-        if (
-            activeExecution &&
-            activeExecution.agentId === agentId
-        ) {
-            stopExecution();
-        }
-
-        addActivity(
-            "Ⅱ",
-            "warning",
-            `${agent.name} paused`,
-            "Agent execution has been paused."
-        );
-
-        showToast(
-            "Agent paused",
-            `${agent.name} has been paused.`,
-            "warning"
-        );
-
-    }
-
-    saveState();
-
-    renderAll();
-
-}
-
-
-/* =========================================================
-   DELETE AGENT
-========================================================= */
-
-function deleteAgent(agentId) {
-
-    const agent =
-        state.agents.find(
-            (item) => item.id === agentId
-        );
-
-    if (!agent) return;
-
-
-    const confirmed = window.confirm(
-        `Delete "${agent.name}" from Agent Hub?`
-    );
-
-    if (!confirmed) return;
+    const total =
+      totals();
 
 
     if (
-        activeExecution &&
-        activeExecution.agentId === agentId
+      !sorted.length ||
+      !fastest ||
+      !slowest
     ) {
-        stopExecution();
+      $("insightsList").innerHTML = `
+        <article class="insight-item">
+          <div class="insight-icon">!</div>
+
+          <div>
+            <strong>
+              No telemetry available
+            </strong>
+
+            <p>
+              Add agent execution data to generate insights.
+            </p>
+          </div>
+        </article>
+      `;
+
+      return;
     }
 
 
-    state.agents =
-        state.agents.filter(
-            (item) => item.id !== agentId
-        );
+    const items = [
 
+      {
+        icon: "↗",
 
-    if (state.agents.length > 0) {
+        title:
+          "Reliability is stable",
 
-        if (state.selectedAgentId === agentId) {
+        text:
+          `${total.successRate.toFixed(
+            1
+          )}% of tracked executions completed successfully in the selected period.`
+      },
 
-            state.selectedAgentId =
-                state.agents[0].id;
 
-        }
+      {
+        icon: "⚡",
 
-    } else {
+        title:
+          `${fastest.name} is the fastest`,
 
-        state.selectedAgentId = null;
+        text:
+          `Average runtime is ${fastest.avg}s, making it the quickest execution path in the current agent set.`
+      },
 
-    }
 
+      {
+        icon: "◌",
 
-    addActivity(
-        "×",
-        "warning",
-        `${agent.name} deleted`,
-        "Agent was removed from this workspace."
-    );
+        title:
+          `${slowest.name} needs runtime attention`,
 
+        text:
+          `Average runtime is ${slowest.avg}s. Review its workflow steps if latency becomes a priority.`
+      },
 
-    saveState();
 
-    renderAll();
+      {
+        icon: "✦",
 
+        title:
+          `${sorted[0].name} has highest reliability`,
 
-    showToast(
-        "Agent deleted",
-        `${agent.name} has been removed.`,
-        "success"
-    );
+        text:
+          `Its current success ratio is ${reliability(
+            sorted[0]
+          ).toFixed(
+            1
+          )}% across ${sorted[0].runs} tracked runs.`
+      }
 
-}
+    ];
 
 
-/* =========================================================
-   RUN AGENT
-========================================================= */
+    $("insightsList").innerHTML =
+      items
+        .map(
+          (item) =>
+            `
+              <article class="insight-item">
 
-function runAgent(agentId) {
-
-    const agent =
-        state.agents.find(
-            (item) => item.id === agentId
-        );
-
-    if (!agent) {
-
-        showToast(
-            "Agent unavailable",
-            "The selected agent could not be found.",
-            "warning"
-        );
-
-        return;
-
-    }
-
-
-    if (agent.status === "paused") {
-
-        showToast(
-            "Agent is paused",
-            "Resume this agent before running it.",
-            "warning"
-        );
-
-        return;
-
-    }
-
-
-    selectAgent(agentId);
-
-
-    /* Stop previous execution */
-    if (executionTimer) {
-
-        clearInterval(executionTimer);
-
-        executionTimer = null;
-
-    }
-
-
-    agent.status = "running";
-
-    agent.progress =
-        Math.max(
-            8,
-            Math.min(35, Number(agent.progress) || 10)
-        );
-
-
-    agent.lastRun = "Just now";
-
-    activeExecution = {
-        agentId,
-        progress: agent.progress,
-        startedAt: Date.now()
-    };
-
-
-    addActivity(
-        "▶",
-        "",
-        `${agent.name} started execution`,
-        `Using ${agent.model || "NEXUS Core"} intelligence.`
-    );
-
-
-    saveState();
-
-    renderAll();
-
-
-    showToast(
-        "Execution started",
-        `${agent.name} is now processing.`,
-        "success"
-    );
-
-
-    executionTimer = setInterval(
-        () => {
-
-            const current =
-                state.agents.find(
-                    (item) =>
-                        item.id === agentId
-                );
-
-            if (!current) {
-
-                stopExecution();
-
-                return;
-
-            }
-
-
-            activeExecution.progress +=
-                Math.floor(Math.random() * 11) + 5;
-
-
-            current.progress =
-                Math.min(
-                    activeExecution.progress,
-                    100
-                );
-
-
-            renderExecution();
-
-
-            if (
-                activeExecution.progress >= 100
-            ) {
-
-                completeExecution(current);
-
-            }
-
-        },
-        850
-    );
-
-}
-
-
-/* =========================================================
-   COMPLETE EXECUTION
-========================================================= */
-
-function completeExecution(agent) {
-
-    if (executionTimer) {
-
-        clearInterval(executionTimer);
-
-        executionTimer = null;
-
-    }
-
-
-    agent.progress = 100;
-
-    agent.tasks =
-        Number(agent.tasks || 0) + 1;
-
-    agent.success =
-        Math.min(
-            100,
-            Number(agent.success || 0) +
-                (Math.random() > 0.5 ? 1 : 0)
-        );
-
-    agent.lastRun = "Just now";
-
-    state.completedTasks =
-        Number(state.completedTasks || 0) + 1;
-
-
-    agent.history =
-        Array.isArray(agent.history)
-            ? agent.history
-            : [];
-
-    agent.history.push(
-        Math.floor(
-            88 + Math.random() * 12
-        )
-    );
-
-    if (agent.history.length > 14) {
-
-        agent.history.shift();
-
-    }
-
-
-    activeExecution = null;
-
-
-    addActivity(
-        "✓",
-        "success",
-        `${agent.name} completed execution`,
-        "Task completed successfully."
-    );
-
-
-    saveState();
-
-    renderAll();
-
-
-    showToast(
-        "Execution completed",
-        `${agent.name} finished successfully.`,
-        "success"
-    );
-
-}
-
-
-/* =========================================================
-   STOP EXECUTION
-========================================================= */
-
-function stopExecution() {
-
-    if (executionTimer) {
-
-        clearInterval(executionTimer);
-
-        executionTimer = null;
-
-    }
-
-    activeExecution = null;
-
-    renderExecution();
-
-}
-
-
-/* =========================================================
-   EXECUTION MONITOR
-========================================================= */
-
-function renderExecution() {
-
-    const container = $("#executionMain");
-
-    if (!container) return;
-
-
-    const agent = getSelectedAgent();
-
-
-    if (!agent) {
-
-        container.innerHTML = `
-            <div class="execution-empty">
-                <div class="execution-icon">✦</div>
-
-                <h3>No agents available</h3>
-
-                <p>
-                    Create an agent to start managing AI executions.
-                </p>
-            </div>
-        `;
-
-        return;
-
-    }
-
-
-    const isActive =
-        activeExecution &&
-        activeExecution.agentId === agent.id;
-
-
-    const progress =
-        isActive
-            ? activeExecution.progress
-            : agent.progress;
-
-
-    container.innerHTML = `
-        <div class="execution-active">
-
-            <div class="execution-agent-header">
-
-                <div class="execution-agent-avatar">
-                    ${getInitials(agent.name)}
+                <div class="insight-icon">
+                  ${item.icon}
                 </div>
 
                 <div>
-                    <h3>${escapeHTML(agent.name)}</h3>
-                    <p>
-                        ${
-                            isActive
-                                ? "Processing current task..."
-                                : `${capitalize(agent.status)} · ${agent.model}`
-                        }
-                    </p>
+
+                  <strong>
+                    ${escapeHtml(
+                      item.title
+                    )}
+                  </strong>
+
+                  <p>
+                    ${escapeHtml(
+                      item.text
+                    )}
+                  </p>
+
                 </div>
 
-            </div>
+              </article>
+            `
+        )
+        .join("");
+  }
 
 
-            <div class="execution-progress">
-
-                <div class="execution-progress-header">
-                    <span>
-                        ${
-                            isActive
-                                ? "Execution progress"
-                                : "Current workload"
-                        }
-                    </span>
-
-                    <strong>
-                        ${clamp(progress, 0, 100)}%
-                    </strong>
-                </div>
-
-                <div class="big-progress">
-                    <span style="width:${clamp(progress, 0, 100)}%"></span>
-                </div>
-
-            </div>
+  function renderActivity() {
+    const list =
+      $("activityList");
 
 
-            <div class="execution-stats">
+    if (!state.activity.length) {
 
-                <div class="execution-stat">
-                    <span>Tasks completed</span>
-                    <strong>${agent.tasks}</strong>
-                </div>
-
-                <div class="execution-stat">
-                    <span>Success rate</span>
-                    <strong>${agent.success}%</strong>
-                </div>
-
-                <div class="execution-stat">
-                    <span>Last execution</span>
-                    <strong>${escapeHTML(agent.lastRun)}</strong>
-                </div>
-
-            </div>
-
-
-            <div class="execution-controls">
-
-                <button
-                    class="primary-button"
-                    type="button"
-                    id="executionRunButton"
-                >
-                    ▶ Run Agent
-                </button>
-
-                <button
-                    class="secondary-button"
-                    type="button"
-                    id="executionDetailsButton"
-                >
-                    View Details
-                </button>
-
-            </div>
-
+      list.innerHTML = `
+        <div class="empty-state">
+          No recent activity to display.
         </div>
-    `;
+      `;
 
-
-    $("#executionRunButton")?.addEventListener(
-        "click",
-        () => runAgent(agent.id)
-    );
-
-
-    $("#executionDetailsButton")?.addEventListener(
-        "click",
-        () => {
-
-            updateDetailsModal(agent.id);
-
-            openModal("detailsModal");
-
-        }
-    );
-
-}
-
-
-/* =========================================================
-   CREATE AGENT
-========================================================= */
-
-function handleCreateAgent(event) {
-
-    event.preventDefault();
-
-
-    const form = event.currentTarget;
-
-
-    const name =
-        $("#agentName").value.trim();
-
-    const role =
-        $("#agentRole").value;
-
-    const description =
-        $("#agentDescription").value.trim();
-
-    const model =
-        $("#agentModel").value;
-
-    const autoRun =
-        $("#agentAutoRun").checked;
-
-
-    if (!name) {
-
-        showToast(
-            "Agent name required",
-            "Enter a name for your new agent.",
-            "warning"
-        );
-
-        $("#agentName").focus();
-
-        return;
-
-    }
-
-
-    if (!description) {
-
-        showToast(
-            "Description required",
-            "Describe what this agent should specialize in.",
-            "warning"
-        );
-
-        $("#agentDescription").focus();
-
-        return;
-
-    }
-
-
-    const id =
-        `agent-${Date.now()}-${Math.random()
-            .toString(36)
-            .slice(2, 7)}`;
-
-
-    const colorMap = {
-        Research: "cyan",
-        Analysis: "purple",
-        Automation: "green",
-        Content: "orange",
-        Support: "cyan"
-    };
-
-
-    const newAgent = {
-
-        id,
-
-        name,
-
-        role,
-
-        description,
-
-        model,
-
-        status: autoRun
-            ? "running"
-            : "idle",
-
-        progress: autoRun
-            ? 12
-            : 0,
-
-        tasks: 0,
-
-        success: 100,
-
-        lastRun: "Never",
-
-        activity: 50,
-
-        color:
-            colorMap[role] || "cyan",
-
-        capabilities:
-            getCapabilitiesForRole(role),
-
-        history: [
-            76,
-            82,
-            74,
-            88,
-            80,
-            92
-        ]
-
-    };
-
-
-    state.agents.unshift(newAgent);
-
-    state.selectedAgentId = id;
-
-
-    addActivity(
-        "✦",
-        "",
-        `${name} created`,
-        `${role} Agent configured with ${model}.`
-    );
-
-
-    saveState();
-
-    renderAll();
-
-    form.reset();
-
-    closeModal("createModal");
-
-
-    showToast(
-        "Agent created",
-        `${name} is now part of your AI workforce.`,
-        "success"
-    );
-
-
-    if (autoRun) {
-
-        setTimeout(
-            () => runAgent(id),
-            250
-        );
-
-    }
-
-}
-
-
-/* =========================================================
-   ROLE CAPABILITIES
-========================================================= */
-
-function getCapabilitiesForRole(role) {
-
-    const capabilities = {
-
-        Research: [
-            "Web Research",
-            "Summarization",
-            "Source Analysis",
-            "Report Generation"
-        ],
-
-        Analysis: [
-            "Data Analysis",
-            "Pattern Detection",
-            "Insights",
-            "Visualization"
-        ],
-
-        Automation: [
-            "Task Execution",
-            "Scheduling",
-            "Workflow Actions",
-            "Notifications"
-        ],
-
-        Content: [
-            "Drafting",
-            "Summarization",
-            "Content Planning",
-            "Formatting"
-        ],
-
-        Support: [
-            "Question Answering",
-            "Classification",
-            "Knowledge Search",
-            "Response Generation"
-        ]
-
-    };
-
-
-    return capabilities[role] || [
-        "Reasoning",
-        "Task Execution",
-        "Analysis"
-    ];
-
-}
-
-
-/* =========================================================
-   DETAILS MODAL
-========================================================= */
-
-function updateDetailsModal(agentId) {
-
-    const agent =
-        state.agents.find(
-            (item) => item.id === agentId
-        );
-
-    if (!agent) return;
-
-
-    state.selectedAgentId = agentId;
-
-
-    $("#detailsAvatar").textContent =
-        getInitials(agent.name);
-
-    $("#detailsRole").textContent =
-        `${agent.role.toUpperCase()} AGENT`;
-
-    $("#detailsTitle").textContent =
-        agent.name;
-
-    $("#detailsDescription").textContent =
-        agent.description;
-
-    $("#detailsStatus").textContent =
-        capitalize(agent.status);
-
-    $("#detailsTasks").textContent =
-        agent.tasks;
-
-    $("#detailsSuccess").textContent =
-        `${agent.success}%`;
-
-    $("#detailsModel").textContent =
-        agent.model;
-
-    $("#detailsLastRun").textContent =
-        `Last run: ${agent.lastRun}`;
-
-
-    const bars = $("#historyBars");
-
-    const history =
-        Array.isArray(agent.history)
-            ? agent.history
-            : [60, 70, 80];
-
-
-    bars.innerHTML =
-        history
-            .map(
-                (value) => `
-                    <div
-                        class="history-bar"
-                        style="height:${clamp(value, 15, 100)}%"
-                        title="${value}% success"
-                    ></div>
-                `
-            )
-            .join("");
-
-
-    const capabilities =
-        $("#capabilityList");
-
-    capabilities.innerHTML =
-        (agent.capabilities || [])
-            .map(
-                (capability) =>
-                    `<span class="capability">
-                        ${escapeHTML(capability)}
-                    </span>`
-            )
-            .join("");
-
-
-    const pauseButton =
-        $("#detailsPauseButton");
-
-    if (agent.status === "paused") {
-
-        pauseButton.textContent =
-            "Resume Agent";
-
-    } else {
-
-        pauseButton.textContent =
-            "Pause Agent";
-
-    }
-
-
-    const runButton =
-        $("#detailsRunButton");
-
-    runButton.textContent =
-        agent.status === "paused"
-            ? "Resume & Run"
-            : "Run Agent";
-
-}
-
-
-/* =========================================================
-   CONSOLE
-========================================================= */
-
-function renderConsole() {
-
-    const agent = getSelectedAgent();
-
-    const greeting = $("#consoleGreeting");
-
-    if (!greeting) return;
-
-
-    if (!agent) {
-
-        greeting.textContent =
-            "Create an agent and give it a task.";
-
-        return;
-
-    }
-
-
-    greeting.textContent =
-        `${agent.name} is selected. Describe a task and send it to the agent.`;
-
-}
-
-
-function sendAgentPrompt() {
-
-    const input = $("#agentPrompt");
-
-    if (!input) return;
-
-
-    const prompt =
-        input.value.trim();
-
-
-    if (!prompt) {
-
-        showToast(
-            "Task required",
-            "Describe what you want your selected agent to do.",
-            "warning"
-        );
-
-        input.focus();
-
-        return;
-
-    }
-
-
-    const agent = getSelectedAgent();
-
-
-    if (!agent) {
-
-        showToast(
-            "No agent selected",
-            "Select an agent before sending a task.",
-            "warning"
-        );
-
-        return;
-
-    }
-
-
-    if (agent.status === "paused") {
-
-        showToast(
-            "Agent is paused",
-            "Resume the agent before sending a task.",
-            "warning"
-        );
-
-        return;
-
-    }
-
-
-    input.value = "";
-
-
-    addActivity(
-        "➤",
-        "",
-        `Task sent to ${agent.name}`,
-        shorten(prompt, 90)
-    );
-
-
-    showToast(
-        "Task submitted",
-        `${agent.name} received your instruction.`,
-        "success"
-    );
-
-
-    runAgent(agent.id);
-
-}
-
-
-/* =========================================================
-   ACTIVITY
-========================================================= */
-
-function renderActivities() {
-
-    const list = $("#activityList");
-
-    if (!list) return;
-
-
-    if (!state.activities.length) {
-
-        list.innerHTML = `
-            <div class="execution-empty">
-                <div class="execution-icon">◷</div>
-                <h3>No activity yet</h3>
-                <p>Agent actions will appear here.</p>
-            </div>
-        `;
-
-        return;
-
+      return;
     }
 
 
     list.innerHTML =
-        state.activities
-            .slice(0, 12)
-            .map(
-                (activity) => `
-                    <div class="activity-item">
+      state.activity
+        .slice(0, 8)
+        .map((item) => {
 
-                        <div class="activity-icon ${escapeAttribute(activity.type || "")}">
-                            ${escapeHTML(activity.icon || "•")}
-                        </div>
+          const icon =
+            item.type === "success"
+              ? "✓"
+              : item.type === "failed"
+                ? "!"
+                : "•";
 
-                        <div class="activity-text">
 
-                            <strong>
-                                ${escapeHTML(activity.title)}
-                            </strong>
+          return `
+            <div class="activity-item">
 
-                            <span>
-                                ${escapeHTML(activity.description)}
-                            </span>
+              <div
+                class="activity-icon ${escapeHtml(
+                  item.type
+                )}"
+              >
+                ${icon}
+              </div>
 
-                        </div>
 
-                        <span class="activity-time">
-                            ${escapeHTML(activity.time)}
-                        </span>
+              <div class="activity-main">
 
-                    </div>
-                `
-            )
-            .join("");
+                <strong>
+                  ${escapeHtml(
+                    item.agent
+                  )}
+                </strong>
 
-}
+                <span>
+                  ${escapeHtml(
+                    item.message
+                  )}
+                  ·
+                  ${item.duration}s
+                </span>
 
+              </div>
 
-function addActivity(
-    icon,
-    type,
-    title,
-    description
-) {
 
-    state.activities.unshift({
+              <span class="activity-time">
+                ${escapeHtml(
+                  item.time
+                )}
+              </span>
 
-        id:
-            `activity-${Date.now()}-${Math.random()
-                .toString(36)
-                .slice(2, 6)}`,
+            </div>
+          `;
+        })
+        .join("");
+  }
 
-        icon,
 
-        type,
+  function renderAll() {
+    renderKpis();
 
-        title,
+    renderRunsChart();
 
-        description,
+    renderRuntimeChart();
 
-        time: "Just now"
+    renderTable();
 
-    });
+    renderInsights();
 
+    renderActivity();
+  }
 
-    state.activities =
-        state.activities.slice(0, 20);
 
-}
-
-
-function clearActivity() {
-
-    if (!state.activities.length) {
-
-        showToast(
-            "Activity already clear",
-            "There are no activity items to remove.",
-            "info"
-        );
-
-        return;
-
-    }
-
-
-    state.activities = [];
-
-    saveState();
-
-    renderActivities();
-
-
-    showToast(
-        "Activity cleared",
-        "The activity feed has been cleared.",
-        "success"
-    );
-
-}
-
-
-/* =========================================================
-   STATS
-========================================================= */
-
-function renderStats() {
-
-    const total =
-        state.agents.length;
-
-    const running =
-        state.agents.filter(
-            (agent) =>
-                agent.status === "running"
-        ).length;
-
-
-    const successfulTasks =
-        state.agents.reduce(
-            (totalTasks, agent) =>
-                totalTasks +
-                Number(agent.tasks || 0),
-            0
-        );
-
-
-    const successValues =
-        state.agents.map(
-            (agent) =>
-                Number(agent.success || 0)
-        );
-
-
-    const averageSuccess =
-        successValues.length
-            ? (
-                successValues.reduce(
-                    (a, b) => a + b,
-                    0
-                ) / successValues.length
-            ).toFixed(1)
-            : "0.0";
-
-
-    $("#totalAgents").textContent =
-        total;
-
-    $("#runningAgents").textContent =
-        running;
-
-    $("#completedTasks").textContent =
-        Number(state.completedTasks || 0);
-
-    $("#successRate").textContent =
-        `${averageSuccess}%`;
-
-}
-
-
-/* =========================================================
-   NOTIFICATIONS
-========================================================= */
-
-function updateNotificationBadge() {
-
-    const badge =
-        $("#notificationBadge");
-
-    if (!badge) return;
-
-
-    const count =
-        Number(state.notifications || 0);
-
-
-    badge.textContent = count;
-
-
-    badge.style.display =
-        count > 0
-            ? "grid"
-            : "none";
-
-}
-
-
-function markNotificationsRead() {
-
-    state.notifications = 0;
-
-    saveState();
-
-    updateNotificationBadge();
-
-    $$(".notification-item").forEach(
-        (item) =>
-            item.classList.remove("unread")
-    );
-
-
-    showToast(
-        "Notifications cleared",
-        "All notifications have been marked as read.",
-        "success"
-    );
-
-}
-
-
-/* =========================================================
-   MODALS
-========================================================= */
-
-function openModal(id) {
-
-    const modal = $(`#${id}`);
-
-    if (!modal) return;
-
-    modal.classList.remove("hidden");
-
-    document.body.style.overflow = "hidden";
-
-
-    const firstInput =
-        modal.querySelector(
-            "input, textarea, select"
-        );
-
-    if (firstInput) {
-
-        setTimeout(
-            () => firstInput.focus(),
-            80
-        );
-
-    }
-
-}
-
-
-function closeModal(id) {
-
-    const modal = $(`#${id}`);
-
-    if (!modal) return;
-
-    modal.classList.add("hidden");
-
-    if (
-        $$(".modal-backdrop:not(.hidden)").length === 0
-    ) {
-        document.body.style.overflow = "";
-    }
-
-}
-
-
-function closeAllModals() {
-
-    $$(".modal-backdrop").forEach(
-        (modal) =>
-            modal.classList.add("hidden")
-    );
-
-    document.body.style.overflow = "";
-
-}
-
-
-/* =========================================================
-   THEME
-========================================================= */
-
-function applyTheme() {
-
-    document.body.classList.toggle(
-        "light-mode",
-        Boolean(state.lightMode)
-    );
-
-}
-
-
-function toggleTheme() {
-
-    state.lightMode =
-        !Boolean(state.lightMode);
-
-    applyTheme();
-
-    saveState();
-
-
-    showToast(
-        "Appearance updated",
-        state.lightMode
-            ? "Light appearance enabled."
-            : "Dark NEXUS appearance enabled.",
-        "info"
-    );
-
-}
-
-
-/* =========================================================
-   NAVIGATION
-========================================================= */
-
-function handleNavigation(destination) {
-
-    const routes = {
-        command: "../command-center/index.html",
-        agents: "../agent-hub/index.html",
-        workflows: "../workflow-builder/index.html",
-        insights: "../ai-insights/index.html"
-    };
-
-    if (routes[destination]) {
-        window.location.href = routes[destination];
-        return;
-    }
-
-    const messages = {
-        tasks:
-            "Tasks are managed through the Command Center and agent execution layer.",
-        activity:
-            "Showing the latest Agent Hub system activity.",
-        settings:
-            "Agent Hub settings are ready for backend integration."
-    };
-
-    showToast(
-        capitalize(destination),
-        messages[destination] ||
-            "This workspace module is available.",
-        "info"
-    );
-
-}
-
-
-/* =========================================================
-   TOAST
-========================================================= */
-
-function showToast(
-    title,
+  function showToast(
     message,
     type = "success"
-) {
-
-    const container =
-        $("#toastContainer");
-
-    if (!container) return;
-
-
-    const icon =
-        type === "warning"
-            ? "!"
-            : type === "info"
-                ? "i"
-                : "✓";
-
-
+  ) {
     const toast =
-        document.createElement("div");
+      document.createElement(
+        "div"
+      );
 
-    toast.className = "toast";
+
+    toast.className =
+      `toast ${type}`;
 
 
-    toast.innerHTML = `
-        <div class="toast-icon">
-            ${icon}
+    toast.textContent =
+      message;
+
+
+    $("toastRegion")
+      .appendChild(toast);
+
+
+    window.setTimeout(
+      () => toast.remove(),
+      2800
+    );
+  }
+
+
+  function updateTimestamp() {
+    $("lastUpdated").textContent =
+      `Updated ${new Date().toLocaleTimeString(
+        [],
+        {
+          hour: "2-digit",
+          minute: "2-digit"
+        }
+      )}`;
+  }
+
+
+  function refresh() {
+
+    state.agents.forEach(
+      (agent) => {
+
+        const delta =
+          Math.random() > 0.45
+            ? 1
+            : 0;
+
+
+        agent.runs += delta;
+
+
+        if (
+          delta &&
+          Math.random() > 0.08
+        ) {
+          agent.success += 1;
+        }
+
+
+        agent.avg =
+          clamp(
+            Math.round(
+              agent.avg +
+              (Math.random() - 0.5) *
+                2
+            ),
+            6,
+            45
+          );
+      }
+    );
+
+
+    if (state.agents.length) {
+
+      const sample =
+        state.agents[
+          Math.floor(
+            Math.random() *
+              state.agents.length
+          )
+        ];
+
+
+      state.activity.unshift({
+        agent: sample.name,
+
+        type: "success",
+
+        message:
+          "Insight telemetry refreshed",
+
+        time: "Just now",
+
+        duration: sample.avg
+      });
+
+    }
+
+
+    state.activity =
+      state.activity.slice(
+        0,
+        8
+      );
+
+
+    saveState();
+
+    renderAll();
+
+    updateTimestamp();
+
+    showToast(
+      "AI Insights refreshed successfully."
+    );
+  }
+
+
+  function exportCsv() {
+
+    const rows = [
+      [
+        "Agent",
+        "Status",
+        "Runs",
+        "Successful",
+        "Avg Runtime (s)",
+        "Reliability (%)"
+      ]
+    ];
+
+
+    state.agents.forEach(
+      (agent) => {
+
+        rows.push([
+          agent.name,
+          agent.status,
+          agent.runs,
+          agent.success,
+          agent.avg,
+          reliability(
+            agent
+          ).toFixed(1)
+        ]);
+
+      }
+    );
+
+
+    const csv =
+      rows
+        .map(
+          (row) =>
+            row
+              .map(
+                (value) =>
+                  `"${String(
+                    value
+                  ).replace(
+                    /"/g,
+                    '""'
+                  )}"`
+              )
+              .join(",")
+        )
+        .join("\n");
+
+
+    const blob =
+      new Blob(
+        [csv],
+        {
+          type:
+            "text/csv;charset=utf-8;"
+        }
+      );
+
+
+    const url =
+      URL.createObjectURL(
+        blob
+      );
+
+
+    const link =
+      document.createElement(
+        "a"
+      );
+
+
+    link.href = url;
+
+    link.download =
+      "nexus-ai-insights.csv";
+
+
+    document.body.appendChild(
+      link
+    );
+
+
+    link.click();
+
+    link.remove();
+
+
+    URL.revokeObjectURL(
+      url
+    );
+
+
+    showToast(
+      "CSV export created."
+    );
+  }
+
+
+  function openDetails(id) {
+
+    const agent =
+      state.agents.find(
+        (item) =>
+          item.id === id
+      );
+
+
+    if (!agent) {
+      return;
+    }
+
+
+    const rate =
+      reliability(agent);
+
+
+    $("dialogAgentName")
+      .textContent =
+      agent.name;
+
+
+    $("dialogContent").innerHTML = `
+
+      <div class="dialog-grid">
+
+        <div class="detail-card">
+          <span>Status</span>
+          <strong>
+            ${escapeHtml(
+              agent.status
+            )}
+          </strong>
         </div>
 
-        <div>
-            <strong>${escapeHTML(title)}</strong>
-            <span>${escapeHTML(message)}</span>
+
+        <div class="detail-card">
+          <span>Specialty</span>
+          <strong>
+            ${escapeHtml(
+              agent.specialty
+            )}
+          </strong>
         </div>
+
+
+        <div class="detail-card">
+          <span>Total runs</span>
+          <strong>
+            ${agent.runs}
+          </strong>
+        </div>
+
+
+        <div class="detail-card">
+          <span>Successful runs</span>
+          <strong>
+            ${agent.success}
+          </strong>
+        </div>
+
+
+        <div class="detail-card">
+          <span>Average runtime</span>
+          <strong>
+            ${agent.avg}s
+          </strong>
+        </div>
+
+
+        <div class="detail-card">
+          <span>Reliability</span>
+          <strong>
+            ${rate.toFixed(1)}%
+          </strong>
+        </div>
+
+      </div>
+
+
+      <div class="detail-note">
+
+        This view is driven by the current
+        NEXUS AI Insights telemetry model.
+        When the project backend is connected,
+        these metrics can be populated directly
+        from execution records without changing
+        the dashboard UI.
+
+      </div>
     `;
 
 
-    container.appendChild(toast);
+    const dialog =
+      $("agentDialog");
 
 
-    setTimeout(
+    if (
+      typeof dialog.showModal ===
+      "function"
+    ) {
+      dialog.showModal();
+    } else {
+      dialog.setAttribute(
+        "open",
+        ""
+      );
+    }
+  }
+
+
+  function closeDialog() {
+    const dialog =
+      $("agentDialog");
+
+
+    if (
+      typeof dialog.close ===
+      "function"
+    ) {
+      dialog.close();
+    } else {
+      dialog.removeAttribute(
+        "open"
+      );
+    }
+  }
+
+
+  function resetData() {
+
+    state.agents =
+      clone(seedAgents);
+
+
+    state.activity =
+      clone(seedActivity);
+
+
+    saveState();
+
+    renderAll();
+
+    updateTimestamp();
+
+    showToast(
+      "Demo telemetry reset."
+    );
+  }
+
+
+  function toggleTheme() {
+
+    document.body.classList.toggle(
+      "light"
+    );
+
+
+    const light =
+      document.body.classList.contains(
+        "light"
+      );
+
+
+    localStorage.setItem(
+      THEME_KEY,
+      light
+        ? "light"
+        : "dark"
+    );
+
+
+    $("themeBtn").textContent =
+      light
+        ? "☀"
+        : "☾";
+
+
+    $("themeBtn").setAttribute(
+      "aria-label",
+      light
+        ? "Switch to dark theme"
+        : "Switch to light theme"
+    );
+  }
+
+
+  function loadTheme() {
+
+    const theme =
+      localStorage.getItem(
+        THEME_KEY
+      );
+
+
+    if (theme === "light") {
+      document.body.classList.add(
+        "light"
+      );
+    }
+
+
+    $("themeBtn").textContent =
+      document.body.classList.contains(
+        "light"
+      )
+        ? "☀"
+        : "☾";
+  }
+
+
+  function bindEvents() {
+
+    $("rangeSelect")
+      .addEventListener(
+        "change",
         () => {
 
-            toast.style.opacity = "0";
-            toast.style.transform = "translateX(12px)";
+          renderAll();
 
-            setTimeout(
-                () => toast.remove(),
-                200
+          updateTimestamp();
+
+          showToast(
+            `Showing the last ${
+              $("rangeSelect").value
+            } days.`
+          );
+        }
+      );
+
+
+    $("refreshBtn")
+      .addEventListener(
+        "click",
+        refresh
+      );
+
+
+    $("generateInsightsBtn")
+      .addEventListener(
+        "click",
+        () => {
+
+          renderInsights();
+
+          showToast(
+            "New AI insights generated from current telemetry."
+          );
+        }
+      );
+
+
+    $("agentSearch")
+      .addEventListener(
+        "input",
+        renderTable
+      );
+
+
+    $("statusFilter")
+      .addEventListener(
+        "change",
+        renderTable
+      );
+
+
+    $("exportBtn")
+      .addEventListener(
+        "click",
+        exportCsv
+      );
+
+
+    $("resetDataBtn")
+      .addEventListener(
+        "click",
+        resetData
+      );
+
+
+    $("clearActivityBtn")
+      .addEventListener(
+        "click",
+        () => {
+
+          state.activity = [];
+
+          saveState();
+
+          renderActivity();
+
+          updateTimestamp();
+
+          showToast(
+            "Activity view cleared."
+          );
+        }
+      );
+
+
+    $("themeBtn")
+      .addEventListener(
+        "click",
+        toggleTheme
+      );
+
+
+    $("closeDialogBtn")
+      .addEventListener(
+        "click",
+        closeDialog
+      );
+
+
+    $("agentDialog")
+      .addEventListener(
+        "click",
+        (event) => {
+
+          if (
+            event.target ===
+            $("agentDialog")
+          ) {
+            closeDialog();
+          }
+
+        }
+      );
+
+
+    $("agentTableBody")
+      .addEventListener(
+        "click",
+        (event) => {
+
+          const button =
+            event.target.closest(
+              ".details-btn"
             );
 
-        },
-        3200
-    );
 
-}
+          if (button) {
+            openDetails(
+              button.dataset.id
+            );
+          }
 
-
-/* =========================================================
-   UTILITIES
-========================================================= */
-
-function capitalize(value) {
-
-    if (!value) return "";
-
-    return (
-        value.charAt(0).toUpperCase() +
-        value.slice(1)
-    );
-
-}
+        }
+      );
 
 
-function getInitials(name) {
+    $("profileButton")?.addEventListener("click", () => {
+      window.location.href = "../command-center/index.html#profile";
+    });
 
-    if (!name) return "AI";
+    $("menuBtn")
+      .addEventListener(
+        "click",
+        () => {
 
+          $("sidebar")
+            .classList.toggle(
+              "open"
+            );
 
-    const words =
-        name
-            .trim()
-            .split(/\s+/)
-            .filter(Boolean);
-
-
-    if (words.length === 1) {
-
-        return words[0]
-            .slice(0, 2)
-            .toUpperCase();
-
-    }
+        }
+      );
 
 
-    return (
-        words[0][0] +
-        words[1][0]
-    ).toUpperCase();
+    document
+      .querySelectorAll(
+        ".nav-item"
+      )
+      .forEach(
+        (item) => {
 
-}
+          item.addEventListener(
+            "click",
+            () => {
 
+              $("sidebar")
+                .classList.remove(
+                  "open"
+                );
 
-function getStatusDotClass(status) {
+            }
+          );
 
-    if (status === "running") {
-        return "online";
-    }
-
-    if (status === "paused") {
-        return "paused";
-    }
-
-    return "";
-
-}
-
-
-function clamp(value, min, max) {
-
-    const number = Number(value);
-
-    if (Number.isNaN(number)) {
-        return min;
-    }
-
-    return Math.min(
-        max,
-        Math.max(min, number)
-    );
-
-}
+        }
+      );
+  }
 
 
-function shorten(text, length) {
+  syncNexusProfile();
+  loadTheme();
 
-    if (!text) return "";
+  bindEvents();
 
-    return text.length > length
-        ? `${text.slice(0, length - 1)}…`
-        : text;
+  renderAll();
 
-}
+  updateTimestamp();
 
-
-/* =========================================================
-   SECURITY / HTML ESCAPING
-========================================================= */
-
-function escapeHTML(value) {
-
-    return String(value ?? "")
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;")
-        .replaceAll("'", "&#039;");
-
-}
-
-
-function escapeAttribute(value) {
-
-    return escapeHTML(value);
-
-}
+})();

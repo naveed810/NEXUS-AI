@@ -1,904 +1,705 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <meta
-        name="description"
-        content="NEXUS AI Agent Hub - manage, monitor, configure and run AI agents from one workspace."
-    >
-
-    <title>NEXUS AI — Agent Hub</title>
-
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
-    <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
-        rel="stylesheet"
-    >
-
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="NEXUS AI Insights dashboard" />
+  <title>NEXUS AI — AI Insights</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 
 <body>
+  <div class="app-shell">
 
-<div class="app-shell">
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar" aria-label="Primary navigation">
 
-    <!-- =========================
-         SIDEBAR
-    ========================== -->
-    <aside class="sidebar" id="sidebar">
-
-        <div class="brand">
-            <div class="brand-mark">
-                <span class="brand-orbit"></span>
-                <span class="brand-core">N</span>
-            </div>
-
-            <div class="brand-text">
-                <strong>NEXUS</strong>
-                <span>AI WORKSPACE</span>
-            </div>
+      <div class="brand">
+        <div class="brand-mark">
+          <span class="brand-orbit"></span>
+          <span class="brand-core">N</span>
         </div>
 
-        <div class="workspace-mini">
-            <div class="workspace-icon">N</div>
+        <div class="brand-text">
+          <strong>NEXUS</strong>
+          <span>AI WORKSPACE</span>
+        </div>
+      </div>
 
-            <div>
-                <strong>NEXUS Workspace</strong>
-                <span>AI Operations</span>
-            </div>
+      <div class="workspace-mini">
+        <div class="workspace-icon">N</div>
+        <div>
+          <strong>NEXUS Workspace</strong>
+          <span>AI Operations</span>
+        </div>
+      </div>
 
-            <button
-                class="icon-button tiny"
-                id="workspaceButton"
-                type="button"
-                title="Workspace"
-                aria-label="Open workspace menu"
-            >
-                ⋯
-            </button>
+      <nav class="nav-list">
+        <div class="nav-label">WORKSPACE</div>
+
+        <a
+          class="nav-item"
+          href="../command-center/index.html"
+          data-nav="Command Center"
+        >
+          <span class="nav-icon">⌂</span>
+          <span>Command Center</span>
+        </a>
+
+        <a
+          class="nav-item"
+          href="../agent-hub/index.html"
+          data-nav="Agent Hub"
+        >
+          <span class="nav-icon">◈</span>
+          <span>Agent Hub</span>
+        </a>
+
+        <a
+          class="nav-item"
+          href="../workflow-builder/index.html"
+          data-nav="Workflow Builder"
+        >
+          <span class="nav-icon">⌁</span>
+          <span>Workflow Builder</span>
+        </a>
+
+        <a
+          class="nav-item active"
+          href="index.html"
+          data-nav="AI Insights"
+          aria-current="page"
+        >
+          <span class="nav-icon">✦</span>
+          <span>AI Insights</span>
+        </a>
+
+      </nav>
+
+      <div class="sidebar-bottom">
+
+        <div class="system-status">
+          <span class="status-dot"></span>
+          <span>AI SYSTEMS <strong>Operational</strong></span>
         </div>
 
-        <nav class="main-nav" aria-label="Main navigation">
+        <button class="profile-mini" id="profileButton" type="button" aria-label="Open profile">
+          <div class="avatar" id="profileAvatar">N</div>
+          <div class="profile-info">
+            <strong id="profileName">NEXUS User</strong>
+            <span id="profileEmail">user@example.com</span>
+          </div>
+          <span class="profile-chevron">›</span>
+        </button>
 
-            <p class="nav-label">WORKSPACE</p>
+        <button
+          class="sidebar-action"
+          id="resetDataBtn"
+          type="button"
+        >
+          ↻ Reset demo data
+        </button>
 
-            <button class="nav-item" type="button" data-nav="command">
-                <span class="nav-icon">⌂</span>
-                <span>Command Center</span>
-            </button>
-
-            <button class="nav-item active" type="button" data-nav="agents">
-                <span class="nav-icon">✦</span>
-                <span>Agent Hub</span>
-                <span class="nav-count" id="navAgentCount">4</span>
-            </button>
-
-            <button class="nav-item" type="button" data-nav="workflows">
-                <span class="nav-icon">◇</span>
-                <span>Workflow Builder</span>
-            </button>
-
-            <button class="nav-item" type="button" data-nav="insights">
-                <span class="nav-icon">◌</span>
-                <span>AI Insights</span>
-            </button>
-
-            <p class="nav-label">MANAGEMENT</p>
-
-            <button class="nav-item" type="button" data-nav="tasks">
-                <span class="nav-icon">✓</span>
-                <span>Tasks</span>
-            </button>
-
-            <button class="nav-item" type="button" data-nav="activity">
-                <span class="nav-icon">◷</span>
-                <span>Activity</span>
-            </button>
-
-            <button class="nav-item" type="button" data-nav="settings">
-                <span class="nav-icon">⚙</span>
-                <span>Settings</span>
-            </button>
-
-        </nav>
-
-        <div class="sidebar-bottom">
-
-            <div class="system-card">
-                <div class="system-card-top">
-                    <span class="status-dot online"></span>
-                    <span>AI SYSTEMS</span>
-                    <strong>Operational</strong>
-                </div>
-
-                <div class="system-meter">
-                    <span></span>
-                </div>
-
-                <small>All agent services available</small>
-            </div>
-
-            <button class="profile-mini" id="profileButton" type="button">
-                <div class="avatar" id="profileAvatar">N</div>
-
-                <div class="profile-info">
-                    <strong id="profileName">NEXUS User</strong>
-                    <span id="profileEmail">user@example.com</span>
-                </div>
-
-                <span class="profile-arrow">›</span>
-            </button>
-
-        </div>
+      </div>
 
     </aside>
 
 
-    <!-- =========================
-         MAIN
-    ========================== -->
+    <!-- MAIN -->
     <main class="main-content">
 
-        <!-- TOPBAR -->
-        <header class="topbar">
-
-            <div class="topbar-left">
-
-                <button
-                    class="icon-button mobile-menu"
-                    id="mobileMenuButton"
-                    type="button"
-                    aria-label="Open navigation"
-                >
-                    ☰
-                </button>
-
-                <div class="page-heading">
-                    <div class="breadcrumb">
-                        NEXUS AI <span>/</span> Agent Hub
-                    </div>
-
-                    <h1>Agent Hub</h1>
-
-                    <p>
-                        Deploy, monitor and control your intelligent agents.
-                    </p>
-                </div>
-
-            </div>
-
-            <div class="topbar-actions">
-
-                <button
-                    class="icon-button"
-                    id="refreshButton"
-                    type="button"
-                    title="Refresh dashboard"
-                    aria-label="Refresh dashboard"
-                >
-                    ↻
-                </button>
-
-                <button
-                    class="icon-button notification-button"
-                    id="notificationButton"
-                    type="button"
-                    title="Notifications"
-                    aria-label="Notifications"
-                >
-                    ♢
-                    <span class="notification-badge" id="notificationBadge">3</span>
-                </button>
-
-                <button
-                    class="icon-button"
-                    id="themeButton"
-                    type="button"
-                    title="Toggle appearance"
-                    aria-label="Toggle appearance"
-                >
-                    ◐
-                </button>
-
-                <button
-                    class="primary-button"
-                    id="headerCreateButton"
-                    type="button"
-                >
-                    <span>＋</span>
-                    New Agent
-                </button>
-
-            </div>
-
-        </header>
-
-
-        <!-- CONTENT -->
-        <div class="page-content">
-
-            <!-- =========================
-                 HERO
-            ========================== -->
-            <section class="hub-hero">
-
-                <div class="hero-copy">
-
-                    <div class="eyebrow">
-                        <span class="pulse-dot"></span>
-                        AGENT OPERATIONS
-                    </div>
-
-                    <h2>
-                        Your AI workforce,
-                        <span>connected.</span>
-                    </h2>
-
-                    <p>
-                        Build specialized agents, launch tasks, monitor execution
-                        and keep every AI operation visible from one control layer.
-                    </p>
-
-                    <div class="hero-actions">
-
-                        <button
-                            class="primary-button"
-                            id="heroCreateButton"
-                            type="button"
-                        >
-                            <span>＋</span>
-                            Create Agent
-                        </button>
-
-                        <button
-                            class="secondary-button"
-                            id="heroRunButton"
-                            type="button"
-                        >
-                            <span>▶</span>
-                            Run Selected
-                        </button>
-
-                    </div>
-
-                </div>
-
-                <div class="hero-visual">
-
-                    <div class="orbital-ring ring-one"></div>
-                    <div class="orbital-ring ring-two"></div>
-
-                    <div class="agent-orb">
-                        <div class="orb-glow"></div>
-                        <strong>AI</strong>
-                        <span>AGENT CORE</span>
-                    </div>
-
-                    <div class="floating-node node-one">
-                        <span>R</span>
-                        Research
-                    </div>
-
-                    <div class="floating-node node-two">
-                        <span>D</span>
-                        Data
-                    </div>
-
-                    <div class="floating-node node-three">
-                        <span>T</span>
-                        Tasks
-                    </div>
-
-                </div>
-
-            </section>
-
-
-            <!-- =========================
-                 STATS
-            ========================== -->
-            <section class="stats-grid">
-
-                <article class="stat-card">
-                    <div class="stat-icon cyan">✦</div>
-
-                    <div class="stat-content">
-                        <span>Total Agents</span>
-                        <strong id="totalAgents">4</strong>
-                        <small class="positive">
-                            <span>↑</span> Active workspace
-                        </small>
-                    </div>
-                </article>
-
-                <article class="stat-card">
-                    <div class="stat-icon purple">●</div>
-
-                    <div class="stat-content">
-                        <span>Running Now</span>
-                        <strong id="runningAgents">2</strong>
-                        <small>
-                            <span class="status-dot online"></span>
-                            Live execution
-                        </small>
-                    </div>
-                </article>
-
-                <article class="stat-card">
-                    <div class="stat-icon blue">✓</div>
-
-                    <div class="stat-content">
-                        <span>Tasks Completed</span>
-                        <strong id="completedTasks">128</strong>
-                        <small class="positive">
-                            ↑ 12.4% this week
-                        </small>
-                    </div>
-                </article>
-
-                <article class="stat-card">
-                    <div class="stat-icon orange">◷</div>
-
-                    <div class="stat-content">
-                        <span>Success Rate</span>
-                        <strong id="successRate">96.8%</strong>
-                        <small>Across all agents</small>
-                    </div>
-                </article>
-
-            </section>
-
-
-            <!-- =========================
-                 AGENT SECTION
-            ========================== -->
-            <section class="section-block" id="agentsSection">
-
-                <div class="section-header">
-
-                    <div>
-                        <span class="section-kicker">AI WORKFORCE</span>
-                        <h2>Your Agents</h2>
-                        <p>Manage your specialized AI workers.</p>
-                    </div>
-
-                    <div class="section-actions">
-
-                        <div class="search-box">
-                            <span>⌕</span>
-                            <input
-                                id="agentSearch"
-                                type="search"
-                                placeholder="Search agents..."
-                                autocomplete="off"
-                            >
-                        </div>
-
-                        <select id="statusFilter" class="select-control">
-                            <option value="all">All Status</option>
-                            <option value="running">Running</option>
-                            <option value="paused">Paused</option>
-                            <option value="idle">Idle</option>
-                        </select>
-
-                        <select id="sortAgents" class="select-control">
-                            <option value="name">Name</option>
-                            <option value="status">Status</option>
-                            <option value="activity">Activity</option>
-                        </select>
-
-                    </div>
-
-                </div>
-
-
-                <div class="agents-grid" id="agentsGrid">
-                    <!-- Generated by JavaScript -->
-                </div>
-
-
-                <div class="empty-state hidden" id="emptyAgents">
-
-                    <div class="empty-icon">✦</div>
-
-                    <h3>No agents found</h3>
-
-                    <p>
-                        Try changing your search or create a new AI agent.
-                    </p>
-
-                    <button
-                        class="primary-button"
-                        id="emptyCreateButton"
-                        type="button"
-                    >
-                        Create Agent
-                    </button>
-
-                </div>
-
-            </section>
-
-
-            <!-- =========================
-                 LOWER GRID
-            ========================== -->
-            <section class="lower-grid">
-
-                <!-- EXECUTION PANEL -->
-                <article class="panel execution-panel">
-
-                    <div class="panel-header">
-
-                        <div>
-                            <span class="section-kicker">LIVE OPERATIONS</span>
-                            <h2>Execution Monitor</h2>
-                        </div>
-
-                        <span class="live-label">
-                            <span class="status-dot online"></span>
-                            LIVE
-                        </span>
-
-                    </div>
-
-                    <div class="execution-main" id="executionMain">
-
-                        <div class="execution-empty">
-                            <div class="execution-icon">▶</div>
-
-                            <h3>Select an agent</h3>
-
-                            <p>
-                                Choose an agent above to view its execution status,
-                                progress and activity.
-                            </p>
-                        </div>
-
-                    </div>
-
-                </article>
-
-
-                <!-- ACTIVITY PANEL -->
-                <article class="panel activity-panel">
-
-                    <div class="panel-header">
-
-                        <div>
-                            <span class="section-kicker">SYSTEM FEED</span>
-                            <h2>Recent Activity</h2>
-                        </div>
-
-                        <button
-                            class="text-button"
-                            id="clearActivityButton"
-                            type="button"
-                        >
-                            Clear
-                        </button>
-
-                    </div>
-
-                    <div class="activity-list" id="activityList">
-                        <!-- Generated by JavaScript -->
-                    </div>
-
-                </article>
-
-            </section>
-
-
-            <!-- =========================
-                 AGENT CONSOLE
-            ========================== -->
-            <section class="panel console-panel">
-
-                <div class="panel-header">
-
-                    <div>
-                        <span class="section-kicker">AGENT CONSOLE</span>
-                        <h2>Ask your Agent</h2>
-                        <p>Send a task to the selected AI worker.</p>
-                    </div>
-
-                    <div class="console-status">
-                        <span class="status-dot online"></span>
-                        Ready
-                    </div>
-
-                </div>
-
-                <div class="console-body">
-
-                    <div class="console-message">
-                        <div class="assistant-avatar">N</div>
-
-                        <div>
-                            <strong>NEXUS Agent System</strong>
-                            <p id="consoleGreeting">
-                                Select an agent and describe what you want it to do.
-                            </p>
-                        </div>
-                    </div>
-
-                    <div class="console-input-row">
-
-                        <textarea
-                            id="agentPrompt"
-                            rows="2"
-                            placeholder="Give your agent a task..."
-                        ></textarea>
-
-                        <button
-                            class="primary-button console-send"
-                            id="sendAgentButton"
-                            type="button"
-                        >
-                            <span>➤</span>
-                            Send
-                        </button>
-
-                    </div>
-
-                    <div class="console-suggestions">
-
-                        <button type="button" class="suggestion-button" data-prompt="Research the latest information about AI agents and summarize the key findings.">
-                            Research latest AI trends
-                        </button>
-
-                        <button type="button" class="suggestion-button" data-prompt="Analyze the current workspace activity and identify the most important tasks.">
-                            Analyze workspace
-                        </button>
-
-                        <button type="button" class="suggestion-button" data-prompt="Create a concise execution plan for my next project task.">
-                            Create execution plan
-                        </button>
-
-                    </div>
-
-                </div>
-
-            </section>
+      <!-- TOP BAR -->
+      <header class="topbar">
+
+        <div class="mobile-brand">
+          <button
+            class="icon-button"
+            id="menuBtn"
+            type="button"
+            aria-label="Open navigation"
+          >
+            ☰
+          </button>
+
+          <span>
+            NEXUS <b>AI</b>
+          </span>
+        </div>
+
+
+        <div class="topbar-title">
+
+          <div class="eyebrow">
+            ANALYTICS / INTELLIGENCE
+          </div>
+
+          <h1>AI Insights</h1>
+
+          <p>
+            Understand agent execution, reliability, and operational trends.
+          </p>
 
         </div>
+
+
+        <div class="topbar-actions">
+
+          <label class="select-wrap">
+            <span>Range</span>
+
+            <select id="rangeSelect" aria-label="Select time range">
+              <option value="7">Last 7 days</option>
+              <option value="14">Last 14 days</option>
+              <option value="30" selected>Last 30 days</option>
+              <option value="90">Last 90 days</option>
+            </select>
+          </label>
+
+
+          <button
+            class="icon-button"
+            id="themeBtn"
+            type="button"
+            aria-label="Toggle theme"
+            title="Toggle theme"
+          >
+            ☾
+          </button>
+
+
+          <button
+            class="primary-button"
+            id="refreshBtn"
+            type="button"
+          >
+            <span>↻</span>
+            Refresh
+          </button>
+
+        </div>
+
+      </header>
+
+
+      <!-- CONTENT -->
+      <div class="content-wrap">
+
+        <!-- KPI CARDS -->
+        <section
+          class="kpi-grid"
+          aria-label="Key performance indicators"
+        >
+
+          <article class="kpi-card">
+
+            <div class="kpi-top">
+              <span>Total Runs</span>
+              <span class="kpi-icon">↗</span>
+            </div>
+
+            <div
+              class="kpi-value"
+              id="totalRuns"
+            >
+              0
+            </div>
+
+            <div class="kpi-meta">
+              <span
+                class="trend positive"
+                id="runsTrend"
+              >
+                +0%
+              </span>
+
+              vs previous period
+            </div>
+
+          </article>
+
+
+          <article class="kpi-card">
+
+            <div class="kpi-top">
+              <span>Success Rate</span>
+              <span class="kpi-icon">✓</span>
+            </div>
+
+            <div
+              class="kpi-value"
+              id="successRate"
+            >
+              0%
+            </div>
+
+            <div class="kpi-meta">
+
+              <span
+                class="trend positive"
+                id="successTrend"
+              >
+                +0%
+              </span>
+
+              reliability
+
+            </div>
+
+          </article>
+
+
+          <article class="kpi-card">
+
+            <div class="kpi-top">
+              <span>Active Agents</span>
+              <span class="kpi-icon">◉</span>
+            </div>
+
+            <div
+              class="kpi-value"
+              id="activeAgents"
+            >
+              0
+            </div>
+
+            <div class="kpi-meta">
+
+              <span
+                class="trend neutral"
+                id="agentTrend"
+              >
+                0
+              </span>
+
+              currently available
+
+            </div>
+
+          </article>
+
+
+          <article class="kpi-card">
+
+            <div class="kpi-top">
+              <span>Avg Runtime</span>
+              <span class="kpi-icon">◷</span>
+            </div>
+
+            <div
+              class="kpi-value"
+              id="avgRuntime"
+            >
+              0s
+            </div>
+
+            <div class="kpi-meta">
+
+              <span
+                class="trend neutral"
+                id="runtimeTrend"
+              >
+                0%
+              </span>
+
+              execution time
+
+            </div>
+
+          </article>
+
+        </section>
+
+
+        <!-- CHARTS -->
+        <section class="dashboard-grid">
+
+          <!-- RUNS -->
+          <article class="panel chart-panel wide">
+
+            <div class="panel-header">
+
+              <div>
+
+                <div class="panel-kicker">
+                  EXECUTION ACTIVITY
+                </div>
+
+                <h2>Runs over time</h2>
+
+              </div>
+
+              <div class="legend">
+
+                <span>
+                  <i class="legend-dot runs"></i>
+                  Runs
+                </span>
+
+                <span>
+                  <i class="legend-dot success"></i>
+                  Successful
+                </span>
+
+              </div>
+
+            </div>
+
+            <div
+              class="chart-wrap"
+              id="runsChart"
+              aria-label="Runs over time chart"
+            ></div>
+
+          </article>
+
+
+          <!-- OUTCOMES -->
+          <article class="panel chart-panel">
+
+            <div class="panel-header">
+
+              <div>
+
+                <div class="panel-kicker">
+                  RELIABILITY
+                </div>
+
+                <h2>Run outcomes</h2>
+
+              </div>
+
+            </div>
+
+
+            <div class="donut-area">
+
+              <div
+                class="donut"
+                id="donutChart"
+              >
+
+                <div>
+
+                  <strong id="donutValue">
+                    0%
+                  </strong>
+
+                  <span>
+                    success
+                  </span>
+
+                </div>
+
+              </div>
+
+
+              <div class="outcome-list">
+
+                <div>
+                  <span class="outcome-label">
+                    <i class="legend-dot success"></i>
+                    Successful
+                  </span>
+
+                  <b id="successfulRuns">0</b>
+                </div>
+
+
+                <div>
+                  <span class="outcome-label">
+                    <i class="legend-dot failed"></i>
+                    Failed
+                  </span>
+
+                  <b id="failedRuns">0</b>
+                </div>
+
+
+                <div>
+                  <span class="outcome-label">
+                    <i class="legend-dot pending"></i>
+                    Other
+                  </span>
+
+                  <b id="otherRuns">0</b>
+                </div>
+
+              </div>
+
+            </div>
+
+          </article>
+
+
+          <!-- RUNTIME -->
+          <article class="panel chart-panel wide">
+
+            <div class="panel-header">
+
+              <div>
+
+                <div class="panel-kicker">
+                  PERFORMANCE
+                </div>
+
+                <h2>Average runtime</h2>
+
+              </div>
+
+              <span class="small-note">
+                seconds
+              </span>
+
+            </div>
+
+            <div
+              class="bar-chart"
+              id="runtimeChart"
+              aria-label="Average runtime by agent"
+            ></div>
+
+          </article>
+
+
+          <!-- AI INSIGHTS -->
+          <article class="panel insight-panel">
+
+            <div class="panel-header">
+
+              <div>
+
+                <div class="panel-kicker">
+                  AI GENERATED
+                </div>
+
+                <h2>Insights</h2>
+
+              </div>
+
+              <button
+                class="text-button"
+                id="generateInsightsBtn"
+                type="button"
+              >
+                Generate
+              </button>
+
+            </div>
+
+            <div
+              id="insightsList"
+              class="insights-list"
+            ></div>
+
+          </article>
+
+        </section>
+
+
+        <!-- AGENT PERFORMANCE -->
+        <section class="panel agents-panel">
+
+          <div class="panel-header agents-header">
+
+            <div>
+
+              <div class="panel-kicker">
+                AGENT PERFORMANCE
+              </div>
+
+              <h2>Execution performance</h2>
+
+            </div>
+
+
+            <div class="table-tools">
+
+              <label class="search-box">
+
+                <span>⌕</span>
+
+                <input
+                  id="agentSearch"
+                  type="search"
+                  placeholder="Search agents..."
+                  autocomplete="off"
+                />
+
+              </label>
+
+
+              <select
+                id="statusFilter"
+                aria-label="Filter agents"
+              >
+
+                <option value="all">
+                  All statuses
+                </option>
+
+                <option value="active">
+                  Active
+                </option>
+
+                <option value="idle">
+                  Idle
+                </option>
+
+                <option value="paused">
+                  Paused
+                </option>
+
+              </select>
+
+
+              <button
+                class="secondary-button"
+                id="exportBtn"
+                type="button"
+              >
+                ⇩ Export CSV
+              </button>
+
+            </div>
+
+          </div>
+
+
+          <div class="table-scroll">
+
+            <table>
+
+              <thead>
+
+                <tr>
+                  <th>Agent</th>
+                  <th>Status</th>
+                  <th>Runs</th>
+                  <th>Success</th>
+                  <th>Avg. Time</th>
+                  <th>Reliability</th>
+                  <th>Action</th>
+                </tr>
+
+              </thead>
+
+              <tbody id="agentTableBody"></tbody>
+
+            </table>
+
+          </div>
+
+
+          <div
+            class="empty-state hidden"
+            id="emptyTable"
+          >
+            No agents match your current filters.
+          </div>
+
+        </section>
+
+
+        <!-- ACTIVITY -->
+        <section class="panel activity-panel">
+
+          <div class="panel-header">
+
+            <div>
+
+              <div class="panel-kicker">
+                LIVE ACTIVITY
+              </div>
+
+              <h2>Recent executions</h2>
+
+            </div>
+
+            <button
+              class="text-button"
+              id="clearActivityBtn"
+              type="button"
+            >
+              Clear view
+            </button>
+
+          </div>
+
+
+          <div
+            id="activityList"
+            class="activity-list"
+          ></div>
+
+        </section>
+
+
+        <!-- FOOTER -->
+        <footer class="footer">
+
+          <span>
+            NEXUS AI Insights
+          </span>
+
+          <span id="lastUpdated">
+            Updated just now
+          </span>
+
+        </footer>
+
+      </div>
 
     </main>
 
-</div>
+  </div>
 
 
-<!-- =========================
-     CREATE AGENT MODAL
-========================== -->
-<div class="modal-backdrop hidden" id="createModal">
+  <!-- TOAST -->
+  <div
+    class="toast-region"
+    id="toastRegion"
+    aria-live="polite"
+    aria-atomic="true"
+  ></div>
 
-    <div
-        class="modal"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="createModalTitle"
-    >
 
-        <div class="modal-header">
+  <!-- DETAILS MODAL -->
+  <dialog
+    class="details-dialog"
+    id="agentDialog"
+  >
 
-            <div>
-                <span class="section-kicker">AGENT CONFIGURATION</span>
-                <h2 id="createModalTitle">Create New Agent</h2>
-            </div>
+    <div class="dialog-header">
 
-            <button
-                class="modal-close"
-                type="button"
-                data-close-modal="createModal"
-                aria-label="Close"
-            >
-                ×
-            </button>
+      <div>
 
+        <div class="panel-kicker">
+          AGENT DETAILS
         </div>
 
-        <form id="createAgentForm">
+        <h2 id="dialogAgentName">
+          Agent
+        </h2>
 
-            <div class="form-group">
+      </div>
 
-                <label for="agentName">
-                    Agent Name
-                </label>
-
-                <input
-                    id="agentName"
-                    name="agentName"
-                    type="text"
-                    maxlength="40"
-                    placeholder="e.g. Market Researcher"
-                    required
-                >
-
-            </div>
-
-            <div class="form-group">
-
-                <label for="agentRole">
-                    Agent Role
-                </label>
-
-                <select id="agentRole" name="agentRole">
-
-                    <option value="Research">Research Agent</option>
-                    <option value="Analysis">Analysis Agent</option>
-                    <option value="Automation">Automation Agent</option>
-                    <option value="Content">Content Agent</option>
-                    <option value="Support">Support Agent</option>
-
-                </select>
-
-            </div>
-
-            <div class="form-group">
-
-                <label for="agentDescription">
-                    Description
-                </label>
-
-                <textarea
-                    id="agentDescription"
-                    name="agentDescription"
-                    rows="4"
-                    maxlength="180"
-                    placeholder="What should this agent specialize in?"
-                    required
-                ></textarea>
-
-            </div>
-
-            <div class="form-group">
-
-                <label for="agentModel">
-                    Intelligence Model
-                </label>
-
-                <select id="agentModel" name="agentModel">
-
-                    <option value="NEXUS Core">NEXUS Core</option>
-                    <option value="NEXUS Reasoner">NEXUS Reasoner</option>
-                    <option value="NEXUS Fast">NEXUS Fast</option>
-
-                </select>
-
-            </div>
-
-            <div class="form-group">
-
-                <label class="checkbox-row">
-
-                    <input
-                        type="checkbox"
-                        id="agentAutoRun"
-                        name="agentAutoRun"
-                    >
-
-                    <span class="custom-checkbox"></span>
-
-                    <span>
-                        Enable agent immediately
-                    </span>
-
-                </label>
-
-            </div>
-
-            <div class="modal-actions">
-
-                <button
-                    class="secondary-button"
-                    type="button"
-                    data-close-modal="createModal"
-                >
-                    Cancel
-                </button>
-
-                <button
-                    class="primary-button"
-                    type="submit"
-                >
-                    Create Agent
-                </button>
-
-            </div>
-
-        </form>
+      <button
+        class="icon-button"
+        id="closeDialogBtn"
+        type="button"
+        aria-label="Close"
+      >
+        ×
+      </button>
 
     </div>
 
-</div>
+    <div id="dialogContent"></div>
+
+  </dialog>
 
 
-<!-- =========================
-     AGENT DETAILS MODAL
-========================== -->
-<div class="modal-backdrop hidden" id="detailsModal">
-
-    <div
-        class="modal large-modal"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="detailsTitle"
-    >
-
-        <div class="modal-header">
-
-            <div class="details-heading">
-                <div class="details-avatar" id="detailsAvatar">R</div>
-
-                <div>
-                    <span class="section-kicker" id="detailsRole">
-                        RESEARCH AGENT
-                    </span>
-
-                    <h2 id="detailsTitle">Research Agent</h2>
-
-                    <p id="detailsDescription">
-                        Researches information and produces structured summaries.
-                    </p>
-                </div>
-            </div>
-
-            <button
-                class="modal-close"
-                type="button"
-                data-close-modal="detailsModal"
-                aria-label="Close"
-            >
-                ×
-            </button>
-
-        </div>
-
-        <div class="details-grid">
-
-            <div class="detail-stat">
-                <span>Status</span>
-                <strong id="detailsStatus">Running</strong>
-            </div>
-
-            <div class="detail-stat">
-                <span>Tasks</span>
-                <strong id="detailsTasks">42</strong>
-            </div>
-
-            <div class="detail-stat">
-                <span>Success</span>
-                <strong id="detailsSuccess">98%</strong>
-            </div>
-
-            <div class="detail-stat">
-                <span>Model</span>
-                <strong id="detailsModel">NEXUS Core</strong>
-            </div>
-
-        </div>
-
-        <div class="details-section">
-
-            <div class="details-section-title">
-                <span>Execution history</span>
-                <span id="detailsLastRun">Last run: Just now</span>
-            </div>
-
-            <div class="history-bars" id="historyBars">
-                <!-- Generated by JavaScript -->
-            </div>
-
-        </div>
-
-        <div class="details-section">
-
-            <div class="details-section-title">
-                <span>Capabilities</span>
-            </div>
-
-            <div class="capability-list" id="capabilityList">
-                <!-- Generated by JavaScript -->
-            </div>
-
-        </div>
-
-        <div class="modal-actions">
-
-            <button
-                class="secondary-button"
-                id="detailsPauseButton"
-                type="button"
-            >
-                Pause Agent
-            </button>
-
-            <button
-                class="primary-button"
-                id="detailsRunButton"
-                type="button"
-            >
-                Run Agent
-            </button>
-
-        </div>
-
-    </div>
-
-</div>
-
-
-<!-- =========================
-     NOTIFICATION PANEL
-========================== -->
-<div class="floating-panel hidden" id="notificationPanel">
-
-    <div class="floating-panel-header">
-
-        <div>
-            <strong>Notifications</strong>
-            <span>Agent Hub updates</span>
-        </div>
-
-        <button
-            class="text-button"
-            id="markNotificationsButton"
-            type="button"
-        >
-            Mark read
-        </button>
-
-    </div>
-
-    <div class="notification-list" id="notificationList">
-
-        <div class="notification-item unread">
-            <span class="notification-icon cyan">✦</span>
-
-            <div>
-                <strong>Agent Hub ready</strong>
-                <p>Your AI workforce is online.</p>
-                <small>Just now</small>
-            </div>
-        </div>
-
-        <div class="notification-item">
-            <span class="notification-icon purple">✓</span>
-
-            <div>
-                <strong>Research completed</strong>
-                <p>Research Agent completed its last task.</p>
-                <small>12 min ago</small>
-            </div>
-        </div>
-
-        <div class="notification-item">
-            <span class="notification-icon orange">!</span>
-
-            <div>
-                <strong>Review recommended</strong>
-                <p>One paused agent needs configuration.</p>
-                <small>34 min ago</small>
-            </div>
-        </div>
-
-    </div>
-
-</div>
-
-
-<!-- =========================
-     TOAST
-========================== -->
-<div class="toast-container" id="toastContainer"></div>
-
-
-<script src="script.js"></script>
+  <script src="script.js"></script>
 
 </body>
 </html>
