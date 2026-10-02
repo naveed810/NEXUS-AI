@@ -3,1738 +3,1492 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="NEXUS AI — Intelligent Work Studio">
-    <title>NEXUS AI — Intelligent Work Studio</title>
+    <meta name="description" content="NEXUS AI — Centralized AI Agent Operating System and Command Platform">
+    <title>NEXUS AI — AI Agent Operating System</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <link rel="stylesheet" href="style.css">
 </head>
 
-<body>
+<body class="theme-dark">
 
     <!-- =====================================================
          APP CONTAINER
     ====================================================== -->
-    <div id="app">
+    <div id="app" class="nexus-os">
 
         <!-- =================================================
-             ONBOARDING
+             SIDEBAR NAVIGATION
         ================================================== -->
-        <section id="onboarding" class="onboarding">
+        <aside class="sidebar" id="sidebar">
 
-            <div class="onboarding-glow glow-one"></div>
-            <div class="onboarding-glow glow-two"></div>
-
-            <div class="onboarding-card">
-
-                <div class="brand brand-large">
-                    <div class="brand-logo">N</div>
-
+            <div class="sidebar-header">
+                <div class="brand">
+                    <div class="brand-logo-frame">
+                        <span class="brand-pulse"></span>
+                        <div class="brand-logo">N</div>
+                    </div>
                     <div class="brand-text">
-                        <strong>NEXUS</strong>
-                        <span>AI</span>
-                    </div>
-                </div>
-
-
-                <!-- STEP 1 -->
-                <div class="onboarding-step" data-step="1">
-
-                    <div class="eyebrow">
-                        INTELLIGENT WORK STUDIO
-                    </div>
-
-                    <h1>
-                        Work smarter.<br>
-                        <span>Think bigger.</span>
-                    </h1>
-
-                    <p>
-                        NEXUS AI brings your tasks, AI agents, workflows,
-                        insights and productivity tools together in one
-                        intelligent workspace.
-                    </p>
-
-                    <button
-                        class="primary-btn hero-button"
-                        id="startBtn">
-                        Get Started
-                        <span>→</span>
-                    </button>
-
-                </div>
-
-
-                <!-- STEP 2 -->
-                <div
-                    class="onboarding-step hidden"
-                    data-step="2">
-
-                    <div class="step-number">
-                        01 / 02
-                    </div>
-
-                    <h2>
-                        Tell us about you.
-                    </h2>
-
-                    <p>
-                        Your information is used to personalize this
-                        browser-based NEXUS AI workspace.
-                    </p>
-
-                    <form
-                        id="profileForm"
-                        class="form-stack">
-
-                        <label>
-                            Your name
-
-                            <input
-                                type="text"
-                                id="nameInput"
-                                placeholder="Enter your name"
-                                maxlength="40"
-                                required>
-                        </label>
-
-                        <label>
-                            Email address
-
-                            <input
-                                type="email"
-                                id="emailInput"
-                                placeholder="you@example.com"
-                                maxlength="100"
-                                required>
-                        </label>
-
-                        <button
-                            class="primary-btn full-width"
-                            type="submit">
-
-                            Continue
-                            <span>→</span>
-
-                        </button>
-
-                    </form>
-
-                </div>
-
-
-                <!-- STEP 3 -->
-                <div
-                    class="onboarding-step hidden"
-                    data-step="3">
-
-                    <div class="step-number">
-                        02 / 02
-                    </div>
-
-                    <h2>
-                        Create your workspace.
-                    </h2>
-
-                    <p>
-                        Choose a workspace name and the type of work
-                        you want NEXUS AI to help you with.
-                    </p>
-
-                    <form
-                        id="workspaceForm"
-                        class="form-stack">
-
-                        <label>
-                            Workspace name
-
-                            <input
-                                type="text"
-                                id="workspaceInput"
-                                value="Personal Workspace"
-                                maxlength="40"
-                                required>
-                        </label>
-
-
-                        <div class="focus-grid">
-
-                            <button
-                                type="button"
-                                class="focus-card active"
-                                data-focus="AI & Productivity">
-
-                                <strong>✦</strong>
-                                <b>AI & Productivity</b>
-                                <small>Plan and execute</small>
-
-                            </button>
-
-
-                            <button
-                                type="button"
-                                class="focus-card"
-                                data-focus="Development">
-
-                                <strong>⌘</strong>
-                                <b>Development</b>
-                                <small>Build projects</small>
-
-                            </button>
-
-
-                            <button
-                                type="button"
-                                class="focus-card"
-                                data-focus="Research">
-
-                                <strong>⌕</strong>
-                                <b>Research</b>
-                                <small>Analyze topics</small>
-
-                            </button>
-
-
-                            <button
-                                type="button"
-                                class="focus-card"
-                                data-focus="Automation">
-
-                                <strong>⚡</strong>
-                                <b>Automation</b>
-                                <small>Automate work</small>
-
-                            </button>
-
+                        <div class="brand-title">
+                            <strong>NEXUS</strong>
+                            <span class="brand-badge">OS</span>
                         </div>
-
-
-                        <button
-                            class="primary-btn full-width"
-                            type="submit">
-
-                            Launch NEXUS AI
-                            <span>→</span>
-
-                        </button>
-
-                    </form>
-
+                        <span class="brand-sub">AI AGENT PLATFORM</span>
+                    </div>
                 </div>
 
-
-                <div class="onboarding-dots">
-                    <i class="active"></i>
-                    <i></i>
-                    <i></i>
-                </div>
-
+                <button class="icon-button mobile-only" id="closeSidebar" aria-label="Close sidebar">✕</button>
             </div>
 
-        </section>
+            <!-- SYSTEM STATUS TICKER -->
+            <div class="system-status-chip">
+                <span class="pulse-indicator online"></span>
+                <span class="status-chip-label">CORE ONLINE</span>
+                <span class="status-chip-val" id="systemClock">00:00:00 UTC</span>
+            </div>
 
+            <!-- WORKSPACE SWITCHER -->
+            <div class="workspace-container">
+                <button class="workspace-switcher" id="workspaceSwitcher" title="Switch Workspace">
+                    <span class="workspace-avatar" id="workspaceAvatar">NX</span>
+                    <span class="workspace-information">
+                        <b id="workspaceName">Command Alpha</b>
+                        <small id="workspaceFocus">Autonomous Operations</small>
+                    </span>
+                    <span class="workspace-arrow">▾</span>
+                </button>
+
+                <div class="dropdown workspace-dropdown hidden" id="workspaceMenu">
+                    <div class="dropdown-title">NEXUS ENVIRONMENTS</div>
+                    <div id="workspaceList"></div>
+                    <button class="dropdown-item" id="addWorkspaceBtn">＋ Deploy Workspace</button>
+                </div>
+            </div>
+
+            <!-- MAIN NAVIGATION -->
+            <nav class="navigation">
+                <div class="navigation-title">OPERATING SYSTEM</div>
+
+                <button class="nav-item active" data-page="command">
+                    <span class="nav-icon">⌂</span>
+                    <span class="nav-text">Command Center</span>
+                    <span class="nav-tag primary">Live</span>
+                </button>
+
+                <button class="nav-item" data-page="missions">
+                    <span class="nav-icon">🎯</span>
+                    <span class="nav-text">Mission Mode</span>
+                    <em id="missionBadge">03</em>
+                </button>
+
+                <button class="nav-item" data-page="agents">
+                    <span class="nav-icon">🤖</span>
+                    <span class="nav-text">Agent Hub</span>
+                    <em id="agentBadge">08</em>
+                </button>
+
+                <button class="nav-item" data-page="workflows">
+                    <span class="nav-icon">⚡</span>
+                    <span class="nav-text">Workflows</span>
+                    <span class="nav-tag">Visual</span>
+                </button>
+
+                <button class="nav-item" data-page="insights">
+                    <span class="nav-icon">📊</span>
+                    <span class="nav-text">AI Insights</span>
+                </button>
+
+                <div class="navigation-title manage-title">OPERATIONS & CONTROL</div>
+
+                <button class="nav-item" data-page="activity">
+                    <span class="nav-icon">📜</span>
+                    <span class="nav-text">Activity Logs</span>
+                </button>
+
+                <button class="nav-item" data-page="alerts">
+                    <span class="nav-icon">🔔</span>
+                    <span class="nav-text">Alerts</span>
+                    <em class="badge-alert" id="alertsNavBadge">02</em>
+                </button>
+
+                <button class="nav-item" data-page="security">
+                    <span class="nav-icon">🔐</span>
+                    <span class="nav-text">Security</span>
+                </button>
+
+                <button class="nav-item" data-page="settings">
+                    <span class="nav-icon">⚙</span>
+                    <span class="nav-text">Settings</span>
+                </button>
+            </nav>
+
+            <!-- SIDEBAR TELEMETRY & PROFILE -->
+            <div class="sidebar-bottom">
+                <div class="telemetry-card">
+                    <div class="telemetry-header">
+                        <span class="telemetry-title">AGENT MESH</span>
+                        <span class="telemetry-val" id="activeAgentRatio">5 / 8 Active</span>
+                    </div>
+                    <div class="telemetry-bar">
+                        <div class="telemetry-fill" id="meshLoadBar" style="width: 65%;"></div>
+                    </div>
+                    <div class="telemetry-footer">
+                        <span>CPU: <b id="sideCpu">48%</b></span>
+                        <span>MEM: <b id="sideMem">2.4 GB</b></span>
+                    </div>
+                </div>
+
+                <button class="profile-card" id="profileBtn">
+                    <span class="profile-avatar" id="profileAvatar">CM</span>
+                    <span class="profile-information">
+                        <b id="profileName">Commander</b>
+                        <small id="profileRole">System Architect</small>
+                    </span>
+                    <span class="profile-status-indicator"></span>
+                </button>
+            </div>
+
+        </aside>
+
+        <div class="sidebar-overlay hidden" id="sidebarOverlay"></div>
 
         <!-- =================================================
-             MAIN APPLICATION
+             MAIN CONTENT WRAPPER
         ================================================== -->
-
-        <div
-            id="appShell"
-            class="app-shell hidden">
-
-
-            <!-- =================================================
-                 SIDEBAR
-            ================================================== -->
-
-            <aside
-                class="sidebar"
-                id="sidebar">
-
-                <div class="sidebar-header">
-
-                    <div class="brand">
-
-                        <div class="brand-logo">
-                            N
-                        </div>
-
-                        <div class="brand-text">
-                            <strong>NEXUS</strong>
-                            <span>AI</span>
-                        </div>
-
-                    </div>
-
-                    <button
-                        class="icon-button mobile-only"
-                        id="closeSidebar">
-                        ×
-                    </button>
-
-                </div>
-
-
-                <!-- WORKSPACE -->
-                <div class="workspace-container">
-
-                    <button
-                        class="workspace-switcher"
-                        id="workspaceSwitcher">
-
-                        <span
-                            class="workspace-avatar"
-                            id="workspaceAvatar">
-                            P
-                        </span>
-
-                        <span class="workspace-information">
-
-                            <b id="workspaceName">
-                                Personal Workspace
-                            </b>
-
-                            <small id="workspaceFocus">
-                                AI & Productivity
-                            </small>
-
-                        </span>
-
-                        <span class="workspace-arrow">
-                           ⌄
-                        </span>
-
-                    </button>
-
-
-                    <div
-                        class="dropdown workspace-dropdown hidden"
-                        id="workspaceMenu">
-
-                        <div class="dropdown-title">
-                            YOUR WORKSPACES
-                        </div>
-
-                        <div id="workspaceList"></div>
-
-                        <button
-                            class="dropdown-item"
-                            id="addWorkspaceBtn">
-
-                            ＋ Create workspace
-
-                        </button>
-
-                    </div>
-
-                </div>
-
-
-                <!-- NAVIGATION -->
-                <nav class="navigation">
-
-                    <div class="navigation-title">
-                        WORKSPACE
-                    </div>
-
-
-                    <button
-                        class="nav-item active"
-                        data-page="command">
-
-                        <span>⌂</span>
-                        Command Center
-
-                    </button>
-
-
-                    <button
-                        class="nav-item"
-                        data-page="agents">
-
-                        <span>✦</span>
-                        AI Agents
-
-                        <em id="agentBadge">
-                            0
-                        </em>
-
-                    </button>
-
-
-                    <button
-                        class="nav-item"
-                        data-page="workflows">
-
-                        <span>⌘</span>
-                        Workflows
-
-                    </button>
-
-
-                    <button
-                        class="nav-item"
-                        data-page="insights">
-
-                        <span>◇</span>
-                        AI Insights
-
-                    </button>
-
-
-                    <div class="navigation-title manage-title">
-                        MANAGE
-                    </div>
-
-
-                    <button
-                        class="nav-item"
-                        data-page="activity">
-
-                        <span>◴</span>
-                        Activity
-
-                    </button>
-
-
-                    <button
-                        class="nav-item"
-                        data-page="integrations">
-
-                        <span>⊞</span>
-                        Integrations
-
-                    </button>
-
-
-                    <button
-                        class="nav-item"
-                        data-page="settings">
-
-                        <span>⚙</span>
-                        Settings
-
-                    </button>
-
-                </nav>
-
-
-                <!-- SIDEBAR BOTTOM -->
-                <div class="sidebar-bottom">
-
-                    <button
-                        class="help-card"
-                        id="helpBtn">
-
-                        <span class="help-icon">
-                            ?
-                        </span>
-
-                        <span>
-                            <b>Need help?</b>
-                            <small>
-                                Explore the NEXUS guide
-                            </small>
-                        </span>
-
-                        <strong>→</strong>
-
-                    </button>
-
-
-                    <button
-                        class="profile-card"
-                        id="profileBtn">
-
-                        <span
-                            class="profile-avatar"
-                            id="profileAvatar">
-                            N
-                        </span>
-
-                        <span class="profile-information">
-
-                            <b id="profileName">
-                                User
-                            </b>
-
-                            <small id="profileEmail">
-                                user@example.com
-                            </small>
-
-                        </span>
-
-                        <strong>•••</strong>
-
-                    </button>
-
-                </div>
-
-            </aside>
-
-
-            <div
-                class="sidebar-overlay hidden"
-                id="sidebarOverlay">
-            </div>
-
-
-            <!-- =================================================
-                 MAIN CONTENT
-            ================================================== -->
-
-            <main class="main-content">
-
-
-                <!-- TOP BAR -->
-                <header class="topbar">
-
+        <main class="main-content">
+
+            <!-- TOPBAR -->
+            <header class="topbar">
+                <div class="topbar-left">
+                    <button class="icon-button mobile-only" id="openSidebar" aria-label="Open sidebar">☰</button>
                     <div class="breadcrumb">
-
-                        <span>
-                            Workspace
-                        </span>
-
-                        <b>/</b>
-
-                        <strong id="breadcrumbName">
-                            Command Center
-                        </strong>
-
+                        <span class="brand-root">NEXUS AI</span>
+                        <span class="separator">/</span>
+                        <strong id="breadcrumbName">Command Center</strong>
                     </div>
+                </div>
 
+                <!-- LIVE PIPELINE CHIP -->
+                <div class="topbar-pipeline-status" id="topPipelineStatus" title="System Status">
+                    <span class="pulse-dot"></span>
+                    <span class="pipeline-text">AUTONOMOUS ORCHESTRATOR ACTIVE</span>
+                </div>
 
-                    <div class="topbar-actions">
+                <div class="topbar-actions">
+                    <button class="search-button" id="searchBtn" title="Search Everything (Ctrl+K)">
+                        <span class="search-icon">⌕</span>
+                        <span class="search-label">Quick Command / Search...</span>
+                        <span class="key-combo"><kbd>Ctrl</kbd><kbd>K</kbd></span>
+                    </button>
 
-                        <button
-                            class="icon-button mobile-only"
-                            id="openSidebar">
-                            ☰
+                    <button class="primary-btn sm quick-mission-btn" id="topNewMissionBtn">
+                        <span>+</span> New Mission
+                    </button>
+
+                    <button class="icon-button" id="themeBtn" title="Toggle Theme">◐</button>
+
+                    <div class="notification-container">
+                        <button class="icon-button" id="notificationBtn" title="System Alerts">
+                            <span>🔔</span>
+                            <i class="notification-dot" id="notificationDot"></i>
                         </button>
 
+                        <div class="dropdown notification-dropdown hidden" id="notificationMenu">
+                            <div class="notification-header">
+                                <div>
+                                    <b>System Alerts</b>
+                                    <small id="notifCountLabel">2 Active</small>
+                                </div>
+                                <button class="text-link" id="markRead">Clear All</button>
+                            </div>
+                            <div class="notification-list" id="notificationList"></div>
+                            <button class="dropdown-footer-btn" data-go="alerts">View All Alerts in Center →</button>
+                        </div>
+                    </div>
+                </div>
+            </header>
 
-                        <button
-                            class="search-button"
-                            id="searchBtn">
+            <!-- CONTENT BODY -->
+            <div class="content">
 
-                            <span>⌕</span>
+                <!-- =============================================
+                     PAGE 1: COMMAND CENTER (MAIN DASHBOARD)
+                ============================================== -->
+                <section class="page active" id="page-command">
+                    <!-- HERO COMMAND HEADER -->
+                    <div class="command-hero">
+                        <div class="hero-left">
+                            <div class="cyber-badge">
+                                <span class="pulse-indicator"></span>
+                                NEXUS CENTRAL COMMAND • CLUSTER ALPHA
+                            </div>
+                            <h1 class="hero-title">
+                                AI Agent Command Platform
+                            </h1>
+                            <p class="hero-desc">
+                                Orchestrate, run, interconnect, and observe autonomous AI agents across missions, workflows, and distributed memory graphs.
+                            </p>
+                        </div>
+                        <div class="hero-right">
+                            <div class="hero-live-clock">
+                                <span class="clock-label">SYSTEM UPTIME</span>
+                                <span class="clock-value" id="systemUptime">99.98% • 14d 06h</span>
+                            </div>
+                            <div class="hero-actions">
+                                <button class="secondary-button" id="refreshBtn">
+                                    <span class="spin-icon">↻</span> Refresh State
+                                </button>
+                                <button class="primary-btn glow" id="cmdNewMissionBtn">
+                                    <span>🎯</span> Launch Mission
+                                </button>
+                            </div>
+                        </div>
+                    </div>
 
-                            <span class="search-label">
-                                Search
+                    <!-- TOP COMMAND KPI MATRIX -->
+                    <div class="kpi-matrix-grid">
+                        <!-- METRIC: AGENTS -->
+                        <div class="kpi-card" data-go="agents">
+                            <div class="kpi-header">
+                                <span class="kpi-icon-badge purple">🤖</span>
+                                <span class="kpi-tag">TOTAL AGENTS</span>
+                            </div>
+                            <div class="kpi-main">
+                                <span class="kpi-number" id="metricTotalAgents">08</span>
+                                <div class="kpi-breakdown">
+                                    <span class="sub-stat active"><i class="dot green"></i> <b id="metricActiveAgents">05</b> Active</span>
+                                    <span class="sub-stat idle"><i class="dot yellow"></i> <b id="metricIdleAgents">02</b> Idle</span>
+                                    <span class="sub-stat failed"><i class="dot red"></i> <b id="metricFailedAgents">01</b> Error</span>
+                                </div>
+                            </div>
+                            <div class="kpi-footer">
+                                <span>Agent Fleet: <b>Operational</b></span>
+                                <span class="action-arrow">→</span>
+                            </div>
+                        </div>
+
+                        <!-- METRIC: MISSIONS -->
+                        <div class="kpi-card" data-go="missions">
+                            <div class="kpi-header">
+                                <span class="kpi-icon-badge cyan">🎯</span>
+                                <span class="kpi-tag">ACTIVE MISSIONS</span>
+                            </div>
+                            <div class="kpi-main">
+                                <span class="kpi-number" id="metricActiveMissions">03</span>
+                                <div class="kpi-breakdown">
+                                    <span class="sub-stat active"><i class="dot cyan"></i> <b id="metricRunningMissions">02</b> Running</span>
+                                    <span class="sub-stat idle"><i class="dot yellow"></i> <b id="metricWaitingMissions">01</b> Queued</span>
+                                    <span class="sub-stat completed"><i class="dot blue"></i> <b id="metricCompletedMissions">07</b> Done</span>
+                                </div>
+                            </div>
+                            <div class="kpi-footer">
+                                <span>Mission Pipeline: <b>80% Avg</b></span>
+                                <span class="action-arrow">→</span>
+                            </div>
+                        </div>
+
+                        <!-- METRIC: TASKS -->
+                        <div class="kpi-card" data-go="insights">
+                            <div class="kpi-header">
+                                <span class="kpi-icon-badge blue">⚡</span>
+                                <span class="kpi-tag">COMPLETED TASKS</span>
+                            </div>
+                            <div class="kpi-main">
+                                <span class="kpi-number" id="metricCompletedTasks">24</span>
+                                <div class="kpi-breakdown">
+                                    <span class="sub-stat active"><i class="dot green"></i> <b>96.8%</b> Success</span>
+                                    <span class="sub-stat failed"><i class="dot red"></i> <b id="metricFailedTasks">01</b> Failed</span>
+                                    <span class="sub-stat idle"><i class="dot purple"></i> <b>3.2s</b> Latency</span>
+                                </div>
+                            </div>
+                            <div class="kpi-footer">
+                                <span>Execution Volume: <b>High</b></span>
+                                <span class="action-arrow">→</span>
+                            </div>
+                        </div>
+
+                        <!-- METRIC: ALERTS -->
+                        <div class="kpi-card" data-go="alerts">
+                            <div class="kpi-header">
+                                <span class="kpi-icon-badge amber">🔔</span>
+                                <span class="kpi-tag">SYSTEM ALERTS</span>
+                            </div>
+                            <div class="kpi-main">
+                                <span class="kpi-number text-amber" id="metricTotalAlerts">02</span>
+                                <div class="kpi-breakdown">
+                                    <span class="sub-stat warning"><i class="dot amber"></i> <b>1</b> Attention</span>
+                                    <span class="sub-stat failed"><i class="dot red"></i> <b>1</b> Critical</span>
+                                    <span class="sub-stat active"><i class="dot green"></i> <b>4</b> Resolved</span>
+                                </div>
+                            </div>
+                            <div class="kpi-footer">
+                                <span>Health: <b>Requires Review</b></span>
+                                <span class="action-arrow">→</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- QUICK ACTION CONTROL BAR -->
+                    <div class="quick-action-strip">
+                        <div class="quick-action-label">QUICK ACTIONS</div>
+                        <div class="quick-action-buttons">
+                            <button class="quick-act-btn primary" id="quickNewMission">
+                                <span class="btn-icon">🎯</span>
+                                <span>+ New Mission</span>
+                            </button>
+                            <button class="quick-act-btn" id="quickCreateAgent">
+                                <span class="btn-icon">🤖</span>
+                                <span>+ Create Agent</span>
+                            </button>
+                            <button class="quick-act-btn" id="quickNewWorkflow">
+                                <span class="btn-icon">⚡</span>
+                                <span>+ New Workflow</span>
+                            </button>
+                            <button class="quick-act-btn" id="quickRunAgentModal">
+                                <span class="btn-icon">▶</span>
+                                <span>Run Agent</span>
+                            </button>
+                            <button class="quick-act-btn" data-go="activity">
+                                <span class="btn-icon">📜</span>
+                                <span>View Logs</span>
+                            </button>
+                            <button class="quick-act-btn" data-go="alerts">
+                                <span class="btn-icon">🔔</span>
+                                <span>View Alerts</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- ACTIVE MISSIONS SECTION (PROGRESS & STATUS) -->
+                    <div class="section-container">
+                        <div class="section-header">
+                            <div>
+                                <span class="section-eyebrow">MISSION PIPELINE</span>
+                                <h2 class="section-title">Active Missions</h2>
+                            </div>
+                            <div class="section-actions">
+                                <button class="primary-btn sm" id="missionSectionAddBtn">+ New Mission</button>
+                                <button class="text-button" data-go="missions">Open Mission Mode →</button>
+                            </div>
+                        </div>
+
+                        <div class="active-missions-grid" id="activeMissionsGrid">
+                            <!-- Populated dynamically by script.js -->
+                        </div>
+                    </div>
+
+                    <!-- AGENT-TO-AGENT COMMUNICATION STREAM -->
+                    <div class="section-container">
+                        <div class="section-header">
+                            <div>
+                                <span class="section-eyebrow">DISTRIBUTED INTELLIGENCE MESH</span>
+                                <h2 class="section-title">Agent-to-Agent Communication Pipeline</h2>
+                            </div>
+                            <span class="live-pulse-badge">
+                                <span class="pulse-indicator"></span> Real-time Data Transfer
                             </span>
-
-                            <kbd>Ctrl</kbd>
-                            <kbd>K</kbd>
-
-                        </button>
-
-
-                        <button
-                            class="icon-button"
-                            id="themeBtn"
-                            title="Toggle theme">
-                            ◐
-                        </button>
-
-
-                        <div class="notification-container">
-
-                            <button
-                                class="icon-button"
-                                id="notificationBtn"
-                                title="Notifications">
-
-                                ♢
-
-                                <i id="notificationDot"></i>
-
-                            </button>
-
-
-                            <div
-                                class="dropdown notification-dropdown hidden"
-                                id="notificationMenu">
-
-                                <div class="notification-header">
-
-                                    <b>
-                                        Notifications
-                                    </b>
-
-                                    <button
-                                        id="markRead">
-                                        Mark read
-                                    </button>
-
-                                </div>
-
-                                <div id="notificationList"></div>
-
-                            </div>
-
                         </div>
 
+                        <div class="agent-mesh-card">
+                            <div class="mesh-pipeline-diagram" id="agentMeshPipeline">
+                                <!-- Agent 1 -->
+                                <div class="mesh-node" id="nodeResearch">
+                                    <div class="node-icon">⌕</div>
+                                    <div class="node-info">
+                                        <strong>Research Agent</strong>
+                                        <small class="node-state success">✓ Result transferred</small>
+                                    </div>
+                                    <span class="node-status-dot online"></span>
+                                </div>
+
+                                <div class="mesh-connector active">
+                                    <div class="connector-line"></div>
+                                    <div class="connector-packet packet-1"></div>
+                                    <span class="connector-label">14 Sources Raw Payload</span>
+                                </div>
+
+                                <!-- Agent 2 -->
+                                <div class="mesh-node" id="nodeData">
+                                    <div class="node-icon">◇</div>
+                                    <div class="node-info">
+                                        <strong>Data Agent</strong>
+                                        <small class="node-state success">✓ Task received</small>
+                                    </div>
+                                    <span class="node-status-dot online"></span>
+                                </div>
+
+                                <div class="mesh-connector active">
+                                    <div class="connector-line"></div>
+                                    <div class="connector-packet packet-2"></div>
+                                    <span class="connector-label">Structured JSON Schema</span>
+                                </div>
+
+                                <!-- Agent 3 -->
+                                <div class="mesh-node active-processing" id="nodeAnalysis">
+                                    <div class="node-icon">✦</div>
+                                    <div class="node-info">
+                                        <strong>Analysis Agent</strong>
+                                        <small class="node-state processing">⏳ Processing</small>
+                                    </div>
+                                    <span class="node-status-dot processing"></span>
+                                </div>
+
+                                <div class="mesh-connector pending">
+                                    <div class="connector-line"></div>
+                                    <span class="connector-label">Awaiting Synthesis</span>
+                                </div>
+
+                                <!-- Agent 4 -->
+                                <div class="mesh-node waiting" id="nodeReport">
+                                    <div class="node-icon">📄</div>
+                                    <div class="node-info">
+                                        <strong>Report Agent</strong>
+                                        <small class="node-state warning">⚠ Waiting</small>
+                                    </div>
+                                    <span class="node-status-dot waiting"></span>
+                                </div>
+                            </div>
+
+                            <div class="mesh-footer">
+                                <div class="mesh-status-legend">
+                                    <span><i class="dot green"></i> Result transferred</span>
+                                    <span><i class="dot cyan"></i> Task received</span>
+                                    <span><i class="dot purple"></i> Processing</span>
+                                    <span><i class="dot yellow"></i> Waiting</span>
+                                </div>
+                                <button class="secondary-button sm" id="simulatePacketBtn">⚡ Transmit Test Payload</button>
+                            </div>
+                        </div>
                     </div>
 
-                </header>
-
-
-                <!-- CONTENT -->
-                <div class="content">
-
-
-                    <!-- =================================================
-                         COMMAND CENTER
-                    ================================================== -->
-
-                    <section
-                        class="page active"
-                        id="page-command">
-
-                        <div class="page-header">
-
-                            <div>
-
-                                <div class="eyebrow">
-                                    <i class="status-dot"></i>
-                                    NEXUS AI WORKSPACE
+                    <!-- LIVE AGENT STATUS MATRIX & PERFORMANCE -->
+                    <div class="two-column-grid">
+                        <!-- LEFT: LIVE AGENT STATUS TABLE -->
+                        <div class="panel-card">
+                            <div class="panel-header">
+                                <div>
+                                    <span class="panel-eyebrow">TELEMETRY</span>
+                                    <h3 class="panel-title">Live Agent Status Monitoring</h3>
                                 </div>
-
-                                <h1>
-                                    Good
-                                    <span id="period">
-                                        evening
-                                    </span>,
-                                    <span id="dashboardName">
-                                        there
-                                    </span>.
-                                </h1>
-
-                                <p>
-                                    Everything you need to think,
-                                    build, automate and understand —
-                                    connected in one intelligent workspace.
-                                </p>
-
+                                <button class="text-button" data-go="agents">View Agent Hub →</button>
                             </div>
 
-
-                            <div class="header-actions">
-
-                                <button
-                                    class="secondary-button"
-                                    id="refreshBtn">
-
-                                    ↻
-                                    <span>
-                                        Refresh
-                                    </span>
-
-                                </button>
-
-
-                                <button
-                                    class="primary-btn"
-                                    id="newTaskBtn">
-
-                                    ＋ New Task
-
-                                </button>
-
+                            <div class="agent-table-wrapper">
+                                <table class="nexus-table" id="liveAgentTable">
+                                    <thead>
+                                        <tr>
+                                            <th>Agent Name</th>
+                                            <th>Status</th>
+                                            <th>CPU</th>
+                                            <th>Memory</th>
+                                            <th>Tasks</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="liveAgentTableBody">
+                                        <!-- Rendered dynamically -->
+                                    </tbody>
+                                </table>
                             </div>
-
                         </div>
 
-
-                        <!-- AI COMMAND -->
-                        <div class="ai-command-card">
-
-                            <div class="ai-command-header">
-
-                                <div class="ai-title">
-
-                                    <span class="ai-icon">
-                                        ✦
-                                    </span>
-
-                                    <span>
-
-                                        <b>
-                                            Ask NEXUS
-                                        </b>
-
-                                        <small>
-                                            AI Command Interface
-                                        </small>
-
-                                    </span>
-
+                        <!-- RIGHT: AGENT PERFORMANCE & SYSTEM HEALTH -->
+                        <div class="panel-card">
+                            <div class="panel-header">
+                                <div>
+                                    <span class="panel-eyebrow">EFFICIENCY MATRIX</span>
+                                    <h3 class="panel-title">Agent Performance</h3>
                                 </div>
-
-
-                                <span class="ai-ready">
-                                    ● Ready
-                                </span>
-
+                                <span class="badge-success">Operational 96.8%</span>
                             </div>
 
-
-                            <form
-                                class="ai-form"
-                                id="aiForm">
-
-                                <input
-                                    id="aiInput"
-                                    type="text"
-                                    placeholder="Ask NEXUS anything...">
-
-                                <button type="submit">
-                                    ↑
-                                </button>
-
-                            </form>
-
-
-                            <div class="ai-chips">
-
-                                <button
-                                    data-command="Summarize my activity">
-
-                                    ✦ Summarize activity
-
-                                </button>
-
-
-                                <button
-                                    data-command="What should I focus on?">
-
-                                    ◇ What should I focus on?
-
-                                </button>
-
-
-                                <button
-                                    data-command="Show active agents">
-
-                                    → Show active agents
-
-                                </button>
-
+                            <div class="performance-bars" id="agentPerformanceMini">
+                                <!-- Dynamic performance progress bars -->
                             </div>
 
-
-                            <div
-                                class="ai-response hidden"
-                                id="aiResponse">
+                            <div class="system-health-strip">
+                                <div class="health-mini-gauge">
+                                    <div class="gauge-value">98<small>%</small></div>
+                                    <div class="gauge-label">Cluster Health</div>
+                                </div>
+                                <div class="health-details">
+                                    <div class="health-metric">
+                                        <span>Agent Uptime</span>
+                                        <b>99.98%</b>
+                                    </div>
+                                    <div class="health-metric">
+                                        <span>Workflow Success</span>
+                                        <b>97.4%</b>
+                                    </div>
+                                    <div class="health-metric">
+                                        <span>Avg Execution</span>
+                                        <b>3.2s</b>
+                                    </div>
+                                </div>
                             </div>
-
                         </div>
+                    </div>
 
-
-                        <!-- QUICK ACTIONS -->
+                    <!-- RECENT ACTIVITY LOGS PREVIEW -->
+                    <div class="section-container">
                         <div class="section-header">
-
                             <div>
-
-                                <span>
-                                    SHORTCUTS
-                                </span>
-
-                                <h2>
-                                    Quick Actions
-                                </h2>
-
+                                <span class="section-eyebrow">AUDIT STREAM</span>
+                                <h2 class="section-title">Recent Activity</h2>
                             </div>
-
-                            <button
-                                class="text-button"
-                                data-go="agents">
-
-                                View all →
-
-                            </button>
-
+                            <button class="text-button" data-go="activity">Open Full Logs →</button>
                         </div>
 
-
-                        <div class="quick-grid">
-
-                            <button
-                                class="quick-card"
-                                id="quickAgent">
-
-                                <i class="purple">
-                                    ✦
-                                </i>
-
-                                <span>
-
-                                    <b>
-                                        Create AI Agent
-                                    </b>
-
-                                    <small>
-                                        Build a specialized assistant
-                                    </small>
-
-                                </span>
-
-                                <strong>→</strong>
-
-                            </button>
+                        <div class="activity-stream-panel" id="recentActivityStream">
+                            <!-- Populated dynamically -->
+                        </div>
+                    </div>
+                </section>
 
 
-                            <button
-                                class="quick-card"
-                                id="quickWorkflow">
+                <!-- =============================================
+                     PAGE 2: MISSION MODE (MAJOR FEATURE)
+                ============================================== -->
+                <section class="page" id="page-missions">
+                    <div class="page-header">
+                        <div>
+                            <div class="eyebrow"><span class="pulse-indicator"></span> AUTONOMOUS OBJECTIVE ENGINE</div>
+                            <h1>Mission Mode</h1>
+                            <p>Provide NEXUS AI with a high-level goal. The system autonomously plans, assigns agents, executes tasks in a coordinated pipeline, and delivers final synthesis.</p>
+                        </div>
+                        <div class="header-actions">
+                            <button class="secondary-button" id="clearCompletedMissionsBtn">Clear Completed</button>
+                            <button class="primary-btn glow" id="openMissionModalBtn">＋ New Mission</button>
+                        </div>
+                    </div>
 
-                                <i class="blue">
-                                    ⌘
-                                </i>
-
-                                <span>
-
-                                    <b>
-                                        Build Workflow
-                                    </b>
-
-                                    <small>
-                                        Automate repetitive work
-                                    </small>
-
-                                </span>
-
-                                <strong>→</strong>
-
-                            </button>
-
-
-                            <button
-                                class="quick-card"
-                                id="quickInsight">
-
-                                <i class="cyan">
-                                    ◇
-                                </i>
-
-                                <span>
-
-                                    <b>
-                                        Explore Insights
-                                    </b>
-
-                                    <small>
-                                        Discover workspace patterns
-                                    </small>
-
-                                </span>
-
-                                <strong>→</strong>
-
-                            </button>
-
-
-                            <button
-                                class="quick-card"
-                                id="quickResearch">
-
-                                <i class="pink">
-                                    ⌕
-                                </i>
-
-                                <span>
-
-                                    <b>
-                                        Start Research
-                                    </b>
-
-                                    <small>
-                                        Investigate a new topic
-                                    </small>
-
-                                </span>
-
-                                <strong>→</strong>
-
-                            </button>
-
+                    <!-- MISSION CREATION & GOAL INPUT BOX -->
+                    <div class="mission-goal-creator-card">
+                        <div class="goal-creator-header">
+                            <div class="goal-label">
+                                <span class="ai-sparkle">✦</span>
+                                <div>
+                                    <strong>Goal Decomposition Engine</strong>
+                                    <small>NEXUS AI will break your goal into multi-agent tasks</small>
+                                </div>
+                            </div>
+                            <span class="engine-ready-tag">● Pipeline Ready</span>
                         </div>
 
+                        <form class="goal-form" id="goalMissionForm">
+                            <div class="goal-input-wrapper">
+                                <input type="text" id="goalInput" placeholder='e.g., "Research the latest AI tools and prepare a comparison report."' required>
+                                <button type="submit" class="primary-btn" id="deployMissionBtn">
+                                    <span>🚀</span> Deploy Mission
+                                </button>
+                            </div>
+                        </form>
 
-                        <!-- TASKS -->
+                        <!-- PRESET HIGH-LEVEL GOALS -->
+                        <div class="goal-presets">
+                            <span class="preset-label">Quick Goal Presets:</span>
+                            <button class="preset-pill" data-preset="Research the latest AI tools and prepare a comparison report.">
+                                ✦ AI Tools Comparison
+                            </button>
+                            <button class="preset-pill" data-preset="Conduct competitor intel and market positioning analysis for SaaS AI platforms.">
+                                ✦ Market Research
+                            </button>
+                            <button class="preset-pill" data-preset="Perform automated security audit and vulnerability scans on API gateway.">
+                                ✦ Security Audit
+                            </button>
+                            <button class="preset-pill" data-preset="Analyze multi-quarter revenue metrics and generate executive summary dashboard.">
+                                ✦ Financial Analysis
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- LIVE ACTIVE MISSION TRACKER (SHOWCASE) -->
+                    <div class="active-mission-showcase" id="activeMissionShowcase">
+                        <!-- Populated by script.js -->
+                    </div>
+
+                    <!-- ALL MISSIONS LIST -->
+                    <div class="section-container">
                         <div class="section-header">
-
                             <div>
-
-                                <span>
-                                    PRODUCTIVITY
-                                </span>
-
-                                <h2>
-                                    My Tasks
-                                </h2>
-
+                                <span class="section-eyebrow">OBJECTIVES REGISTRY</span>
+                                <h2 class="section-title">All Workspace Missions</h2>
                             </div>
-
-                            <button
-                                class="text-button"
-                                id="addTaskText">
-
-                                ＋ Add task
-
-                            </button>
-
+                            <div class="mission-filter-tabs">
+                                <button class="filter-tab active" data-filter="all">All (<span id="countMissionsAll">0</span>)</button>
+                                <button class="filter-tab" data-filter="running">Running (<span id="countMissionsRunning">0</span>)</button>
+                                <button class="filter-tab" data-filter="waiting">Queued (<span id="countMissionsQueued">0</span>)</button>
+                                <button class="filter-tab" data-filter="completed">Completed (<span id="countMissionsDone">0</span>)</button>
+                            </div>
                         </div>
 
+                        <div class="missions-table-container">
+                            <table class="nexus-table" id="missionsRegistryTable">
+                                <thead>
+                                    <tr>
+                                        <th>Mission Name</th>
+                                        <th>Status</th>
+                                        <th>Progress</th>
+                                        <th>Assigned Agents</th>
+                                        <th>Started</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="missionsTableBody">
+                                    <!-- Rendered dynamically -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
 
-                        <div class="stats-grid">
 
-                            <div class="stat-card">
+                <!-- =============================================
+                     PAGE 3: AGENT HUB
+                ============================================== -->
+                <section class="page" id="page-agents">
+                    <div class="page-header">
+                        <div>
+                            <div class="eyebrow">AGENT FLEET ARCHITECTURE</div>
+                            <h1>Agent Hub</h1>
+                            <p>Configure, monitor, run, inspect memory, and test autonomous intelligence agents across your operating workspace.</p>
+                        </div>
+                        <div class="header-actions">
+                            <button class="secondary-button" id="launchPlaygroundTabBtn">▶ Test in Playground</button>
+                            <button class="primary-btn" id="createAgentMainBtn">＋ Create Agent</button>
+                        </div>
+                    </div>
 
-                                <i class="purple">
-                                    ◷
-                                </i>
+                    <!-- AGENT HUB SUB TABS -->
+                    <div class="sub-nav-tabs">
+                        <button class="sub-tab-btn active" data-subtab="fleet">Agent Fleet (<span id="hubFleetCount">8</span>)</button>
+                        <button class="sub-tab-btn" data-subtab="marketplace">Marketplace & Discovery</button>
+                        <button class="sub-tab-btn" data-subtab="playground">Testing Playground</button>
+                        <button class="sub-tab-btn" data-subtab="memory">Agent Memory Inspector</button>
+                    </div>
 
-                                <span>
-                                    Total
-                                    <b id="totalTasks">
-                                        0
-                                    </b>
-                                </span>
-
+                    <!-- SUBTAB 1: AGENT FLEET -->
+                    <div class="subtab-content active" id="subtab-fleet">
+                        <div class="hub-toolbar">
+                            <div class="search-input-group">
+                                <span class="search-icon">⌕</span>
+                                <input type="text" id="agentSearchInput" placeholder="Filter agents by name, role, model...">
                             </div>
-
-
-                            <div class="stat-card">
-
-                                <i class="blue">
-                                    ✓
-                                </i>
-
-                                <span>
-                                    Completed
-                                    <b id="doneTasks">
-                                        0
-                                    </b>
-                                </span>
-
+                            <div class="filter-group">
+                                <select id="agentRoleFilter" class="nexus-select">
+                                    <option value="all">All Roles</option>
+                                    <option value="Research">Research</option>
+                                    <option value="Analysis">Analysis</option>
+                                    <option value="Coding">Coding</option>
+                                    <option value="Testing">Testing</option>
+                                    <option value="Report">Report</option>
+                                    <option value="Planning">Planning</option>
+                                    <option value="Security">Security</option>
+                                </select>
+                                <select id="agentStatusFilter" class="nexus-select">
+                                    <option value="all">All Statuses</option>
+                                    <option value="running">Running</option>
+                                    <option value="idle">Idle</option>
+                                    <option value="waiting">Waiting</option>
+                                    <option value="error">Error</option>
+                                </select>
                             </div>
-
-
-                            <div class="stat-card">
-
-                                <i class="yellow">
-                                    !
-                                </i>
-
-                                <span>
-                                    Pending
-                                    <b id="pendingTasks">
-                                        0
-                                    </b>
-                                </span>
-
-                            </div>
-
-
-                            <div class="stat-card">
-
-                                <i class="cyan">
-                                    ⚡
-                                </i>
-
-                                <span>
-                                    High Priority
-                                    <b id="highTasks">
-                                        0
-                                    </b>
-                                </span>
-
-                            </div>
-
                         </div>
 
+                        <div class="agent-cards-grid" id="agentFleetGrid">
+                            <!-- Rendered dynamically -->
+                        </div>
+                    </div>
 
-                        <div
-                            class="task-list"
-                            id="taskList">
+                    <!-- SUBTAB 2: AGENT MARKETPLACE -->
+                    <div class="subtab-content hidden" id="subtab-marketplace">
+                        <div class="marketplace-banner">
+                            <div class="market-hero">
+                                <h2>NEXUS Agent Marketplace</h2>
+                                <p>Discover and deploy pre-trained, battle-tested AI agents ready to integrate into your autonomous workflows.</p>
+                            </div>
+                            <div class="market-categories" id="marketCategories">
+                                <button class="cat-pill active" data-cat="all">All Categories</button>
+                                <button class="cat-pill" data-cat="Research">Research</button>
+                                <button class="cat-pill" data-cat="Coding">Coding</button>
+                                <button class="cat-pill" data-cat="Data">Data</button>
+                                <button class="cat-pill" data-cat="Productivity">Productivity</button>
+                                <button class="cat-pill" data-cat="Automation">Automation</button>
+                                <button class="cat-pill" data-cat="Writing">Writing</button>
+                                <button class="cat-pill" data-cat="Testing">Testing</button>
+                                <button class="cat-pill" data-cat="Analysis">Analysis</button>
+                            </div>
                         </div>
 
+                        <div class="marketplace-grid" id="marketplaceGrid">
+                            <!-- Rendered dynamically -->
+                        </div>
+                    </div>
 
-                        <!-- TWO COLUMN -->
-                        <div class="two-column">
-
-
-                            <!-- AGENTS -->
-                            <div class="panel">
-
+                    <!-- SUBTAB 3: AGENT TESTING PLAYGROUND -->
+                    <div class="subtab-content hidden" id="subtab-playground">
+                        <div class="playground-layout">
+                            <div class="playground-control-panel">
                                 <div class="panel-header">
-
                                     <div>
-
-                                        <span>
-                                            AI AGENTS
-                                        </span>
-
-                                        <h2>
-                                            Active Agents
-                                        </h2>
-
+                                        <span class="panel-eyebrow">INTERACTIVE LAB</span>
+                                        <h3 class="panel-title">Agent Test Console</h3>
                                     </div>
-
-                                    <small
-                                        id="activeAgentLabel">
-                                        0 active
-                                    </small>
-
+                                    <span class="badge-ready">SANDBOX READY</span>
                                 </div>
 
-
-                                <div id="agentPreview">
-                                </div>
-
-                            </div>
-
-
-                            <!-- HEALTH -->
-                            <div class="panel">
-
-                                <div class="panel-header">
-
-                                    <div>
-
-                                        <span>
-                                            SYSTEM
-                                        </span>
-
-                                        <h2>
-                                            Workspace Health
-                                        </h2>
-
-                                    </div>
-
-                                    <small class="good">
-                                        Excellent
-                                    </small>
-
-                                </div>
-
-
-                                <div class="health-container">
-
-                                    <div class="health-ring">
-
-                                        <div>
-
-                                            <b id="healthScore">
-                                                94
-                                            </b>
-
-                                            <small>
-                                                /100
-                                            </small>
-
-                                        </div>
-
-                                    </div>
-
-
-                                    <div class="health-lines">
-
-                                        <p>
-                                            <span>
-                                                Agent uptime
-                                            </span>
-
-                                            <b>
-                                                99.8%
-                                            </b>
-                                        </p>
-
-                                        <p>
-                                            <span>
-                                                Workflow success
-                                            </span>
-
-                                            <b>
-                                                97.4%
-                                            </b>
-                                        </p>
-
-                                        <p>
-                                            <span>
-                                                Tasks completed
-                                            </span>
-
-                                            <b id="healthTasks">
-                                                0%
-                                            </b>
-                                        </p>
-
-                                    </div>
-
-                                </div>
-
-                            </div>
-
-                        </div>
-
-
-                        <!-- ACTIVITY + INSIGHT -->
-                        <div class="two-column">
-
-
-                            <div class="panel">
-
-                                <div class="panel-header">
-
-                                    <div>
-
-                                        <span>
-                                            ACTIVITY
-                                        </span>
-
-                                        <h2>
-                                            Workspace Activity
-                                        </h2>
-
-                                    </div>
-
-                                    <select id="activityPeriod">
-
-                                        <option>
-                                            7 days
-                                        </option>
-
-                                        <option>
-                                            30 days
-                                        </option>
-
+                                <div class="playground-form">
+                                    <label class="input-label">Select Agent to Test</label>
+                                    <select id="playgroundAgentSelect" class="nexus-select full-width">
+                                        <!-- Options populated dynamically -->
                                     </select>
 
+                                    <div class="agent-preview-chip" id="playgroundAgentMeta">
+                                        <!-- Rendered dynamically -->
+                                    </div>
+
+                                    <label class="input-label">Test Input / Prompt</label>
+                                    <textarea id="playgroundPrompt" rows="4" class="nexus-textarea" placeholder="Enter task instructions for this agent..."></textarea>
+
+                                    <div class="playground-actions">
+                                        <button class="primary-btn full-width glow" id="playgroundRunBtn">
+                                            <span>▶</span> RUN TEST
+                                        </button>
+                                    </div>
                                 </div>
-
-
-                                <div
-                                    class="chart"
-                                    id="chart">
-                                </div>
-
                             </div>
 
+                            <div class="playground-results-panel">
+                                <div class="panel-header">
+                                    <div>
+                                        <span class="panel-eyebrow">TELEMETRY & LOGS</span>
+                                        <h3 class="panel-title">Execution Output</h3>
+                                    </div>
+                                    <div class="execution-badge" id="playgroundStatusBadge">
+                                        <span class="status-dot"></span> Awaiting Run
+                                    </div>
+                                </div>
 
-                            <div class="panel insight-panel">
+                                <div class="playground-metrics-bar" id="playgroundMetrics">
+                                    <div class="play-stat">
+                                        <span>Status</span>
+                                        <b id="playStatStatus">IDLE</b>
+                                    </div>
+                                    <div class="play-stat">
+                                        <span>Execution Time</span>
+                                        <b id="playStatTime">--</b>
+                                    </div>
+                                    <div class="play-stat">
+                                        <span>Tokens Used</span>
+                                        <b id="playStatTokens">--</b>
+                                    </div>
+                                    <div class="play-stat">
+                                        <span>Memory Ingested</span>
+                                        <b id="playStatMem">--</b>
+                                    </div>
+                                </div>
 
-                                <i>
-                                    ✦
-                                </i>
+                                <div class="playground-output-box" id="playgroundOutputBox">
+                                    <div class="empty-state-box">
+                                        <span class="empty-icon">🧪</span>
+                                        <p>Select an agent and click <b>RUN TEST</b> to inspect autonomous output, execution latency, and step-by-step logs.</p>
+                                    </div>
+                                </div>
 
-                                <span>
-                                    AI INSIGHT
-                                </span>
-
-                                <h2>
-                                    Your workspace is ready
-                                    for momentum.
-                                </h2>
-
-                                <p>
-                                    Complete high-priority tasks
-                                    and activate an automation workflow
-                                    to keep repetitive work moving.
-                                </p>
-
-                                <button
-                                    class="text-button"
-                                    data-go="insights">
-
-                                    Explore insights →
-
-                                </button>
-
+                                <div class="playground-logs-feed" id="playgroundLogsFeed">
+                                    <div class="logs-feed-title">REAL-TIME AGENT LOGS</div>
+                                    <div id="playLogsContent" class="code-log-box">Ready. No active session.</div>
+                                </div>
                             </div>
-
                         </div>
-
-                    </section>
-
-
-                    <!-- =================================================
-                         AI AGENTS
-                    ================================================== -->
-
-                    <section
-                        class="page"
-                        id="page-agents">
-
-                        <div class="page-header compact">
-
-                            <div>
-
-                                <div class="eyebrow">
-                                    AI AGENTS
-                                </div>
-
-                                <h1>
-                                    Agent Hub
-                                </h1>
-
-                                <p>
-                                    Manage intelligent agents,
-                                    monitor their status and control
-                                    their activity.
-                                </p>
-
-                            </div>
-
-
-                            <button
-                                class="primary-btn"
-                                id="createAgentBtn">
-
-                                ＋ Create Agent
-
-                            </button>
-
-                        </div>
-
-
-                        <div
-                            class="agent-grid"
-                            id="agentGrid">
-                        </div>
-
-                    </section>
-
-
-                    <!-- =================================================
-                         WORKFLOWS
-                    ================================================== -->
-
-                    <section
-                        class="page"
-                        id="page-workflows">
-
-                        <div class="page-header compact">
-
-                            <div>
-
-                                <div class="eyebrow">
-                                    AUTOMATION
-                                </div>
-
-                                <h1>
-                                    Workflow Builder
-                                </h1>
-
-                                <p>
-                                    Design repeatable workflows and
-                                    automate everyday operations.
-                                </p>
-
-                            </div>
-
-
-                            <button
-                                class="primary-btn"
-                                id="createWorkflowBtn">
-
-                                ＋ New Workflow
-
-                            </button>
-
-                        </div>
-
-
-                        <div
-                            class="workflow-grid"
-                            id="workflowGrid">
-                        </div>
-
-                    </section>
-
-
-                    <!-- =================================================
-                         INSIGHTS
-                    ================================================== -->
-
-                    <section
-                        class="page"
-                        id="page-insights">
-
-                        <div class="page-header compact">
-
-                            <div>
-
-                                <div class="eyebrow">
-                                    INTELLIGENCE
-                                </div>
-
-                                <h1>
-                                    AI Insights
-                                </h1>
-
-                                <p>
-                                    Understand patterns across your
-                                    workspace activity.
-                                </p>
-
-                            </div>
-
-                        </div>
-
-
-                        <div class="insight-grid">
-
-                            <article>
-
-                                <small>
-                                    01
-                                </small>
-
-                                <span>
-                                    PRODUCTIVITY
-                                </span>
-
-                                <h2>
-                                    Focus on high-priority work
-                                    before adding more tasks.
-                                </h2>
-
-                                <p>
-                                    Grouping work into focused execution
-                                    blocks can make your workspace
-                                    easier to manage.
-                                </p>
-
-                            </article>
-
-
-                            <article>
-
-                                <small>
-                                    02
-                                </small>
-
-                                <span>
-                                    AUTOMATION
-                                </span>
-
-                                <h2>
-                                    Repeated actions are candidates
-                                    for workflows.
-                                </h2>
-
-                                <p>
-                                    Turn recurring manual steps into
-                                    reusable automation flows.
-                                </p>
-
-                            </article>
-
-
-                            <article>
-
-                                <small>
-                                    03
-                                </small>
-
-                                <span>
-                                    AGENTS
-                                </span>
-
-                                <h2>
-                                    Clear agent responsibilities
-                                    make monitoring easier.
-                                </h2>
-
-                                <p>
-                                    Assign specialized roles so every
-                                    agent has a defined purpose.
-                                </p>
-
-                            </article>
-
-                        </div>
-
-                    </section>
-
-
-                    <!-- =================================================
-                         ACTIVITY
-                    ================================================== -->
-
-                    <section
-                        class="page"
-                        id="page-activity">
-
-                        <div class="page-header compact">
-
-                            <div>
-
-                                <div class="eyebrow">
-                                    WORKSPACE HISTORY
-                                </div>
-
-                                <h1>
-                                    Activity
-                                </h1>
-
-                                <p>
-                                    A timeline of important workspace
-                                    events.
-                                </p>
-
-                            </div>
-
-                        </div>
-
-
-                        <div
-                            class="timeline"
-                            id="timeline">
-                        </div>
-
-                    </section>
-
-
-                    <!-- =================================================
-                         INTEGRATIONS
-                    ================================================== -->
-
-                    <section
-                        class="page"
-                        id="page-integrations">
-
-                        <div class="page-header compact">
-
-                            <div>
-
-                                <div class="eyebrow">
-                                    CONNECTIONS
-                                </div>
-
-                                <h1>
-                                    Integrations
-                                </h1>
-
-                                <p>
-                                    Connect the tools your workspace
-                                    depends on.
-                                </p>
-
-                            </div>
-
-                        </div>
-
-
-                        <div class="integration-grid">
-
-                            <article>
-
-                                <b>GH</b>
-
-                                <div>
-                                    <h3>GitHub</h3>
-                                    <p>
-                                        Repositories and development
-                                        activity
-                                    </p>
-                                </div>
-
-                                <button data-integration="GitHub">
-                                    Connect
-                                </button>
-
-                            </article>
-
-
-                            <article>
-
-                                <b>DS</b>
-
-                                <div>
-                                    <h3>Google Drive</h3>
-                                    <p>
-                                        Documents and workspace files
-                                    </p>
-                                </div>
-
-                                <button data-integration="Google Drive">
-                                    Connect
-                                </button>
-
-                            </article>
-
-
-                            <article>
-
-                                <b>SL</b>
-
-                                <div>
-                                    <h3>Slack</h3>
-                                    <p>
-                                        Team communication and alerts
-                                    </p>
-                                </div>
-
-                                <button data-integration="Slack">
-                                    Connect
-                                </button>
-
-                            </article>
-
-
-                            <article>
-
-                                <b>CL</b>
-
-                                <div>
-                                    <h3>Calendar</h3>
-                                    <p>
-                                        Meetings and scheduled work
-                                    </p>
-                                </div>
-
-                                <button data-integration="Calendar">
-                                    Connect
-                                </button>
-
-                            </article>
-
-                        </div>
-
-                    </section>
-
-
-                    <!-- =================================================
-                         SETTINGS
-                    ================================================== -->
-
-                    <section
-                        class="page"
-                        id="page-settings">
-
-                        <div class="page-header compact">
-
-                            <div>
-
-                                <div class="eyebrow">
-                                    PREFERENCES
-                                </div>
-
-                                <h1>
-                                    Settings
-                                </h1>
-
-                                <p>
-                                    Control your NEXUS AI workspace
-                                    preferences.
-                                </p>
-
-                            </div>
-
-                        </div>
-
-
-                        <div class="settings-container">
-
-                            <div class="setting-row">
-
-                                <div>
-                                    <b>
-                                        Appearance
-                                    </b>
-
-                                    <small>
-                                        Switch between dark and
-                                        light mode.
-                                    </small>
-                                </div>
-
-                                <button
-                                    class="secondary-button"
-                                    id="settingsTheme">
-
-                                    Toggle theme
-
-                                </button>
-
-                            </div>
-
-
-                            <div class="setting-row">
-
-                                <div>
-                                    <b>
-                                        Notifications
-                                    </b>
-
-                                    <small>
-                                        Show workspace activity
-                                        notifications.
-                                    </small>
-                                </div>
-
-                                <label class="toggle-switch">
-
-                                    <input
-                                        type="checkbox"
-                                        id="notificationToggle"
-                                        checked>
-
-                                    <span></span>
-
-                                </label>
-
-                            </div>
-
-
-                            <div class="setting-row">
-
-                                <div>
-                                    <b>
-                                        Profile
-                                    </b>
-
-                                    <small>
-                                        Update your name and email.
-                                    </small>
-
-                                </div>
-
-                                <button
-                                    class="secondary-button"
-                                    id="settingsProfile">
-
-                                    Edit profile
-
-                                </button>
-
-                            </div>
-
-
-                            <div class="setting-row danger">
-
-                                <div>
-                                    <b>
-                                        Reset local workspace
-                                    </b>
-
-                                    <small>
-                                        Remove NEXUS AI data stored
-                                        in this browser.
-                                    </small>
-                                </div>
-
-                                <button
-                                    class="danger-button"
-                                    id="resetBtn">
-
-                                    Reset data
-
-                                </button>
-
-                            </div>
-
-                        </div>
-
-                    </section>
-
-                </div>
-
-            </main>
-
-        </div>
-
-
-        <!-- =================================================
-             COMMAND PALETTE
-        ================================================== -->
-
-        <div
-            class="overlay hidden"
-            id="paletteOverlay">
-
-            <div class="command-palette">
-
-                <div class="palette-search">
-
-                    <span>
-                        ⌕
-                    </span>
-
-                    <input
-                        id="paletteInput"
-                        placeholder="Search commands..."
-                        autocomplete="off">
-
-                    <kbd>
-                        ESC
-                    </kbd>
-
-                </div>
-
-                <div id="paletteResults"></div>
-
-            </div>
-
-        </div>
-
-
-        <!-- =================================================
-             MODAL
-        ================================================== -->
-
-        <div
-            class="overlay hidden"
-            id="modalOverlay">
-
-            <div class="modal">
-
-                <div class="modal-header">
-
-                    <div>
-
-                        <span id="modalLabel">
-                            NEXUS AI
-                        </span>
-
-                        <h2 id="modalTitle">
-                            Modal
-                        </h2>
-
                     </div>
 
-                    <button
-                        class="icon-button"
-                        id="modalClose">
+                    <!-- SUBTAB 4: AGENT MEMORY INSPECTOR -->
+                    <div class="subtab-content hidden" id="subtab-memory">
+                        <div class="memory-layout">
+                            <div class="memory-sidebar-list">
+                                <div class="memory-list-header">
+                                    <b>SELECT AGENT</b>
+                                    <small>VECTOR & CONTEXT GRAPH</small>
+                                </div>
+                                <div class="memory-agent-picker" id="memoryAgentPicker">
+                                    <!-- Rendered dynamically -->
+                                </div>
+                            </div>
 
-                        ×
+                            <div class="memory-view-panel">
+                                <div class="memory-view-header">
+                                    <div class="agent-memory-info">
+                                        <h3 id="memoryTargetName">Research Agent</h3>
+                                        <span class="memory-id-badge" id="memoryTargetId">nexus-agent-001</span>
+                                    </div>
+                                    <div class="memory-actions">
+                                        <button class="secondary-button sm" id="addMemoryItemBtn">+ Add Knowledge Item</button>
+                                        <button class="danger-button sm" id="clearAgentMemoryBtn">Clear Memory</button>
+                                    </div>
+                                </div>
 
-                    </button>
+                                <div class="memory-stats-strip">
+                                    <div class="mem-stat-card">
+                                        <span class="label">Previous Tasks</span>
+                                        <b id="memStatTasks">24</b>
+                                    </div>
+                                    <div class="mem-stat-card">
+                                        <span class="label">Saved Context</span>
+                                        <b id="memStatContext">18</b>
+                                    </div>
+                                    <div class="mem-stat-card">
+                                        <span class="label">Knowledge Items</span>
+                                        <b id="memStatKnowledge">126</b>
+                                    </div>
+                                    <div class="mem-stat-card">
+                                        <span class="label">Vector Retention</span>
+                                        <b>99.4%</b>
+                                    </div>
+                                </div>
 
+                                <div class="memory-entries-wrapper">
+                                    <h4>SAVED CONTEXT & KNOWLEDGE GRAPH</h4>
+                                    <div class="memory-items-list" id="memoryItemsList">
+                                        <!-- Rendered dynamically -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+
+                <!-- =============================================
+                     PAGE 4: VISUAL WORKFLOW BUILDER
+                ============================================== -->
+                <section class="page" id="page-workflows">
+                    <div class="page-header">
+                        <div>
+                            <div class="eyebrow">AUTOMATION GRAPH</div>
+                            <h1>Visual Workflow Builder</h1>
+                            <p>Connect AI agents into visual execution graphs. Chain inputs, reasoning nodes, analysis pipelines, and structured outputs.</p>
+                        </div>
+                        <div class="header-actions">
+                            <button class="secondary-button" id="duplicateWorkflowBtn">⧉ Duplicate</button>
+                            <button class="secondary-button" id="saveWorkflowBtn">💾 Save Workflow</button>
+                            <button class="danger-button sm hidden" id="stopWorkflowBtn">⏹ Stop Flow</button>
+                            <button class="primary-btn glow" id="runWorkflowBtn">▶ Run Workflow</button>
+                        </div>
+                    </div>
+
+                    <!-- WORKFLOW CANVAS TOOLBAR -->
+                    <div class="canvas-control-bar">
+                        <div class="canvas-active-wf">
+                            <span class="wf-icon">⚡</span>
+                            <div>
+                                <b id="wfCurrentName">Autonomous Research & Synthesis Pipeline</b>
+                                <small id="wfCurrentStatus">Ready • 3 Connected Agents</small>
+                            </div>
+                        </div>
+
+                        <div class="canvas-actions">
+                            <select id="workflowPicker" class="nexus-select">
+                                <option value="wf-1">Autonomous Research & Synthesis Pipeline</option>
+                                <option value="wf-2">Code Quality & Vulnerability Scan</option>
+                                <option value="wf-3">Data Ingestion & Report Generator</option>
+                            </select>
+                            <button class="secondary-button sm" id="addAgentNodeBtn">＋ Add Agent Node</button>
+                            <button class="secondary-button sm" id="resetCanvasLayoutBtn">↻ Reset Layout</button>
+                        </div>
+                    </div>
+
+                    <!-- INTERACTIVE VISUAL WORKFLOW CANVAS -->
+                    <div class="workflow-canvas-container" id="workflowCanvas">
+                        <div class="canvas-grid-bg"></div>
+
+                        <!-- CANVAS NODES -->
+                        <div class="canvas-node node-input" id="node-wf-input" style="left: 60px; top: 180px;">
+                            <div class="node-handle in disabled"></div>
+                            <div class="node-header">
+                                <span class="node-type-badge input">INPUT</span>
+                                <span class="node-title">Data Stream</span>
+                            </div>
+                            <div class="node-body">
+                                <p>Source: Web / Search API</p>
+                                <small>Payload: Raw Queries</small>
+                            </div>
+                            <div class="node-handle out" data-node="node-wf-input"></div>
+                        </div>
+
+                        <div class="canvas-connection conn-1" id="conn-1">
+                            <svg class="conn-svg" width="100%" height="100%">
+                                <path id="path-1" d="M 230 220 C 310 220, 310 220, 380 220" stroke="rgba(139,92,246,0.6)" stroke-width="2" fill="none" stroke-dasharray="4,4" />
+                            </svg>
+                            <div class="conn-pulse" id="pulse-1"></div>
+                        </div>
+
+                        <div class="canvas-node node-agent" id="node-wf-research" style="left: 380px; top: 160px;">
+                            <div class="node-handle in" data-node="node-wf-research"></div>
+                            <div class="node-header">
+                                <span class="node-type-badge agent">AGENT</span>
+                                <span class="node-title">Research Agent</span>
+                                <button class="node-delete-btn" title="Remove">✕</button>
+                            </div>
+                            <div class="node-body">
+                                <div class="node-stat-row">
+                                    <span>Model</span>
+                                    <b>NEXUS Reasoner</b>
+                                </div>
+                                <div class="node-stat-row">
+                                    <span>Output</span>
+                                    <b>14 Sources JSON</b>
+                                </div>
+                            </div>
+                            <div class="node-handle out" data-node="node-wf-research"></div>
+                        </div>
+
+                        <div class="canvas-connection conn-2" id="conn-2">
+                            <svg class="conn-svg" width="100%" height="100%">
+                                <path id="path-2" d="M 550 220 C 630 220, 630 220, 700 220" stroke="rgba(34,211,238,0.6)" stroke-width="2" fill="none" stroke-dasharray="4,4" />
+                            </svg>
+                            <div class="conn-pulse" id="pulse-2"></div>
+                        </div>
+
+                        <div class="canvas-node node-agent" id="node-wf-analysis" style="left: 700px; top: 160px;">
+                            <div class="node-handle in" data-node="node-wf-analysis"></div>
+                            <div class="node-header">
+                                <span class="node-type-badge agent">AGENT</span>
+                                <span class="node-title">Analysis Agent</span>
+                                <button class="node-delete-btn" title="Remove">✕</button>
+                            </div>
+                            <div class="node-body">
+                                <div class="node-stat-row">
+                                    <span>Task</span>
+                                    <b>Pattern & Synthesis</b>
+                                </div>
+                                <div class="node-stat-row">
+                                    <span>Accuracy</span>
+                                    <b>97.8%</b>
+                                </div>
+                            </div>
+                            <div class="node-handle out" data-node="node-wf-analysis"></div>
+                        </div>
+
+                        <div class="canvas-connection conn-3" id="conn-3">
+                            <svg class="conn-svg" width="100%" height="100%">
+                                <path id="path-3" d="M 870 220 C 950 220, 950 220, 1020 220" stroke="rgba(52,211,153,0.6)" stroke-width="2" fill="none" stroke-dasharray="4,4" />
+                            </svg>
+                            <div class="conn-pulse" id="pulse-3"></div>
+                        </div>
+
+                        <div class="canvas-node node-agent" id="node-wf-report" style="left: 1020px; top: 160px;">
+                            <div class="node-handle in" data-node="node-wf-report"></div>
+                            <div class="node-header">
+                                <span class="node-type-badge agent">AGENT</span>
+                                <span class="node-title">Report Agent</span>
+                                <button class="node-delete-btn" title="Remove">✕</button>
+                            </div>
+                            <div class="node-body">
+                                <div class="node-stat-row">
+                                    <span>Format</span>
+                                    <b>Markdown & PDF</b>
+                                </div>
+                                <div class="node-stat-row">
+                                    <span>Status</span>
+                                    <b>Ready</b>
+                                </div>
+                            </div>
+                            <div class="node-handle out" data-node="node-wf-report"></div>
+                        </div>
+
+                        <div class="canvas-connection conn-4" id="conn-4">
+                            <svg class="conn-svg" width="100%" height="100%">
+                                <path id="path-4" d="M 1190 220 C 1260 220, 1260 220, 1320 220" stroke="rgba(245,158,11,0.6)" stroke-width="2" fill="none" stroke-dasharray="4,4" />
+                            </svg>
+                            <div class="conn-pulse" id="pulse-4"></div>
+                        </div>
+
+                        <div class="canvas-node node-output" id="node-wf-output" style="left: 1320px; top: 180px;">
+                            <div class="node-handle in" data-node="node-wf-output"></div>
+                            <div class="node-header">
+                                <span class="node-type-badge output">OUTPUT</span>
+                                <span class="node-title">Executive Deliverable</span>
+                            </div>
+                            <div class="node-body">
+                                <p>Destination: Storage & Dashboard</p>
+                                <small>Format: Executive Brief</small>
+                            </div>
+                            <div class="node-handle out disabled"></div>
+                        </div>
+                    </div>
+
+                    <!-- WORKFLOW LIVE LOGS & EXECUTION DRAWER -->
+                    <div class="workflow-execution-console">
+                        <div class="console-header">
+                            <span class="console-title">LIVE WORKFLOW EXECUTION FEED</span>
+                            <span class="console-status" id="wfConsoleStatus">Idle • Click "Run Workflow" to trigger pipeline</span>
+                        </div>
+                        <div class="console-output" id="wfConsoleOutput">
+                            <div class="console-line system">[SYSTEM] Visual Workflow Builder initialized. 4 connected nodes. Pipeline ready.</div>
+                        </div>
+                    </div>
+                </section>
+
+
+                <!-- =============================================
+                     PAGE 5: AI INSIGHTS & ANALYTICS
+                ============================================== -->
+                <section class="page" id="page-insights">
+                    <div class="page-header">
+                        <div>
+                            <div class="eyebrow">SYSTEM ANALYTICS & TELEMETRY</div>
+                            <h1>AI Insights</h1>
+                            <p>Deep performance monitoring, agent throughput metrics, task execution latency, and autonomous system health.</p>
+                        </div>
+                        <div class="header-actions">
+                            <select id="insightsTimeRange" class="nexus-select">
+                                <option value="7">Last 7 Days</option>
+                                <option value="30">Last 30 Days</option>
+                                <option value="90">Last Quarter</option>
+                            </select>
+                            <button class="secondary-button" id="exportAnalyticsBtn">Export Report</button>
+                        </div>
+                    </div>
+
+                    <!-- INSIGHT STATS CARDS -->
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <i class="purple">⚡</i>
+                            <span>
+                                Total Tasks Run
+                                <b id="insTotalTasks">248</b>
+                            </span>
+                        </div>
+                        <div class="stat-card">
+                            <i class="green">✓</i>
+                            <span>
+                                Completed Tasks
+                                <b id="insCompletedTasks">239</b>
+                            </span>
+                        </div>
+                        <div class="stat-card">
+                            <i class="red">✕</i>
+                            <span>
+                                Failed Tasks
+                                <b id="insFailedTasks">09</b>
+                            </span>
+                        </div>
+                        <div class="stat-card">
+                            <i class="cyan">◷</i>
+                            <span>
+                                Avg Execution
+                                <b id="insAvgTime">3.2s</b>
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- CHARTS GRID -->
+                    <div class="two-column-grid">
+                        <!-- CHART 1: AGENT PERFORMANCE COMPARISON -->
+                        <div class="panel-card">
+                            <div class="panel-header">
+                                <div>
+                                    <span class="panel-eyebrow">EFFICIENCY BY AGENT</span>
+                                    <h3 class="panel-title">Agent Performance & Success Rate</h3>
+                                </div>
+                                <span class="badge-success">Avg: 96.4%</span>
+                            </div>
+
+                            <div class="chart-content" id="agentPerformanceChart">
+                                <!-- Populated dynamically by script.js -->
+                            </div>
+                        </div>
+
+                        <!-- CHART 2: DAILY & WEEKLY ACTIVITY TRENDS -->
+                        <div class="panel-card">
+                            <div class="panel-header">
+                                <div>
+                                    <span class="panel-eyebrow">ACTIVITY VOLUME</span>
+                                    <h3 class="panel-title">Execution Velocity Over Time</h3>
+                                </div>
+                                <div class="chart-toggle-group">
+                                    <button class="chart-btn active" data-chart="daily">Daily</button>
+                                    <button class="chart-btn" data-chart="weekly">Weekly</button>
+                                </div>
+                            </div>
+
+                            <div class="chart-svg-container" id="activityTrendSvg">
+                                <!-- SVG Bar/Line chart generated dynamically -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SECOND ROW: MISSION METRICS & AGENT USAGE -->
+                    <div class="two-column-grid">
+                        <!-- MISSION STATISTICS -->
+                        <div class="panel-card">
+                            <div class="panel-header">
+                                <div>
+                                    <span class="panel-eyebrow">OBJECTIVES</span>
+                                    <h3 class="panel-title">Mission Execution Statistics</h3>
+                                </div>
+                            </div>
+
+                            <div class="mission-stats-summary">
+                                <div class="summary-metric-card">
+                                    <b>12</b>
+                                    <span>Total Missions Launched</span>
+                                </div>
+                                <div class="summary-metric-card">
+                                    <b class="text-green">09</b>
+                                    <span>Completed on Target</span>
+                                </div>
+                                <div class="summary-metric-card">
+                                    <b class="text-cyan">02</b>
+                                    <span>In-Flight Autonomous</span>
+                                </div>
+                                <div class="summary-metric-card">
+                                    <b class="text-amber">01</b>
+                                    <span>Queued / Paused</span>
+                                </div>
+                            </div>
+
+                            <div class="mission-duration-breakdown">
+                                <h4>Average Mission Phasing Times</h4>
+                                <div class="phase-bar-item">
+                                    <span>Planning Phase</span>
+                                    <div class="phase-bar"><div class="fill" style="width: 15%;"></div></div>
+                                    <b>4.2s</b>
+                                </div>
+                                <div class="phase-bar-item">
+                                    <span>Research & Discovery</span>
+                                    <div class="phase-bar"><div class="fill" style="width: 45%;"></div></div>
+                                    <b>18.6s</b>
+                                </div>
+                                <div class="phase-bar-item">
+                                    <span>Analysis & Synthesis</span>
+                                    <div class="phase-bar"><div class="fill" style="width: 25%;"></div></div>
+                                    <b>11.4s</b>
+                                </div>
+                                <div class="phase-bar-item">
+                                    <span>Report Compilation</span>
+                                    <div class="phase-bar"><div class="fill" style="width: 15%;"></div></div>
+                                    <b>6.1s</b>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- AGENT WORKLOAD DISTRIBUTION -->
+                        <div class="panel-card">
+                            <div class="panel-header">
+                                <div>
+                                    <span class="panel-eyebrow">DISTRIBUTION</span>
+                                    <h3 class="panel-title">Agent Fleet Workload Share</h3>
+                                </div>
+                            </div>
+
+                            <div class="workload-list" id="agentWorkloadDistribution">
+                                <!-- Populated dynamically -->
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+
+                <!-- =============================================
+                     PAGE 6: ACTIVITY LOGS
+                ============================================== -->
+                <section class="page" id="page-activity">
+                    <div class="page-header">
+                        <div>
+                            <div class="eyebrow">AUDIT & EVENT STREAM</div>
+                            <h1>Activity Logs</h1>
+                            <p>Real-time chronological telemetry across all agent actions, workflow executions, and system events.</p>
+                        </div>
+                        <div class="header-actions">
+                            <button class="secondary-button" id="exportLogsJson">Export JSON</button>
+                            <button class="secondary-button" id="exportLogsCsv">Export CSV</button>
+                            <button class="danger-button sm" id="clearAllLogsBtn">Clear Logs</button>
+                        </div>
+                    </div>
+
+                    <!-- ACTIVITY LOG CONTROLS & FILTERS -->
+                    <div class="log-control-bar">
+                        <div class="log-filter-pills" id="logFilters">
+                            <button class="filter-pill active" data-cat="all">All Events</button>
+                            <button class="filter-pill" data-cat="agents">Agents</button>
+                            <button class="filter-pill" data-cat="workflows">Workflows</button>
+                            <button class="filter-pill" data-cat="missions">Missions</button>
+                            <button class="filter-pill" data-cat="errors">Errors</button>
+                            <button class="filter-pill" data-cat="system">System</button>
+                        </div>
+
+                        <div class="search-input-group log-search">
+                            <span class="search-icon">⌕</span>
+                            <input type="text" id="logSearchInput" placeholder="Search events, agents, tokens, status...">
+                        </div>
+                    </div>
+
+                    <!-- FULL LOG STREAM TABLE/CONTAINER -->
+                    <div class="activity-log-table-container">
+                        <div class="log-stream-header">
+                            <span>TIME</span>
+                            <span>TYPE</span>
+                            <span>SOURCE</span>
+                            <span>EVENT DESCRIPTION</span>
+                            <span>STATUS</span>
+                        </div>
+                        <div class="log-stream-body" id="fullActivityLogStream">
+                            <!-- Rendered dynamically -->
+                        </div>
+                    </div>
+                </section>
+
+
+                <!-- =============================================
+                     PAGE 7: SMART ALERTS
+                ============================================== -->
+                <section class="page" id="page-alerts">
+                    <div class="page-header">
+                        <div>
+                            <div class="eyebrow">SECURITY & NOTIFICATIONS</div>
+                            <h1>Smart Alerts</h1>
+                            <p>Proactive notifications regarding mission milestones, agent errors, operational thresholds, and system alerts.</p>
+                        </div>
+                        <div class="header-actions">
+                            <button class="secondary-button" id="resolveAllAlertsBtn">Acknowledge All</button>
+                            <button class="primary-btn sm" id="triggerMockAlertBtn">＋ Test Alert</button>
+                        </div>
+                    </div>
+
+                    <!-- ALERT FILTERS -->
+                    <div class="alert-filter-bar">
+                        <div class="filter-group">
+                            <button class="filter-tab active" data-alertfilter="all">All Alerts</button>
+                            <button class="filter-tab" data-alertfilter="critical">🔴 Critical (<span id="alertCountCritical">1</span>)</button>
+                            <button class="filter-tab" data-alertfilter="warning">🟠 Warning (<span id="alertCountWarning">1</span>)</button>
+                            <button class="filter-tab" data-alertfilter="attention">🟡 Attention (<span id="alertCountAttention">0</span>)</button>
+                            <button class="filter-tab" data-alertfilter="resolved">🟢 Resolved (<span id="alertCountResolved">4</span>)</button>
+                        </div>
+                    </div>
+
+                    <!-- ALERTS CONTAINER -->
+                    <div class="alerts-feed-container" id="alertsFeed">
+                        <!-- Populated dynamically -->
+                    </div>
+                </section>
+
+
+                <!-- =============================================
+                     PAGE 8: SECURITY & PERMISSION CENTER
+                ============================================== -->
+                <section class="page" id="page-security">
+                    <div class="page-header">
+                        <div>
+                            <div class="eyebrow">GOVERNANCE & ACCESS CONTROL</div>
+                            <h1>Security & Permission Center</h1>
+                            <p>Enforce strict capability boundaries and zero-trust sandboxing for every autonomous AI agent in your fleet.</p>
+                        </div>
+                        <div class="header-actions">
+                            <button class="secondary-button" id="resetPermissionsBtn">Reset to Default Policy</button>
+                            <button class="primary-btn" id="savePermissionsBtn">Apply Security Policies</button>
+                        </div>
+                    </div>
+
+                    <!-- SECURITY OVERVIEW CARDS -->
+                    <div class="security-policy-overview">
+                        <div class="policy-card safe">
+                            <div class="policy-icon">🛡</div>
+                            <div>
+                                <b>Zero-Trust Sandboxing</b>
+                                <small>Agents run in isolated browser-virtualized contexts</small>
+                            </div>
+                        </div>
+                        <div class="policy-card safe">
+                            <div class="policy-icon">🔐</div>
+                            <div>
+                                <b>Audit Compliance</b>
+                                <small>Every permission call is logged to the activity stream</small>
+                            </div>
+                        </div>
+                        <div class="policy-card warning">
+                            <div class="policy-icon">⚠️</div>
+                            <div>
+                                <b>Privileged Actions Guard</b>
+                                <small>Delete files & outbound emails restricted by default</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- AGENT PERMISSIONS MATRIX TABLE -->
+                    <div class="section-container">
+                        <div class="section-header">
+                            <div>
+                                <span class="section-eyebrow">CAPABILITY MATRIX</span>
+                                <h2 class="section-title">Agent Permission Matrix</h2>
+                            </div>
+                        </div>
+
+                        <div class="permissions-table-wrapper">
+                            <table class="nexus-table permissions-table" id="permissionsTable">
+                                <thead>
+                                    <tr>
+                                        <th>Agent Name</th>
+                                        <th>Internet Access</th>
+                                        <th>Read Documents</th>
+                                        <th>Search Info</th>
+                                        <th>Delete Files</th>
+                                        <th>Send Emails</th>
+                                        <th>Code Exec</th>
+                                        <th>Policy Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="permissionsTableBody">
+                                    <!-- Rendered dynamically -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+
+                <!-- =============================================
+                     PAGE 9: SETTINGS
+                ============================================== -->
+                <section class="page" id="page-settings">
+                    <div class="page-header">
+                        <div>
+                            <div class="eyebrow">PREFERENCES & INFRASTRUCTURE</div>
+                            <h1>Settings</h1>
+                            <p>Manage workspace configuration, operating telemetry, appearance, and developer connectivity.</p>
+                        </div>
+                    </div>
+
+                    <div class="settings-container">
+                        <!-- APPEARANCE -->
+                        <div class="setting-row">
+                            <div>
+                                <b>Interface Theme</b>
+                                <small>Select between high-contrast dark cyberpunk and clean light mode.</small>
+                            </div>
+                            <div class="theme-selector-strip">
+                                <button class="theme-opt-btn active" id="optThemeDark">Dark Mode</button>
+                                <button class="theme-opt-btn" id="optThemeLight">Light Mode</button>
+                            </div>
+                        </div>
+
+                        <!-- LIVE TELEMETRY SIMULATION -->
+                        <div class="setting-row">
+                            <div>
+                                <b>Live Fleet Telemetry Simulation</b>
+                                <small>Periodically simulate agent CPU load, background heartbeat, and communications.</small>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="telemetryToggle" checked>
+                                <span></span>
+                            </label>
+                        </div>
+
+                        <!-- NOTIFICATIONS -->
+                        <div class="setting-row">
+                            <div>
+                                <b>Smart Desktop / Toast Alerts</b>
+                                <small>Show real-time toast alerts when missions complete or agent tasks finish.</small>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="notificationToggle" checked>
+                                <span></span>
+                            </label>
+                        </div>
+
+                        <!-- WORKSPACE INFO -->
+                        <div class="setting-row">
+                            <div>
+                                <b>Workspace Designation</b>
+                                <small>Custom identifier for this command center instance.</small>
+                            </div>
+                            <input type="text" id="settingsWorkspaceName" class="nexus-input" value="Command Alpha" maxlength="40">
+                        </div>
+
+                        <!-- USER PROFILE -->
+                        <div class="setting-row">
+                            <div>
+                                <b>Operator Identity</b>
+                                <small>User persona displayed across logs and audit receipts.</small>
+                            </div>
+                            <div class="profile-input-pair">
+                                <input type="text" id="settingsUserName" class="nexus-input" value="Commander" placeholder="Operator Name">
+                                <input type="email" id="settingsUserEmail" class="nexus-input" value="commander@nexus.ai" placeholder="Email">
+                            </div>
+                        </div>
+
+                        <!-- DANGER ZONE -->
+                        <div class="setting-row danger">
+                            <div>
+                                <b>Reset Operating System State</b>
+                                <small>Reset all local data, missions, agents, and logs to pristine factory defaults.</small>
+                            </div>
+                            <button class="danger-button" id="resetSystemBtn">Factory Reset State</button>
+                        </div>
+                    </div>
+                </section>
+
+            </div><!-- /.content -->
+
+        </main>
+    </div><!-- /#app -->
+
+
+    <!-- =====================================================
+         MODALS & DRAWERS
+    ====================================================== -->
+
+    <!-- GENERIC MODAL OVERLAY -->
+    <div class="overlay hidden" id="modalOverlay">
+        <div class="modal-card" id="modalContainer">
+            <div class="modal-header">
+                <div>
+                    <span class="modal-eyebrow" id="modalLabel">NEXUS AI</span>
+                    <h2 class="modal-title" id="modalTitle">Modal Window</h2>
                 </div>
-
-                <div id="modalBody"></div>
-
+                <button class="icon-button modal-close-btn" id="modalClose">✕</button>
             </div>
-
+            <div class="modal-body" id="modalBody">
+                <!-- Dynamically injected -->
+            </div>
         </div>
-
-
-        <!-- =================================================
-             TOAST
-        ================================================== -->
-
-        <div
-            class="toast hidden"
-            id="toast">
-        </div>
-
     </div>
 
+    <!-- MISSION DETAILS / RESULT MODAL -->
+    <div class="overlay hidden" id="missionDetailsOverlay">
+        <div class="modal-card wide" id="missionDetailsModal">
+            <div class="modal-header">
+                <div>
+                    <span class="modal-eyebrow">MISSION OBJECTIVE INSPECTION</span>
+                    <h2 class="modal-title" id="mdModalTitle">Mission Details</h2>
+                </div>
+                <button class="icon-button modal-close-btn" id="closeMissionDetails">✕</button>
+            </div>
+            <div class="modal-body" id="mdModalBody">
+                <!-- Injected by script.js -->
+            </div>
+        </div>
+    </div>
+
+    <!-- COMMAND PALETTE (CTRL+K) -->
+    <div class="overlay hidden" id="paletteOverlay">
+        <div class="command-palette">
+            <div class="palette-search">
+                <span class="search-icon">⌕</span>
+                <input id="paletteInput" placeholder="Type a command, page, agent, or mission..." autocomplete="off">
+                <kbd>ESC</kbd>
+            </div>
+            <div class="palette-results" id="paletteResults"></div>
+        </div>
+    </div>
+
+    <!-- TOAST NOTIFICATIONS -->
+    <div class="toast-container" id="toastContainer"></div>
 
     <script src="script.js"></script>
-
 </body>
 </html>
