@@ -679,6 +679,17 @@
 
         syncCommandCenterFromBackend();
 
+        /* Initialize 3D Quantum Neural Core */
+        if (window.initNexus3DWidget) {
+            const container = document.getElementById("command3DCore");
+            if (container) {
+                window.command3DCore = window.initNexus3DWidget(container, {
+                    theme: "default",
+                    showHud: true
+                });
+            }
+        }
+
     }
 
 
@@ -3728,6 +3739,8 @@
 
     function executeAICommand(command) {
 
+        window.command3DCore?.setState("thinking");
+
         const text =
             command
                 .trim()
@@ -3835,16 +3848,61 @@
 
 
         responseBox.innerHTML = `
-            <strong>✦ NEXUS AI</strong>
-            <br>
-            ${escapeHTML(response)}
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; gap: 12px;">
+                <div>
+                    <strong>✦ NEXUS AI</strong>
+                    <br>
+                    ${escapeHTML(response)}
+                </div>
+                <button type="button" class="nexus-action-button nexus-speak-btn" id="commandSpeakBtn" style="padding: 5px 12px; font-size: 11px; white-space: nowrap; border-radius: 8px;">
+                    🔊 Speak
+                </button>
+            </div>
         `;
-
 
         responseBox.classList.remove(
             "hidden"
         );
 
+        const speakBtn = document.getElementById("commandSpeakBtn");
+        if (speakBtn) {
+            speakBtn.addEventListener("click", () => {
+                if (window.nexusVoice) {
+                    if (window.nexusVoice.isSpeaking) {
+                        window.nexusVoice.stop();
+                        speakBtn.innerHTML = "🔊 Speak";
+                        speakBtn.classList.remove("speaking");
+                    } else {
+                        window.nexusVoice.setEnabled(true);
+                        speakBtn.innerHTML = "⏹ Stop";
+                        speakBtn.classList.add("speaking");
+                        window.nexusVoice.speak(response, window.command3DCore);
+
+                        const checkVoice = setInterval(() => {
+                            if (!window.nexusVoice.isSpeaking) {
+                                speakBtn.innerHTML = "🔊 Speak";
+                                speakBtn.classList.remove("speaking");
+                                clearInterval(checkVoice);
+                            }
+                        }, 250);
+                    }
+                }
+            });
+        }
+
+        /* 3D Core Reactivity & Voice */
+        if (window.command3DCore) {
+            window.command3DCore.setState("speaking");
+            if (window.nexusVoice && window.nexusVoice.enabled) {
+                window.nexusVoice.speak(response, window.command3DCore);
+            } else {
+                setTimeout(() => {
+                    if (!window.nexusVoice?.isSpeaking) {
+                        window.command3DCore?.setState("idle");
+                    }
+                }, 2400);
+            }
+        }
 
         addActivity(
             "NEXUS AI command",
@@ -4718,6 +4776,23 @@
 
                 }
             );
+
+
+        $("#aiInput")?.addEventListener("focus", () => {
+            window.command3DCore?.setState("listening");
+        });
+
+        $("#aiInput")?.addEventListener("input", () => {
+            if ($("#aiInput").value.trim().length > 0) {
+                window.command3DCore?.setState("listening");
+            }
+        });
+
+        $("#aiInput")?.addEventListener("blur", () => {
+            if (window.command3DCore?.state === "listening" && !window.nexusVoice?.isSpeaking) {
+                window.command3DCore?.setState("idle");
+            }
+        });
 
 
         /* AI suggestion chips */

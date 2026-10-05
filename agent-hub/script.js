@@ -777,6 +777,17 @@ document.addEventListener(
 
         checkBackendConnection();
 
+        /* Initialize 3D Quantum Neural Core */
+        if (window.initNexus3DWidget) {
+            const container = document.getElementById("agentHub3DCore");
+            if (container) {
+                window.hub3DCore = window.initNexus3DWidget(container, {
+                    theme: "default",
+                    showHud: true
+                });
+            }
+        }
+
         showToast(
             "Agent Hub ready",
             "NEXUS AI is ready for execution.",
@@ -990,6 +1001,22 @@ function bindEvents() {
 
         }
     );
+
+    $("#agentPrompt")?.addEventListener("focus", () => {
+        window.hub3DCore?.setState("listening");
+    });
+
+    $("#agentPrompt")?.addEventListener("input", () => {
+        if ($("#agentPrompt").value.trim().length > 0) {
+            window.hub3DCore?.setState("listening");
+        }
+    });
+
+    $("#agentPrompt")?.addEventListener("blur", () => {
+        if (window.hub3DCore?.state === "listening" && !window.nexusVoice?.isSpeaking) {
+            window.hub3DCore?.setState("idle");
+        }
+    });
 
 
     /* -----------------------------------------------------
@@ -1846,6 +1873,17 @@ function selectAgent(
 
     renderConsole();
 
+    /* Morph 3D Quantum Neural Core to match selected Agent */
+    if (window.hub3DCore) {
+        const role = (agent.role || "").toLowerCase();
+        let theme = "default";
+        if (role.includes("research")) theme = "research";
+        else if (role.includes("analy") || role.includes("data")) theme = "analysis";
+        else if (role.includes("auto") || role.includes("task")) theme = "automation";
+        else if (role.includes("content")) theme = "content";
+        window.hub3DCore.setTheme(theme);
+    }
+
 
     showToast(
         "Agent selected",
@@ -2231,6 +2269,9 @@ async function runAgent(
     agent.status =
         "running";
 
+    /* Transition 3D core into high-speed thinking singularity */
+    window.hub3DCore?.setState("thinking");
+
 
     agent.progress =
         Math.max(
@@ -2565,6 +2606,19 @@ function completeExecution(
 
     renderAll();
 
+    /* 3D Core Speaking State & Voice Synthesis */
+    if (window.hub3DCore) {
+        window.hub3DCore.setState("speaking");
+        if (window.nexusVoice && window.nexusVoice.enabled) {
+            window.nexusVoice.speak(response, window.hub3DCore);
+        } else {
+            setTimeout(() => {
+                if (!window.nexusVoice?.isSpeaking) {
+                    window.hub3DCore?.setState("idle");
+                }
+            }, 2600);
+        }
+    }
 
     showToast(
         "Execution completed",
@@ -3123,6 +3177,14 @@ function createAIResponseCard(
 
                     <button
                         type="button"
+                        class="nexus-action-button nexus-speak-btn"
+                        data-response-action="speak"
+                    >
+                        🔊 Speak Answer
+                    </button>
+
+                    <button
+                        type="button"
                         class="nexus-action-button"
                         data-response-action="rerun"
                     >
@@ -3186,6 +3248,34 @@ document.addEventListener(
             exportAIReport(
                 agent
             );
+
+        }
+
+
+        else if (
+            action === "speak"
+        ) {
+
+            if (window.nexusVoice) {
+                if (window.nexusVoice.isSpeaking) {
+                    window.nexusVoice.stop();
+                    button.innerHTML = "🔊 Speak Answer";
+                    button.classList.remove("speaking");
+                } else {
+                    window.nexusVoice.setEnabled(true);
+                    button.innerHTML = "⏹ Stop Voice";
+                    button.classList.add("speaking");
+                    window.nexusVoice.speak(agent.lastResponse, window.hub3DCore);
+
+                    const pollVoice = setInterval(() => {
+                        if (!window.nexusVoice.isSpeaking) {
+                            button.innerHTML = "🔊 Speak Answer";
+                            button.classList.remove("speaking");
+                            clearInterval(pollVoice);
+                        }
+                    }, 250);
+                }
+            }
 
         }
 

@@ -6,6 +6,7 @@
   <meta name="description" content="NEXUS AI Insights dashboard" />
   <title>NEXUS AI — AI Insights</title>
   <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="../shared/nexus-3d-core.css" />
 </head>
 
 <body>
@@ -174,6 +175,17 @@
           >
             <span>↻</span>
             Refresh
+          </button>
+
+          <button
+            class="primary-button"
+            id="holoBtn"
+            type="button"
+            onclick="window.openNexusHoloChamber && window.openNexusHoloChamber('analysis')"
+            title="Open 3D Holographic Analytics Chamber"
+          >
+            <span>✦</span>
+            3D Hologram
           </button>
 
         </div>
@@ -699,6 +711,8 @@
   </dialog>
 
 
+  <script src="../shared/vendor/three.min.js"></script>
+  <script src="../shared/nexus-3d-core.js"></script>
   <script src="script.js"></script>
 
 </body>

@@ -719,9 +719,12 @@ body.light-mode .hub-hero {
 
 .hero-visual {
     position: relative;
-    width: 320px;
-    height: 210px;
-    flex: 0 0 320px;
+    width: 360px;
+    height: 235px;
+    flex: 0 0 360px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .agent-orb {
@@ -2189,7 +2192,10 @@ body.light-mode .hub-hero {
     }
 
     .hero-visual {
-        display: none;
+        width: 100%;
+        height: 220px;
+        flex: none;
+        margin-top: 18px;
     }
 
     .hero-copy h2 {
@@ -3265,4 +3271,29 @@ select:focus-visible {
 
     }
 
+}
+
+/* =========================================================
+   3D VOICE / AUDIO ACTION BUTTON
+========================================================= */
+
+.nexus-action-button.nexus-speak-btn {
+    background: rgba(0, 240, 255, 0.12);
+    border-color: rgba(70, 223, 255, 0.4);
+    color: #46dfff;
+    font-weight: 600;
+}
+
+.nexus-action-button.nexus-speak-btn:hover {
+    background: rgba(0, 240, 255, 0.22);
+    box-shadow: 0 0 14px rgba(0, 240, 255, 0.35);
+    color: #ffffff;
+}
+
+.nexus-action-button.nexus-speak-btn.speaking {
+    background: rgba(16, 185, 129, 0.2);
+    border-color: #10b981;
+    color: #34d399;
+    box-shadow: 0 0 16px rgba(16, 185, 129, 0.45);
+    animation: nexusHoloFastPulse 0.8s infinite ease-in-out;
 }

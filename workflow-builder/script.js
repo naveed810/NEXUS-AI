@@ -2218,13 +2218,23 @@ function showWorkflowResult(response, metadata = {}) {
             </small>
 
 
-            <button
-                type="button"
-                class="btn btn-secondary"
-                id="copyWorkflowResultBtn"
-            >
-                📋 Copy Result
-            </button>
+            <div style="display:flex;gap:8px;">
+                <button
+                    type="button"
+                    class="btn btn-secondary"
+                    id="speakWorkflowResultBtn"
+                >
+                    🔊 Speak Report
+                </button>
+
+                <button
+                    type="button"
+                    class="btn btn-secondary"
+                    id="copyWorkflowResultBtn"
+                >
+                    📋 Copy Result
+                </button>
+            </div>
 
         </div>
 
@@ -2259,6 +2269,34 @@ function showWorkflowResult(response, metadata = {}) {
     if (closeBtn) {
         closeBtn.onclick = () => {
             panel.remove();
+        };
+    }
+
+    /*
+     * Speak button
+     */
+    const speakButton = document.getElementById("speakWorkflowResultBtn");
+    if (speakButton) {
+        speakButton.onclick = function () {
+            if (window.nexusVoice) {
+                if (window.nexusVoice.isSpeaking) {
+                    window.nexusVoice.stop();
+                    speakButton.innerHTML = "🔊 Speak Report";
+                    speakButton.classList.remove("active");
+                } else {
+                    window.nexusVoice.setEnabled(true);
+                    speakButton.innerHTML = "⏹ Stop Voice";
+                    speakButton.classList.add("active");
+                    window.nexusVoice.speak(answer);
+                    const poll = setInterval(() => {
+                        if (!window.nexusVoice.isSpeaking) {
+                            speakButton.innerHTML = "🔊 Speak Report";
+                            speakButton.classList.remove("active");
+                            clearInterval(poll);
+                        }
+                    }, 250);
+                }
+            }
         };
     }
 

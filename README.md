@@ -79,13 +79,26 @@ flowchart TD
 - **Agent Performance Audit:** Detailed table tracking runs, reliability percentages, and specialty areas.
 - **Live Activity Feed:** Granular log of recent executions with execution status badges, relative time, and duration.
 
+### 🔮 3D Holographic Quantum Neural Core & Voice Engine (Advanced WebGL)
+- **Live Interactive Three.js 3D Entity:** A cybernetic holographic neural core featuring 3 concentric gimbal rings, a quantum geodesic icosahedron cage, and an 850-node neural particle swarm rendered in 60 FPS WebGL.
+- **Dynamic AI State Reactivity:**
+  - `IDLE`: Gentle harmonic breathing oscillation and soft orbital particle drift.
+  - `LISTENING`: Reactive waveform ripples as the user types or focuses on prompt inputs.
+  - `THINKING`: High-speed gyroscopic spin and particle vortex singularity during live Gemini reasoning.
+  - `SPEAKING`: Real-time audio-reactive frequency pulsation synchronized to synthesized speech.
+- **Agent Persona Morphing:** Dynamically transforms color palette, geometry, and particle physics when selecting different agents (Cyan for Research, Violet for Data, Emerald for Task Automation, Amber for Content).
+- **Interactive Orbit & Drag:** Presenters can orbit 360°, inspect, and tilt the 3D entity with mouse drag and touch gestures.
+- **NEXUS Voice Engine:** Neural voice synthesis (Web Speech API) with natural pitch modulation, 6-band animated audio spectrum equalizer, and one-click spoken AI responses.
+- **Fullscreen Holographic Chamber Mode:** One-click cinematic full-screen view with live telemetry telemetry, mode switcher, and interactive neural probes.
+
 ---
 
 ## 🛠 Tech Stack
 
 | Layer | Technology | Description |
 |---|---|---|
-| **Frontend** | HTML5, CSS3, Vanilla ES6+ | Glassmorphism dark UI, CSS variables, responsive grid, zero external JS dependencies |
+| **Frontend** | HTML5, CSS3, Vanilla ES6+ | Glassmorphism dark UI, CSS variables, responsive grid, zero bundler setup |
+| **3D & Audio** | Three.js (WebGL), Web Speech API | 3D Holographic Quantum Core, dynamic particle shaders, neural speech synthesis |
 | **Backend** | Python 3.12/3.13, FastAPI | Asynchronous RESTful API, CORS middleware, strict validation |
 | **LLM Provider** | Google GenAI SDK | Gemini 3.8 Flash with multi-model fallback resiliency (`gemini-flash-latest`, `gemini-2.5-flash-lite`) |
 | **Database** | SQLite 3 (`nexus_ai.db`) | Persistent logging of execution IDs, prompts, responses, durations, and statuses |

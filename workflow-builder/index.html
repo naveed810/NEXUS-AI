@@ -12,6 +12,7 @@
     <title>NEXUS AI — Workflow Builder</title>
 
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="../shared/nexus-3d-core.css">
 </head>
 
 <body>
@@ -311,6 +312,15 @@
                         ＋ New
                     </button>
 
+                    <button
+                        class="btn btn-ghost"
+                        id="holoBtn"
+                        type="button"
+                        onclick="window.openNexusHoloChamber && window.openNexusHoloChamber('automation')"
+                        title="Open 3D Quantum Neural Chamber">
+                        ✦ 3D Hologram
+                    </button>
+
                 </div>
 
             </div>
@@ -482,6 +492,8 @@
 </div>
 
 
+<script src="../shared/vendor/three.min.js"></script>
+<script src="../shared/nexus-3d-core.js"></script>
 <script src="script.js"></script>
 
 </body>

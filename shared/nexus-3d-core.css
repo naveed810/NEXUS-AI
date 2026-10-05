@@ -1,0 +1,478 @@
+/* =========================================================
+   NEXUS AI — 3D HOLOGRAPHIC QUANTUM NEURAL CORE
+   Shared Visualizer & Voice Synthesizer Stylesheet
+   Dark Glassmorphism + Futuristic Hologram HUD
+========================================================= */
+
+:root {
+    --holo-cyan: #00f0ff;
+    --holo-purple: #9b7cff;
+    --holo-magenta: #ec4899;
+    --holo-emerald: #10b981;
+    --holo-amber: #f59e0b;
+    --holo-bg: rgba(9, 13, 24, 0.75);
+    --holo-border: rgba(70, 223, 255, 0.28);
+    --holo-glow: rgba(0, 240, 255, 0.35);
+}
+
+/* =========================================================
+   3D CORE CONTAINER & VIEWPORT
+========================================================= */
+
+.nexus-3d-wrapper {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    min-height: 220px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 18px;
+    overflow: hidden;
+    background: radial-gradient(circle at center, rgba(16, 26, 52, 0.6) 0%, rgba(7, 10, 18, 0.95) 80%);
+    border: 1px solid var(--holo-border);
+    box-shadow: 
+        0 0 35px rgba(0, 240, 255, 0.08),
+        inset 0 0 40px rgba(11, 19, 39, 0.8);
+    user-select: none;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.nexus-3d-wrapper:hover {
+    border-color: rgba(70, 223, 255, 0.5);
+    box-shadow: 
+        0 0 45px rgba(0, 240, 255, 0.16),
+        inset 0 0 50px rgba(16, 26, 52, 0.9);
+}
+
+.nexus-3d-canvas {
+    width: 100% !important;
+    height: 100% !important;
+    display: block;
+    cursor: grab;
+    outline: none;
+}
+
+.nexus-3d-canvas:active {
+    cursor: grabbing;
+}
+
+/* Scanline / Grid overlay for holographic look */
+.nexus-3d-scanlines {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: linear-gradient(
+        rgba(18, 16, 38, 0) 50%, 
+        rgba(0, 240, 255, 0.025) 50%
+    );
+    background-size: 100% 4px;
+    z-index: 2;
+}
+
+.nexus-3d-vignette {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: radial-gradient(circle at center, transparent 40%, rgba(7, 10, 18, 0.85) 100%);
+    z-index: 2;
+}
+
+/* =========================================================
+   HUD TELEMETRY OVERLAY
+========================================================= */
+
+.nexus-3d-hud {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 12px 14px;
+    z-index: 4;
+}
+
+.nexus-3d-hud-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.nexus-3d-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    background: rgba(10, 16, 30, 0.78);
+    border: 1px solid rgba(70, 223, 255, 0.3);
+    backdrop-filter: blur(8px);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: #e2e8f0;
+    text-transform: uppercase;
+}
+
+.nexus-3d-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--holo-cyan);
+    box-shadow: 0 0 10px var(--holo-cyan);
+    animation: nexusHoloPulse 2s infinite ease-in-out;
+}
+
+.nexus-3d-dot.thinking {
+    background: var(--holo-magenta);
+    box-shadow: 0 0 12px var(--holo-magenta);
+    animation: nexusHoloFastPulse 0.6s infinite ease-in-out;
+}
+
+.nexus-3d-dot.speaking {
+    background: var(--holo-emerald);
+    box-shadow: 0 0 14px var(--holo-emerald);
+    animation: nexusHoloFastPulse 0.4s infinite ease-in-out;
+}
+
+.nexus-3d-actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    pointer-events: auto;
+}
+
+.nexus-3d-btn {
+    appearance: none;
+    background: rgba(13, 20, 38, 0.85);
+    border: 1px solid rgba(70, 223, 255, 0.25);
+    color: #cbd5e1;
+    border-radius: 8px;
+    padding: 5px 8px;
+    font-size: 11px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    transition: all 0.2s ease;
+    backdrop-filter: blur(6px);
+}
+
+.nexus-3d-btn:hover {
+    background: rgba(22, 34, 64, 0.95);
+    border-color: var(--holo-cyan);
+    color: #ffffff;
+    box-shadow: 0 0 12px rgba(0, 240, 255, 0.25);
+    transform: translateY(-1px);
+}
+
+.nexus-3d-btn.active {
+    background: rgba(0, 240, 255, 0.15);
+    border-color: var(--holo-cyan);
+    color: var(--holo-cyan);
+    box-shadow: 0 0 15px rgba(0, 240, 255, 0.3);
+}
+
+.nexus-3d-hud-bottom {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.nexus-3d-telemetry {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 10px;
+    color: rgba(148, 163, 184, 0.85);
+    letter-spacing: 0.04em;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.nexus-3d-telemetry span strong {
+    color: var(--holo-cyan);
+    font-weight: 600;
+}
+
+/* Real-time spectrum EQ bars */
+.nexus-3d-eq {
+    display: flex;
+    align-items: flex-end;
+    gap: 3px;
+    height: 18px;
+    padding: 3px 6px;
+    border-radius: 6px;
+    background: rgba(8, 12, 22, 0.6);
+    border: 1px solid rgba(70, 223, 255, 0.15);
+}
+
+.nexus-3d-eq-bar {
+    width: 3px;
+    height: 20%;
+    min-height: 2px;
+    background: linear-gradient(to top, var(--holo-purple), var(--holo-cyan));
+    border-radius: 2px;
+    transition: height 0.08s ease;
+}
+
+/* =========================================================
+   FULLSCREEN HOLOGRAPHIC CHAMBER MODAL
+========================================================= */
+
+.nexus-chamber-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 99999;
+    background: rgba(3, 6, 12, 0.94);
+    backdrop-filter: blur(18px);
+    display: flex;
+    flex-direction: column;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+.nexus-chamber-modal.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.nexus-chamber-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 28px;
+    border-bottom: 1px solid rgba(70, 223, 255, 0.2);
+    background: rgba(7, 11, 20, 0.85);
+    z-index: 10;
+}
+
+.nexus-chamber-title {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.nexus-chamber-logo {
+    width: 38px;
+    height: 38px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #00f0ff, #9b7cff);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #03060c;
+    font-weight: 800;
+    font-size: 18px;
+    box-shadow: 0 0 20px rgba(0, 240, 255, 0.5);
+}
+
+.nexus-chamber-title h2 {
+    font-size: 20px;
+    font-weight: 700;
+    color: #ffffff;
+    margin: 0;
+    letter-spacing: -0.02em;
+}
+
+.nexus-chamber-title p {
+    font-size: 12px;
+    color: #94a3b8;
+    margin: 2px 0 0 0;
+}
+
+.nexus-chamber-body {
+    flex: 1;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.nexus-chamber-canvas-box {
+    position: absolute;
+    inset: 0;
+}
+
+.nexus-chamber-hud-left {
+    position: absolute;
+    left: 28px;
+    top: 28px;
+    bottom: 28px;
+    width: 320px;
+    z-index: 10;
+    pointer-events: none;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.nexus-chamber-hud-right {
+    position: absolute;
+    right: 28px;
+    top: 28px;
+    bottom: 28px;
+    width: 380px;
+    z-index: 10;
+    pointer-events: none;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+}
+
+.nexus-chamber-card {
+    pointer-events: auto;
+    background: rgba(10, 16, 30, 0.85);
+    border: 1px solid rgba(70, 223, 255, 0.25);
+    border-radius: 16px;
+    padding: 18px;
+    backdrop-filter: blur(12px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+}
+
+.nexus-chamber-card h4 {
+    margin: 0 0 10px 0;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--holo-cyan);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.nexus-chamber-modes {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+}
+
+.nexus-chamber-mode-btn {
+    background: rgba(15, 23, 42, 0.8);
+    border: 1px solid rgba(70, 223, 255, 0.2);
+    border-radius: 10px;
+    padding: 10px 12px;
+    color: #cbd5e1;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.nexus-chamber-mode-btn small {
+    font-size: 10px;
+    color: #64748b;
+    font-weight: 400;
+}
+
+.nexus-chamber-mode-btn:hover {
+    border-color: var(--holo-cyan);
+    background: rgba(22, 34, 64, 0.9);
+    color: #fff;
+    transform: translateY(-2px);
+}
+
+.nexus-chamber-mode-btn.active {
+    border-color: var(--holo-cyan);
+    background: rgba(0, 240, 255, 0.15);
+    color: #fff;
+    box-shadow: 0 0 15px rgba(0, 240, 255, 0.25);
+}
+
+.nexus-chamber-prompt-box {
+    display: flex;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.nexus-chamber-prompt-box input {
+    flex: 1;
+    background: rgba(7, 10, 18, 0.85);
+    border: 1px solid rgba(70, 223, 255, 0.3);
+    border-radius: 10px;
+    padding: 10px 14px;
+    color: #fff;
+    font-size: 13px;
+    outline: none;
+    transition: border-color 0.2s ease;
+}
+
+.nexus-chamber-prompt-box input:focus {
+    border-color: var(--holo-cyan);
+    box-shadow: 0 0 12px rgba(0, 240, 255, 0.25);
+}
+
+.nexus-chamber-send-btn {
+    background: linear-gradient(135deg, var(--holo-cyan), #0077ff);
+    border: none;
+    color: #03060c;
+    font-weight: 700;
+    border-radius: 10px;
+    padding: 0 16px;
+    cursor: pointer;
+    font-size: 13px;
+    transition: all 0.2s ease;
+}
+
+.nexus-chamber-send-btn:hover {
+    box-shadow: 0 0 18px rgba(0, 240, 255, 0.6);
+    transform: translateY(-1px);
+}
+
+/* =========================================================
+   ANIMATION KEYFRAMES
+========================================================= */
+
+@keyframes nexusHoloPulse {
+    0%, 100% {
+        transform: scale(1);
+        opacity: 0.85;
+    }
+    50% {
+        transform: scale(1.35);
+        opacity: 1;
+    }
+}
+
+@keyframes nexusHoloFastPulse {
+    0%, 100% {
+        transform: scale(1);
+        opacity: 0.9;
+    }
+    50% {
+        transform: scale(1.6);
+        opacity: 1;
+    }
+}
+
+/* =========================================================
+   RESPONSIVENESS
+========================================================= */
+
+@media (max-width: 900px) {
+    .nexus-chamber-hud-left,
+    .nexus-chamber-hud-right {
+        position: static;
+        width: 100%;
+    }
+    .nexus-chamber-body {
+        flex-direction: column;
+        overflow-y: auto;
+        padding: 16px;
+    }
+    .nexus-chamber-canvas-box {
+        position: relative;
+        height: 280px;
+        min-height: 280px;
+        margin-bottom: 16px;
+    }
+}
