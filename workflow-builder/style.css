@@ -62,7 +62,8 @@ button {
 
 
 body {
-    overflow: hidden;
+    overflow-x: hidden;
+    overflow-y: auto;
 }
 
 
@@ -239,12 +240,8 @@ body {
 
 
 /* ================= WORKSPACE ================= */
-
 .workspace {
-
-    min-height: 0;
-
-    flex: 1;
+    min-height: calc(100vh - 72px);
 
     display: grid;
 
@@ -252,8 +249,9 @@ body {
         270px
         minmax(0,1fr)
         300px;
-}
 
+    align-items: stretch;
+}
 
 /* ================= SIDEBAR ================= */
 
@@ -501,16 +499,14 @@ body {
 
 /* ================= CANVAS ================= */
 
-.canvas-panel {
+.canvas {
+    position: relative;
 
-    min-width: 0;
+    min-height: 720px;
 
-    display: flex;
+    height: calc(100vh - 154px);
 
-    flex-direction: column;
-
-    background:
-        #090d15;
+    overflow: auto;
 }
 
 
@@ -1391,3 +1387,695 @@ body{background-image:radial-gradient(circle at 10% 8%,rgba(70,223,255,.07),tran
 @media(max-width:760px){.sidebar-profile{margin-top:10px;}.topbar-actions{gap:6px;}.topbar-actions .btn{padding:9px 10px;}}
 
 @media(max-width:760px){#workflowSidebar{transform:translateX(-110%);transition:transform .25s ease;position:fixed!important;left:0!important;top:0!important;bottom:0!important;width:min(86vw,330px)!important;z-index:1000;overflow-y:auto;}#workflowSidebar.open{transform:translateX(0);}body:has(#workflowSidebar.open)::after{content:"";position:fixed;inset:0;background:rgba(0,0,0,.58);z-index:999;pointer-events:none;}.mobile-menu-btn{display:grid!important;place-items:center;}}
+
+/* =========================================================
+   NEXUS AI WORKFLOW BUILDER — FINAL LAYOUT FIX
+   Shared workspace navigation + scrolling
+========================================================= */
+
+
+/* ================= GLOBAL SCROLLING ================= */
+
+html {
+    min-height: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+body {
+    min-height: 100vh;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+
+/* ================= MOBILE MENU ================= */
+
+.mobile-menu-btn {
+    display: none;
+
+    width: 38px;
+    height: 38px;
+
+    align-items: center;
+    justify-content: center;
+
+    border: 1px solid var(--border);
+    border-radius: 10px;
+
+    color: var(--text);
+    background: var(--panel-2);
+
+    font-size: 18px;
+    cursor: pointer;
+}
+
+
+/* ================= WORKSPACE BRAND ================= */
+
+.sidebar-workspace {
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+    padding:
+        2px
+        4px
+        16px;
+
+    margin-bottom: 14px;
+
+    border-bottom:
+        1px solid
+        var(--border);
+}
+
+
+.workspace-icon {
+    width: 34px;
+    height: 34px;
+
+    flex: 0 0 34px;
+
+    display: grid;
+    place-items: center;
+
+    border-radius: 10px;
+
+    color: white;
+
+    font-size: 15px;
+    font-weight: 900;
+
+    background:
+        linear-gradient(
+            135deg,
+            #46dfff,
+            #9b7cff
+        );
+
+    box-shadow:
+        0 8px 24px
+        rgba(70,223,255,.16);
+}
+
+
+.sidebar-workspace strong {
+    display: block;
+
+    color: var(--text);
+
+    font-size: 12px;
+    font-weight: 800;
+}
+
+
+.sidebar-workspace span {
+    display: block;
+
+    margin-top: 2px;
+
+    color: var(--muted);
+
+    font-size: 10px;
+}
+
+
+/* ================= MODULE NAVIGATION ================= */
+
+.module-sidebar-nav {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 4px;
+
+    margin-bottom: 20px;
+}
+
+
+.module-sidebar-nav .nav-label {
+    padding:
+        0
+        4px
+        7px;
+
+    color: #68758a;
+
+    font-size: 10px;
+
+    font-weight: 800;
+
+    letter-spacing: .13em;
+}
+
+
+.module-sidebar-nav a {
+    position: relative;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 9px;
+
+    width: 100%;
+
+    min-height: 38px;
+
+    padding:
+        0
+        10px;
+
+    border:
+        1px solid
+        transparent;
+
+    border-radius: 9px;
+
+    color: var(--muted);
+
+    background: transparent;
+
+    font-size: 11px;
+
+    font-weight: 650;
+
+    text-decoration: none;
+
+    transition:
+        color .18s ease,
+        background .18s ease,
+        border-color .18s ease,
+        transform .18s ease;
+}
+
+
+.module-sidebar-nav a span {
+    width: 20px;
+
+    display: inline-grid;
+
+    place-items: center;
+
+    color: currentColor;
+
+    font-size: 14px;
+}
+
+
+.module-sidebar-nav a:hover {
+    color: var(--text);
+
+    background:
+        rgba(255,255,255,.045);
+
+    border-color:
+        rgba(255,255,255,.07);
+
+    transform:
+        translateX(2px);
+}
+
+
+.module-sidebar-nav a.active {
+    color: white;
+
+    background:
+        linear-gradient(
+            90deg,
+            rgba(70,223,255,.10),
+            rgba(124,92,255,.13)
+        );
+
+    border-color:
+        rgba(70,223,255,.16);
+
+    box-shadow:
+        inset 2px 0 0 #46dfff;
+}
+
+
+.module-sidebar-nav a.active span {
+    color: #46dfff;
+}
+
+
+/* ================= SIDEBAR SCROLL ================= */
+
+.sidebar {
+    min-height: 0;
+
+    overflow-x: hidden;
+    overflow-y: auto;
+
+    scrollbar-width: thin;
+}
+
+
+/* ================= INSPECTOR SCROLL ================= */
+
+.inspector {
+    min-height: 0;
+
+    overflow-x: hidden;
+    overflow-y: auto;
+
+    scrollbar-width: thin;
+}
+
+
+/* ================= WORKFLOW CANVAS ================= */
+
+.canvas-panel {
+    min-width: 0;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    background: #090d15;
+    overflow-y: auto;
+    max-height: calc(100vh - 72px);
+}
+
+
+.canvas {
+    position: relative;
+
+    min-width: 100%;
+
+    min-height: 720px;
+
+    height:
+        calc(
+            100vh - 154px
+        );
+
+    overflow-x: auto;
+    overflow-y: auto;
+
+    scrollbar-width: thin;
+
+    outline: none;
+
+    background:
+        #080c13;
+}
+
+
+/* ================= WORKSPACE ================= */
+
+.workspace {
+    min-height:
+        calc(
+            100vh - 72px
+        );
+
+    display: grid;
+
+    grid-template-columns:
+        270px
+        minmax(0, 1fr)
+        300px;
+
+    align-items: stretch;
+}
+
+
+/* ================= TOPBAR ================= */
+
+.topbar {
+    position: sticky;
+
+    top: 0;
+
+    z-index: 100;
+
+    flex-shrink: 0;
+}
+
+
+/* ================= NODE CANVAS SIZE ================= */
+
+#workflowCanvas {
+    min-width: 1100px;
+    min-height: 760px;
+}
+
+
+/* ================= NODE VISIBILITY ================= */
+
+.workflow-node {
+    z-index: 3;
+}
+
+
+/* ================= CONNECTIONS ================= */
+
+.connections-layer {
+    z-index: 1;
+}
+
+.grid-overlay {
+    z-index: 0;
+}
+
+
+/* ================= RESULT PANEL ================= */
+
+.workflow-execution-result {
+    margin:
+        18px
+        20px
+        30px;
+
+    padding: 20px;
+
+    border:
+        1px solid
+        rgba(70,223,255,.14);
+
+    border-radius: 16px;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(16,24,38,.96),
+            rgba(12,17,28,.96)
+        );
+
+    box-shadow:
+        0 20px 60px
+        rgba(0,0,0,.28);
+}
+
+
+.workflow-result-header {
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 16px;
+
+    margin-bottom: 18px;
+}
+
+
+.workflow-result-header h2 {
+    margin: 4px 0 0;
+
+    font-size: 18px;
+
+    color: var(--text);
+}
+
+
+.workflow-result-status {
+    padding:
+        7px
+        10px;
+
+    border:
+        1px solid
+        rgba(75,212,155,.25);
+
+    border-radius: 999px;
+
+    color: #6de2ad;
+
+    background:
+        rgba(75,212,155,.08);
+
+    font-size: 10px;
+
+    font-weight: 800;
+}
+
+
+.workflow-result-metrics {
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, minmax(0,1fr));
+
+    gap: 10px;
+
+    margin-bottom: 16px;
+}
+
+
+.workflow-result-metrics > div {
+    padding: 13px;
+
+    border:
+        1px solid
+        var(--border);
+
+    border-radius: 11px;
+
+    background:
+        rgba(255,255,255,.025);
+}
+
+
+.workflow-result-metrics strong {
+    display: block;
+
+    color: var(--text);
+
+    font-size: 16px;
+}
+
+
+.workflow-result-metrics span {
+    display: block;
+
+    margin-top: 3px;
+
+    color: var(--muted);
+
+    font-size: 10px;
+}
+
+
+.workflow-result-body {
+    overflow: auto;
+
+    max-height: 420px;
+
+    padding: 16px;
+
+    border:
+        1px solid
+        var(--border);
+
+    border-radius: 12px;
+
+    background:
+        #080c13;
+}
+
+
+.workflow-result-body pre {
+    margin: 0;
+
+    white-space: pre-wrap;
+    word-break: break-word;
+
+    color: #dce5f5;
+
+    font-family:
+        Inter,
+        ui-sans-serif,
+        system-ui,
+        sans-serif;
+
+    font-size: 12px;
+
+    line-height: 1.7;
+}
+
+
+.workflow-result-footer {
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 12px;
+
+    margin-top: 14px;
+}
+
+
+.workflow-result-footer small {
+    color: var(--muted);
+
+    font-size: 9px;
+}
+
+
+/* ================= MOBILE ================= */
+
+@media (max-width: 1050px) {
+
+    .workspace {
+        grid-template-columns:
+            230px
+            minmax(0,1fr);
+    }
+
+    .inspector {
+        display: none;
+    }
+
+}
+
+
+@media (max-width: 760px) {
+
+    html {
+        overflow-y: auto;
+    }
+
+    body {
+        overflow-y: auto;
+    }
+
+    .topbar {
+        position: sticky;
+
+        top: 0;
+
+        height: auto;
+
+        min-height: 72px;
+
+        padding:
+            12px;
+
+        gap: 10px;
+    }
+
+
+    .mobile-menu-btn {
+        display: flex;
+    }
+
+
+    .workspace {
+        display: block;
+
+        min-height: auto;
+    }
+
+
+    .sidebar {
+        position: fixed;
+
+        top: 72px;
+        bottom: 0;
+        left: 0;
+
+        z-index: 200;
+
+        width: 270px;
+
+        transform:
+            translateX(-105%);
+
+        transition:
+            transform .25s ease;
+
+        box-shadow:
+            20px 0 60px
+            rgba(0,0,0,.35);
+    }
+
+
+    .sidebar.open {
+        transform:
+            translateX(0);
+    }
+
+
+    .canvas-panel {
+        min-height: 760px;
+    }
+
+
+    .canvas {
+        height: 760px;
+
+        min-height: 760px;
+    }
+
+
+    #workflowCanvas {
+        min-width: 1000px;
+    }
+
+
+    .topbar-actions {
+        margin-left: auto;
+    }
+
+
+    .topbar-actions .btn-secondary {
+        display: none;
+    }
+
+
+    .workflow-result-metrics {
+        grid-template-columns: 1fr;
+    }
+
+
+    .workflow-result-header,
+    .workflow-result-footer {
+        align-items: flex-start;
+
+        flex-direction: column;
+    }
+
+}
+
+
+/* ================= SMALL MOBILE ================= */
+
+@media (max-width: 480px) {
+
+    .brand-subtitle {
+        display: none;
+    }
+
+
+    .topbar-actions .btn {
+        padding:
+            9px
+            10px;
+
+        font-size: 11px;
+    }
+
+
+    .sidebar {
+        width: 290px;
+    }
+
+}
+/* Keep workflow nodes and execution result separate */
+
+#workflowCanvas {
+    position: relative;
+}
+
+#workflowExecutionResult {
+    position: relative;
+    z-index: 20;
+    flex-shrink: 0;
+}

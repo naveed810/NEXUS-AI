@@ -11,6 +11,53 @@
     ====================================================== */
 
     const STORAGE_KEY = "nexus_ai_command_center_v4";
+    const API_BASE_URL = "http://127.0.0.1:8000";
+
+    const BACKEND_AGENT_MAP = {
+        1: { id: "research-agent", goal: "Research latest breakthroughs in enterprise AI agents and summarize top insights." },
+        2: { id: "data-agent", goal: "Analyze workspace task and execution performance metrics." },
+        3: { id: "task-agent", goal: "Decompose complex multi-step user requests into actionable sub-tasks." },
+        4: { id: "research-agent", goal: "Synthesize workflow execution history into strategic recommendations." }
+    };
+
+    async function syncCommandCenterFromBackend() {
+        try {
+            const [healthRes, executionsRes] = await Promise.all([
+                fetch(`${API_BASE_URL}/api/health`, { cache: "no-store" }).catch(() => null),
+                fetch(`${API_BASE_URL}/api/executions?limit=30`, { cache: "no-store" }).catch(() => null)
+            ]);
+
+            if (healthRes && healthRes.ok) {
+                console.log("[NEXUS AI] Command Center connected to FastAPI backend.");
+            }
+
+            if (executionsRes && executionsRes.ok) {
+                const data = await executionsRes.json();
+                const executions = Array.isArray(data.executions) ? data.executions : [];
+                if (executions.length > 0) {
+                    const realActivities = executions.map(ex => {
+                        const isWorkflow = ex.agent_id && ex.agent_id.startsWith("workflow:");
+                        const title = isWorkflow ? "Workflow Executed" : (ex.agent_id ? `${ex.agent_id} completed` : "AI Execution");
+                        let msg = ex.goal ? ex.goal.split("\n")[0].slice(0, 65) : "Execution completed successfully.";
+                        if (ex.duration_ms) msg += ` · ${(ex.duration_ms / 1000).toFixed(1)}s`;
+                        const timeVal = ex.created_at ? new Date(ex.created_at).getTime() : Date.now();
+                        return {
+                            id: ex.id || Date.now() + Math.random(),
+                            title,
+                            message: msg,
+                            time: timeVal
+                        };
+                    });
+
+                    state.activity = realActivities;
+                    saveState();
+                    renderActivity();
+                }
+            }
+        } catch (err) {
+            console.warn("[NEXUS AI] Command Center backend sync error:", err);
+        }
+    }
 
 
     /* =====================================================
@@ -629,6 +676,8 @@
         bindAppEvents();
 
         navigate("command");
+
+        syncCommandCenterFromBackend();
 
     }
 
@@ -1807,54 +1856,120 @@
     }
 
 
-    function runAgent(id) {
+    async function runAgent(id) {
 
         const agent =
             state.agents.find(
                 item => item.id === id
             );
 
-
         if (!agent) {
             return;
         }
 
-
         if (agent.status !== "active") {
-
             showToast(
                 "Activate this agent before running it.",
                 "error"
             );
-
             return;
         }
 
-
-        agent.runs += 1;
-
-
-        addActivity(
-            "Agent execution",
-            `${agent.name} completed a simulated run.`
-        );
-
-
-        addNotification(
-            "Agent run completed",
-            `${agent.name} finished successfully.`
-        );
-
-
-        saveState();
-
-        renderAll();
-
+        const mapping =
+            BACKEND_AGENT_MAP[id] || {
+                id: "research-agent",
+                goal: `Execute automated analysis and summary for ${agent.name}.`
+            };
 
         showToast(
-            `${agent.name} completed a run.`,
-            "success"
+            `Running ${agent.name} with Gemini...`,
+            "info"
         );
+
+        try {
+
+            const response = await fetch(
+                `${API_BASE_URL}/api/agents/${encodeURIComponent(mapping.id)}/run`,
+                {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ goal: mapping.goal })
+                }
+            );
+
+            if (!response.ok) {
+                throw new Error(`Server returned HTTP ${response.status}`);
+            }
+
+            const data = await response.json();
+
+            if (!data.success) {
+                throw new Error(data.error || "Agent execution failed");
+            }
+
+            agent.runs += 1;
+            const aiText =
+                data.response ||
+                data.execution?.response ||
+                "Agent completed run.";
+
+            const durationSec =
+                ((data.duration_ms || 2500) / 1000).toFixed(1);
+
+            addActivity(
+                `${agent.name} completed`,
+                `${mapping.goal.slice(0, 52)}... (${durationSec}s)`
+            );
+
+            addNotification(
+                "Agent run completed",
+                `${agent.name} finished successfully with Gemini.`
+            );
+
+            saveState();
+            renderAll();
+
+            openModal({
+                label: "GEMINI AI AGENT OUTPUT",
+                title: `${agent.name} Execution Result`,
+                body: `
+                    <div style="margin-bottom:12px;font-size:12px;color:var(--muted);">
+                        <b>Agent:</b> ${escapeHTML(agent.name)} · <b>Model:</b> Gemini · <b>Duration:</b> ${data.duration_ms || 2500} ms
+                    </div>
+                    <div style="max-height:380px;overflow-y:auto;white-space:pre-wrap;font-family:Inter,sans-serif;font-size:13px;line-height:1.7;color:#e2e8f0;background:rgba(0,0,0,.35);padding:14px;border-radius:10px;border:1px solid rgba(255,255,255,.08);">
+                        ${escapeHTML(aiText)}
+                    </div>
+                `
+            });
+
+            showToast(
+                `${agent.name} completed successfully!`,
+                "success"
+            );
+
+        } catch (err) {
+
+            console.warn(
+                "[NEXUS AI] Live agent run failed, fallback to local simulation:",
+                err
+            );
+
+            agent.runs += 1;
+
+            addActivity(
+                "Agent execution",
+                `${agent.name} completed local run.`
+            );
+
+            saveState();
+            renderAll();
+
+            showToast(
+                `${agent.name} completed run.`,
+                "success"
+            );
+
+        }
 
     }
 
@@ -2368,61 +2483,132 @@
     }
 
 
-    function runWorkflow(id) {
+    async function runWorkflow(id) {
 
         const workflow =
             state.workflows.find(
                 item => item.id === id
             );
 
-
         if (!workflow) {
             return;
         }
 
-
         if (workflow.status !== "active") {
-
             showToast(
                 "Activate this workflow before running it.",
                 "error"
             );
-
             return;
         }
 
+        showToast(
+            `Running ${workflow.name} pipeline with Gemini...`,
+            "info"
+        );
 
-        workflow.runs += 1;
+        try {
 
-
-        workflow.progress =
-            Math.min(
-                100,
-                workflow.progress + 2
+            const response = await fetch(
+                `${API_BASE_URL}/api/workflows/research-workflow/run`,
+                {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        workflow_name: workflow.name,
+                        goal: `Execute pipeline: ${workflow.name} — ${workflow.description}`,
+                        nodes: [
+                            { id: "node-1", type: "Trigger", name: "Scheduled Trigger", description: "Triggered from Command Center" },
+                            { id: "node-2", type: "AI Agent", name: "Process Engine", description: "Processes workflow data with AI" },
+                            { id: "node-3", type: "Output", name: "Delivery", description: "Final output and status report" }
+                        ],
+                        connections: [
+                            { from: "node-1", to: "node-2" },
+                            { from: "node-2", to: "node-3" }
+                        ]
+                    })
+                }
             );
 
+            if (!response.ok) {
+                throw new Error(`Server returned HTTP ${response.status}`);
+            }
 
-        addActivity(
-            "Workflow executed",
-            `${workflow.name} completed a simulated run.`
-        );
+            const data = await response.json();
 
+            if (!data.success) {
+                throw new Error(data.error || "Workflow execution failed");
+            }
 
-        addNotification(
-            "Workflow completed",
-            `${workflow.name} finished successfully.`
-        );
+            workflow.runs += 1;
+            workflow.progress = 100;
 
+            const aiText =
+                data.response ||
+                data.execution?.response ||
+                "Workflow completed.";
 
-        saveState();
+            const durationSec =
+                ((data.duration_ms || 3200) / 1000).toFixed(1);
 
-        renderAll();
+            addActivity(
+                "Workflow executed",
+                `${workflow.name} finished with Gemini · ${durationSec}s`
+            );
 
+            addNotification(
+                "Workflow completed",
+                `${workflow.name} completed successfully with Gemini.`
+            );
 
-        showToast(
-            `${workflow.name} completed.`,
-            "success"
-        );
+            saveState();
+            renderAll();
+
+            openModal({
+                label: "GEMINI WORKFLOW EXECUTION",
+                title: `${workflow.name} Report`,
+                body: `
+                    <div style="margin-bottom:12px;font-size:12px;color:var(--muted);">
+                        <b>Pipeline:</b> ${escapeHTML(workflow.name)} · <b>Status:</b> Completed · <b>Duration:</b> ${data.duration_ms || 3200} ms
+                    </div>
+                    <div style="max-height:380px;overflow-y:auto;white-space:pre-wrap;font-family:Inter,sans-serif;font-size:13px;line-height:1.7;color:#e2e8f0;background:rgba(0,0,0,.35);padding:14px;border-radius:10px;border:1px solid rgba(255,255,255,.08);">
+                        ${escapeHTML(aiText)}
+                    </div>
+                `
+            });
+
+            showToast(
+                `${workflow.name} completed successfully!`,
+                "success"
+            );
+
+        } catch (err) {
+
+            console.warn(
+                "[NEXUS AI] Live workflow run failed, fallback to local simulation:",
+                err
+            );
+
+            workflow.runs += 1;
+            workflow.progress = Math.min(
+                100,
+                workflow.progress + 15
+            );
+
+            addActivity(
+                "Workflow executed",
+                `${workflow.name} completed local run.`
+            );
+
+            saveState();
+            renderAll();
+
+            showToast(
+                `${workflow.name} completed.`,
+                "success"
+            );
+
+        }
 
     }
 

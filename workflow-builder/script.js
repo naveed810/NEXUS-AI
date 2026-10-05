@@ -82,15 +82,141 @@ const NODE_META = {
 
 
 const els = {};
+/* =========================================================
+   PERSIST WORKFLOW STATE
+========================================================= */
 
+function persistWorkflowState() {
+
+    try {
+
+        const payload = {
+
+            workflowName:
+                state.workflowName,
+
+            nodes:
+                state.nodes,
+
+            connections:
+                state.connections,
+
+            selectedNodeId:
+                state.selectedNodeId,
+
+            nextNodeId:
+                state.nextNodeId,
+
+            savedAt:
+                new Date().toISOString()
+
+        };
+
+
+        localStorage.setItem(
+            "nexusWorkflowBuilderState",
+            JSON.stringify(payload)
+        );
+
+    }
+
+    catch (error) {
+
+        console.warn(
+            "[NEXUS AI] Could not persist workflow state.",
+            error
+        );
+
+    }
+
+}
+/* =========================================================
+   RESTORE WORKFLOW STATE
+========================================================= */
+
+function restoreWorkflowState() {
+
+    try {
+
+        let raw =
+            localStorage.getItem(
+                "nexusWorkflowBuilderState"
+            );
+
+        if (!raw) {
+            raw = localStorage.getItem("nexusWorkflow");
+        }
+
+        if (!raw) {
+            return false;
+        }
+
+        const saved =
+            JSON.parse(raw);
+
+        if (
+            !saved ||
+            !Array.isArray(saved.nodes) ||
+            !Array.isArray(saved.connections)
+        ) {
+            return false;
+        }
+
+        state.workflowName =
+            saved.workflowName ||
+            saved.name ||
+            "Customer Support Workflow";
+
+        state.nodes =
+            saved.nodes;
+
+        state.connections =
+            saved.connections;
+
+        state.selectedNodeId =
+            saved.selectedNodeId || null;
+
+        state.nextNodeId =
+            Number(saved.nextNodeId) ||
+            (
+                state.nodes.length + 1
+            );
+
+        if (els.title) {
+            els.title.textContent =
+                state.workflowName;
+        }
+
+        console.log(
+            "[NEXUS AI] Workflow state restored:",
+            state.nodes.length,
+            "nodes",
+            state.connections.length,
+            "connections"
+        );
+
+        return true;
+
+    }
+
+    catch (error) {
+
+        console.warn(
+            "[NEXUS AI] Could not restore workflow state.",
+            error
+        );
+
+        return false;
+
+    }
+
+}
 
 /* ================= INITIALIZATION ================= */
 
 document.addEventListener(
     "DOMContentLoaded",
     () => {
-
-        syncNexusProfile();
 
         els.canvas =
             document.getElementById(
@@ -116,6 +242,9 @@ document.addEventListener(
             document.getElementById(
                 "workflowTitle"
             );
+
+        syncNexusProfile();
+        restoreWorkflowState();
 
         els.toast =
             document.getElementById(
@@ -152,12 +281,98 @@ document.addEventListener(
         window.location.href = "../command-center/index.html#profile";
     });
 
-    document.querySelectorAll(".module-sidebar-nav a").forEach(link => {
-            link.addEventListener("click", () => {
-                workflowSidebar?.classList.remove("open");
-            });
-        });
+ document
+    .querySelectorAll(".module-sidebar-nav a")
+    .forEach(link => {
 
+        link.addEventListener(
+            "click",
+            event => {
+
+                workflowSidebar?.classList.remove("open");
+
+
+                /*
+                 * Prevent the Workflow Builder
+                 * from navigating to itself.
+                 */
+
+                const target =
+                    new URL(
+                        link.href,
+                        window.location.href
+                    );
+
+
+                const current =
+                    new URL(
+                        window.location.href
+                    );
+
+
+                if (
+                    target.pathname ===
+                    current.pathname
+                ) {
+
+                    event.preventDefault();
+
+                    event.stopPropagation();
+
+                    return false;
+                }
+
+            }
+        );
+
+    });
+    /*
+ * Prevent accidental navigation to the
+ * current Workflow Builder page.
+ */
+
+document.addEventListener(
+    "click",
+    event => {
+
+        const link =
+            event.target.closest(
+                ".module-sidebar-nav a"
+            );
+
+
+        if (!link) {
+            return;
+        }
+
+
+        const target =
+            new URL(
+                link.href,
+                window.location.href
+            );
+
+
+        const current =
+            new URL(
+                window.location.href
+            );
+
+
+        if (
+            target.pathname ===
+            current.pathname
+        ) {
+
+            event.preventDefault();
+
+            event.stopImmediatePropagation();
+
+        }
+
+    },
+    true
+);
         /*
          * NODE BUTTONS
          */
@@ -336,6 +551,24 @@ document.addEventListener(
 
 
         render();
+
+        /* Restore the last Gemini result after the page initializes.
+           This keeps the answer visible even if Live Server/browser
+           reloads the document. */
+        restoreWorkflowResult();
+
+        /* Never allow the current Workflow Builder nav item to
+           navigate/reload the same page. */
+        document.getElementById("currentWorkflowNav")?.addEventListener("click", event => {
+            event.preventDefault();
+            event.stopPropagation();
+            return false;
+        });
+
+        /* Persist state immediately before any browser navigation/reload. */
+        window.addEventListener("beforeunload", () => {
+            persistWorkflowState();
+        });
 
     }
 );
@@ -635,6 +868,7 @@ function render() {
     renderInspector();
 
     drawConnections();
+    persistWorkflowState();
 
 }
 
@@ -1326,7 +1560,92 @@ function drawConnections() {
 
 }
 
+/* =========================================================
+   PERSIST LAST WORKFLOW RESULT
+========================================================= */
 
+function saveWorkflowResult(response, metadata = {}) {
+
+    try {
+
+        localStorage.setItem(
+            "nexusWorkflowLastResult",
+            JSON.stringify({
+
+                workflowName:
+                    state.workflowName,
+
+                response:
+                    String(response ?? ""),
+
+                metadata: {
+                    nodes:
+                        metadata.nodes ?? state.nodes.length,
+                    connections:
+                        metadata.connections ?? state.connections.length,
+                    duration:
+                        metadata.duration ?? "—",
+                    executionId:
+                        metadata.executionId ?? "N/A"
+                },
+
+                completedAt:
+                    new Date().toISOString()
+
+            })
+        );
+
+    }
+
+    catch (error) {
+
+        console.warn(
+            "[NEXUS AI] Could not save workflow result.",
+            error
+        );
+
+    }
+
+}
+
+
+function restoreWorkflowResult() {
+
+    try {
+
+        const raw =
+            localStorage.getItem(
+                "nexusWorkflowLastResult"
+            );
+
+        if (!raw) {
+            return false;
+        }
+
+        const saved = JSON.parse(raw);
+
+        if (!saved || typeof saved.response !== "string" || !saved.response.trim()) {
+            return false;
+        }
+
+        showWorkflowResult(
+            saved.response,
+            saved.metadata || {}
+        );
+
+        return true;
+
+    } catch (error) {
+
+        console.warn(
+            "[NEXUS AI] Could not restore workflow result.",
+            error
+        );
+
+        return false;
+    }
+
+}
 /* ================= SAVE WORKFLOW ================= */
 
 function saveWorkflow() {
@@ -1353,6 +1672,8 @@ function saveWorkflow() {
         JSON.stringify(payload)
     );
 
+    persistWorkflowState();
+
 
     showToast(
         "Workflow saved locally"
@@ -1365,91 +1686,647 @@ function saveWorkflow() {
 
 
 /* ================= RUN WORKFLOW ================= */
-
-function runWorkflow() {
+async function runWorkflow() {
 
     if (state.isRunning) {
-
         return false;
-
     }
 
-
     if (!state.nodes.length) {
-
         showToast(
             "Add at least one node before running"
         );
-
         return false;
-
     }
 
-
-    const validation =
-        validateWorkflow();
-
+    const validation = validateWorkflow();
 
     if (!validation.valid) {
-
         showToast(
             validation.message
         );
+        return false;
+    }
+
+    state.isRunning = true;
+
+    const runButton =
+        document.getElementById("runBtn");
+
+    if (runButton) {
+        runButton.disabled = true;
+        runButton.textContent = "⏳ Running...";
+    }
+
+    const startedAt = performance.now();
+
+    showToast(
+        "Workflow started"
+    );
+
+    try {
+
+        /*
+         * Build a useful workflow goal from the
+         * configured nodes.
+         */
+
+        const nodeDescriptions = state.nodes
+            .map((node, index) => {
+
+                const config =
+                    node.config || {};
+
+                const configValue =
+                    config.value ||
+                    config.prompt ||
+                    config.url ||
+                    config.rule ||
+                    config.result ||
+                    "";
+
+                return [
+                    `Step ${index + 1}: ${node.name}`,
+                    `Type: ${node.type}`,
+                    `Description: ${node.description}`,
+                    configValue
+                        ? `Configuration: ${configValue}`
+                        : ""
+                ]
+                    .filter(Boolean)
+                    .join("\n");
+
+            })
+            .join("\n\n");
+
+
+        /*
+         * Build connection description.
+         */
+
+        const nodeMap = {};
+
+        state.nodes.forEach(node => {
+
+            nodeMap[node.id] =
+                node.name || node.type;
+
+        });
+
+
+        const connectionDescriptions =
+            state.connections
+                .map(connection => {
+
+                    const from =
+                        nodeMap[
+                            connection.from
+                        ] || connection.from;
+
+                    const to =
+                        nodeMap[
+                            connection.to
+                        ] || connection.to;
+
+                    return `${from} → ${to}`;
+
+                })
+                .join("\n");
+
+
+        /*
+         * Create the workflow objective.
+         *
+         * This is sent to the backend and Gemini.
+         */
+
+        const goal = `
+Execute the workflow "${state.workflowName}".
+
+Workflow objective:
+Process the configured workflow from the first node to the final output.
+
+Workflow steps:
+
+${nodeDescriptions}
+
+Workflow connections:
+
+${connectionDescriptions || "No explicit connections."}
+
+Execute the workflow logically and provide the final useful result.
+Do not claim external actions were actually performed unless they
+were genuinely executed by the system.
+`.trim();
+
+
+        /*
+         * Send workflow to FastAPI.
+         */
+
+        const response =
+            await fetch(
+                `http://127.0.0.1:8000/api/workflows/research-workflow/run`,
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body: JSON.stringify({
+
+                        workflow_name:
+                            state.workflowName,
+
+                        goal,
+
+                        nodes:
+                            state.nodes,
+
+                        connections:
+                            state.connections
+
+                    })
+                }
+            );
+
+
+        /*
+         * Handle HTTP errors.
+         */
+
+        if (!response.ok) {
+
+            throw new Error(
+                `Backend returned HTTP ${response.status}`
+            );
+
+        }
+
+
+        const result =
+            await response.json();
+
+
+        /*
+         * Handle backend execution failure.
+         */
+
+        if (!result.success) {
+
+            throw new Error(
+                result.error ||
+                result.message ||
+                "Workflow execution failed."
+            );
+
+        }
+
+
+        const elapsed =
+            Math.round(
+                performance.now() -
+                startedAt
+            );
+
+
+        /*
+         * Get the actual Gemini response.
+         */
+
+        const aiResponse =
+            result.response ||
+            result.execution?.response ||
+            result.message ||
+            "Workflow completed without a response.";
+
+
+        /*
+         * Display the result.
+         */
+
+        showWorkflowResult(
+            aiResponse,
+            {
+                duration:
+                    result.duration_ms ||
+                    elapsed,
+
+                nodes:
+                    result.nodes_processed ||
+                    state.nodes.length,
+
+                connections:
+                    result.connections_processed ||
+                    state.connections.length,
+
+                executionId:
+                    result.execution_id ||
+                    result.execution?.execution_id ||
+                    result.execution?.id ||
+                    "N/A"
+            }
+        );
+
+
+        saveWorkflowResult(
+            aiResponse,
+            {
+                duration:
+                    result.duration_ms ||
+                    elapsed,
+
+                nodes:
+                    result.nodes_processed ||
+                    state.nodes.length,
+
+                connections:
+                    result.connections_processed ||
+                    state.connections.length,
+
+                executionId:
+                    result.execution_id ||
+                    result.execution?.execution_id ||
+                    result.execution?.id ||
+                    "N/A"
+            }
+        );
+
+
+        /*
+         * Update UI.
+         */
+
+        state.isRunning = false;
+
+        if (runButton) {
+            runButton.disabled = false;
+            runButton.textContent =
+                "▶ Run Workflow";
+        }
+
+
+        showToast(
+            "Workflow completed successfully"
+        );
+
+
+        return true;
+
+    } catch (error) {
+
+         console.error(
+            "[NEXUS AI] Workflow execution error:",
+            error
+        );
+
+
+        state.isRunning = false;
+
+        if (runButton) {
+            runButton.disabled = false;
+            runButton.textContent =
+                "▶ Run Workflow";
+        }
+
+
+        showToast(
+            error.message ||
+            "Workflow execution failed."
+        );
+
 
         return false;
+    }
+}
+/* =========================================================
+   WORKFLOW RESULT DISPLAY
+   IMPORTANT:
+   Result is placed OUTSIDE the workflow canvas so
+   rendering the result can never delete workflow nodes.
+========================================================= */
+
+/* =========================================================
+   NEXUS AI WORKFLOW RESULT
+========================================================= */
+
+function showWorkflowResult(response, metadata = {}) {
+
+    console.log(
+        "[NEXUS AI] Gemini workflow response:",
+        response
+    );
+
+    let panel =
+        document.getElementById(
+            "workflowExecutionResult"
+        );
+
+
+    /* Create the result panel only once */
+
+    if (!panel) {
+
+        panel =
+            document.createElement("section");
+
+        panel.id =
+            "workflowExecutionResult";
+
+        panel.className =
+            "workflow-execution-result";
+
+
+        const canvasPanel =
+            document.querySelector(
+                ".canvas-panel"
+            );
+
+
+        if (!canvasPanel) {
+
+            console.error(
+                "[NEXUS AI] .canvas-panel not found"
+            );
+
+            return;
+
+        }
+
+
+        /*
+         * Put result AFTER the canvas.
+         * Never put it inside #workflowCanvas.
+         */
+
+        canvasPanel.appendChild(
+            panel
+        );
 
     }
 
 
-    state.isRunning =
-        true;
+    /* Convert Gemini response safely */
 
-
-    const runButton =
-        document.getElementById(
-            "runBtn"
+    const answer =
+        String(
+            response ??
+            "Gemini returned an empty response."
         );
 
 
-    runButton.disabled =
-        true;
+    const workflowName =
+        String(
+            state.workflowName ||
+            "NEXUS AI Workflow"
+        );
 
 
-    runButton.textContent =
-        "⏳ Running...";
+    const nodes =
+        metadata.nodes ??
+        state.nodes.length;
 
 
-    setTimeout(
-        () => {
-
-            state.isRunning =
-                false;
+    const connections =
+        metadata.connections ??
+        state.connections.length;
 
 
-            runButton.disabled =
-                false;
+    const duration =
+        metadata.duration ??
+        "—";
 
 
-            runButton.textContent =
-                "▶ Run Workflow";
+    const executionId =
+        String(
+            metadata.executionId ||
+            "N/A"
+        );
 
 
-            showToast(
-                `Workflow completed · ${state.nodes.length} nodes processed`
-            );
+    /*
+     * Build HTML WITHOUT using escapeHtml().
+     * This prevents a missing helper from
+     * breaking the result display.
+     */
 
-        },
-        700
+    panel.innerHTML = `
+
+        <div class="workflow-result-header">
+
+            <div>
+
+                <div
+                    style="
+                        color:#46dfff;
+                        font-size:10px;
+                        font-weight:800;
+                        letter-spacing:.14em;
+                        margin-bottom:6px;
+                    "
+                >
+                    NEXUS AI EXECUTION
+                </div>
+
+                <h2>
+                    Workflow Completed
+                </h2>
+
+            </div>
+
+            <div style="display:flex;align-items:center;gap:10px;">
+                <span class="workflow-result-status">
+                    ● COMPLETED
+                </span>
+                <button
+                    type="button"
+                    class="icon-btn"
+                    id="closeWorkflowResultBtn"
+                    title="Close Report"
+                    style="border:1px solid rgba(255,255,255,.1);border-radius:8px;background:rgba(255,255,255,.05);color:var(--muted);width:32px;height:32px;display:inline-grid;place-items:center;cursor:pointer;font-size:14px;"
+                >
+                    ✕
+                </button>
+            </div>
+
+        </div>
+
+
+        <div class="workflow-result-metrics">
+
+            <div>
+
+                <strong>
+                    ${nodes}
+                </strong>
+
+                <span>
+                    Nodes
+                </span>
+
+            </div>
+
+
+            <div>
+
+                <strong>
+                    ${connections}
+                </strong>
+
+                <span>
+                    Connections
+                </span>
+
+            </div>
+
+
+            <div>
+
+                <strong>
+                    ${duration}
+                    ${
+                        typeof duration === "number"
+                            ? " ms"
+                            : ""
+                    }
+                </strong>
+
+                <span>
+                    Duration
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <div
+            class="workflow-result-body"
+            id="workflowGeminiAnswer"
+        ></div>
+
+
+        <div class="workflow-result-footer">
+
+            <small>
+                ${workflowName}
+                · Gemini AI
+                · Execution ID:
+                ${executionId}
+            </small>
+
+
+            <button
+                type="button"
+                class="btn btn-secondary"
+                id="copyWorkflowResultBtn"
+            >
+                📋 Copy Result
+            </button>
+
+        </div>
+
+    `;
+
+
+    /*
+     * Put the Gemini answer using textContent.
+     *
+     * This is safer than inserting Gemini text
+     * directly into HTML.
+     */
+
+    const answerElement =
+        document.getElementById(
+            "workflowGeminiAnswer"
+        );
+
+
+    if (answerElement) {
+
+        answerElement.textContent =
+            answer;
+
+    }
+
+
+    /*
+     * Close button
+     */
+    const closeBtn = document.getElementById("closeWorkflowResultBtn");
+    if (closeBtn) {
+        closeBtn.onclick = () => {
+            panel.remove();
+        };
+    }
+
+    /*
+     * Copy button
+     */
+
+    const copyButton =
+        document.getElementById(
+            "copyWorkflowResultBtn"
+        );
+
+
+    if (copyButton) {
+
+        copyButton.onclick =
+            async function () {
+
+                try {
+
+                    await navigator.clipboard.writeText(
+                        answer
+                    );
+
+                    showToast(
+                        "Copied",
+                        "Gemini workflow result copied."
+                    );
+
+                } catch (error) {
+
+                    console.error(
+                        "[NEXUS AI] Copy failed:",
+                        error
+                    );
+
+                    showToast(
+                        "Copy failed"
+                    );
+
+                }
+
+            };
+
+    }
+
+
+    /*
+     * DO NOT call render().
+     * DO NOT modify state.nodes.
+     * DO NOT modify state.connections.
+     */
+
+
+    console.log(
+        "[NEXUS AI] Workflow result displayed successfully."
     );
 
+    /* Keep the result visible without changing the page URL. */
+    panel.hidden = false;
 
-    return true;
+    try {
+        panel.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    } catch (_) {}
+
+    return panel;
 
 }
-
-
-/* ================= VALIDATION ================= */
-
 function validateWorkflow() {
 
     if (!state.nodes.length) {
@@ -1545,6 +2422,13 @@ function clearWorkflow() {
         null;
 
 
+    localStorage.removeItem("nexusWorkflowLastResult");
+
+    document
+        .getElementById("workflowExecutionResult")
+        ?.remove();
+
+
     render();
 
 
@@ -1573,7 +2457,10 @@ function newWorkflow() {
         state.workflowName;
 
 
+    localStorage.removeItem("nexusWorkflowLastResult");
+
     updateStatus();
+    persistWorkflowState();
 
 
     showToast(
@@ -1599,6 +2486,12 @@ function loadSampleWorkflow() {
 
     els.title.textContent =
         state.workflowName;
+
+
+    localStorage.removeItem("nexusWorkflowLastResult");
+    document
+        .getElementById("workflowExecutionResult")
+        ?.remove();
 
 
     addNode(
@@ -1709,8 +2602,7 @@ function loadSampleWorkflow() {
 
 
     render();
-
-
+    persistWorkflowState();
     showToast(
         "Sample workflow loaded"
     );
@@ -1760,6 +2652,9 @@ function renameWorkflow() {
 
     els.title.textContent =
         trimmed;
+
+
+    persistWorkflowState();
 
 
     showToast(
