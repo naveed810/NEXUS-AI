@@ -1,10 +1,21 @@
 
 function syncNexusProfile() {
     try {
-        const raw = localStorage.getItem("nexus_ai_command_center_v4");
-        const state = raw ? JSON.parse(raw) : {};
-        const name = state?.user?.name || "NEXUS User";
-        const email = state?.user?.email || "user@example.com";
+        let name = "NEXUS User";
+        let email = "user@example.com";
+        const profRaw = localStorage.getItem("nexus_user_profile");
+        if (profRaw) {
+            const prof = JSON.parse(profRaw);
+            if (prof?.name) name = prof.name;
+            if (prof?.email) email = prof.email;
+        } else {
+            const raw = localStorage.getItem("nexus_ai_command_center_v4");
+            if (raw) {
+                const state = JSON.parse(raw);
+                if (state?.user?.name) name = state.user.name;
+                if (state?.user?.email) email = state.user.email;
+            }
+        }
         const avatar = name.trim().charAt(0).toUpperCase() || "N";
         document.getElementById("profileName")?.replaceChildren(document.createTextNode(name));
         document.getElementById("profileEmail")?.replaceChildren(document.createTextNode(email));
@@ -266,6 +277,16 @@ document.addEventListener(
                 "modalBackdrop"
             );
 
+        if (window.initNexus3DWidget) {
+            const container = document.getElementById("workflow3DCore");
+            if (container) {
+                window.workflow3DCore = window.initNexus3DWidget(container, {
+                    theme: "automation",
+                    showHud: true
+                });
+            }
+        }
+
 
         /*
          * MOBILE WORKSPACE NAVIGATION
@@ -273,106 +294,39 @@ document.addEventListener(
         const mobileMenuBtn = document.getElementById("mobileMenuBtn");
         const workflowSidebar = document.getElementById("workflowSidebar");
 
-        mobileMenuBtn?.addEventListener("click", () => {
+        mobileMenuBtn?.addEventListener("click", (e) => {
+            e.stopPropagation();
             workflowSidebar?.classList.toggle("open");
         });
 
-        document.getElementById("sidebarProfile")?.addEventListener("click", () => {
-        window.location.href = "../command-center/index.html#profile";
-    });
-
- document
-    .querySelectorAll(".module-sidebar-nav a")
-    .forEach(link => {
-
-        link.addEventListener(
-            "click",
-            event => {
-
-                workflowSidebar?.classList.remove("open");
-
-
-                /*
-                 * Prevent the Workflow Builder
-                 * from navigating to itself.
-                 */
-
-                const target =
-                    new URL(
-                        link.href,
-                        window.location.href
-                    );
-
-
-                const current =
-                    new URL(
-                        window.location.href
-                    );
-
-
-                if (
-                    target.pathname ===
-                    current.pathname
-                ) {
-
-                    event.preventDefault();
-
-                    event.stopPropagation();
-
-                    return false;
-                }
-
+        document.addEventListener("click", (e) => {
+            if (workflowSidebar?.classList.contains("open") && !workflowSidebar.contains(e.target) && !mobileMenuBtn?.contains(e.target)) {
+                workflowSidebar.classList.remove("open");
             }
-        );
+        });
 
-    });
-    /*
- * Prevent accidental navigation to the
- * current Workflow Builder page.
- */
+        document.getElementById("sidebarProfile")?.addEventListener("click", (e) => {
+            e.preventDefault();
+            if (window.openNexusProfileModal) {
+                window.openNexusProfileModal();
+            } else {
+                window.location.href = "../command-center/index.html#profile";
+            }
+        });
 
-document.addEventListener(
-    "click",
-    event => {
+        document
+            .querySelectorAll(".module-sidebar-nav a")
+            .forEach(link => {
+                link.addEventListener("click", event => {
+                    workflowSidebar?.classList.remove("open");
 
-        const link =
-            event.target.closest(
-                ".module-sidebar-nav a"
-            );
-
-
-        if (!link) {
-            return;
-        }
-
-
-        const target =
-            new URL(
-                link.href,
-                window.location.href
-            );
-
-
-        const current =
-            new URL(
-                window.location.href
-            );
-
-
-        if (
-            target.pathname ===
-            current.pathname
-        ) {
-
-            event.preventDefault();
-
-            event.stopImmediatePropagation();
-
-        }
-
-    },
-    true
-);
+                    const href = link.getAttribute("href");
+                    if (href === "#" || link.id === "currentWorkflowNav") {
+                        event.preventDefault();
+                        return false;
+                    }
+                });
+            });
         /*
          * NODE BUTTONS
          */
@@ -802,16 +756,71 @@ function render() {
             element.addEventListener(
                 "click",
                 event => {
-
                     event.stopPropagation();
-
                     selectNode(
                         node.id
                     );
-
                 }
             );
 
+            // Node Drag & Drop Functionality
+            let isDragging = false;
+            let dragStartX = 0;
+            let dragStartY = 0;
+            let initialNodeX = 0;
+            let initialNodeY = 0;
+            let hasMoved = false;
+
+            element.addEventListener("pointerdown", (e) => {
+                if (e.target.closest(".node-action")) return;
+                isDragging = true;
+                hasMoved = false;
+                dragStartX = e.clientX;
+                dragStartY = e.clientY;
+                initialNodeX = node.x;
+                initialNodeY = node.y;
+                try {
+                    element.setPointerCapture(e.pointerId);
+                } catch (_) {}
+                selectNode(node.id);
+            });
+
+            element.addEventListener("pointermove", (e) => {
+                if (!isDragging) return;
+                const dx = e.clientX - dragStartX;
+                const dy = e.clientY - dragStartY;
+                if (!hasMoved && Math.hypot(dx, dy) > 4) {
+                    hasMoved = true;
+                    element.classList.add("dragging");
+                }
+                if (!hasMoved) return;
+                
+                const newX = Math.max(10, Math.round(initialNodeX + dx));
+                const newY = Math.max(10, Math.round(initialNodeY + dy));
+                
+                node.x = newX;
+                node.y = newY;
+                element.style.left = `${newX}px`;
+                element.style.top = `${newY}px`;
+                
+                drawConnections();
+            });
+
+            const stopDrag = (e) => {
+                if (!isDragging) return;
+                isDragging = false;
+                element.classList.remove("dragging");
+                try {
+                    element.releasePointerCapture(e.pointerId);
+                } catch (_) {}
+                if (hasMoved) {
+                    drawConnections();
+                    persistWorkflowState();
+                }
+            };
+
+            element.addEventListener("pointerup", stopDrag);
+            element.addEventListener("pointercancel", stopDrag);
 
             element
                 .querySelector(
@@ -820,16 +829,12 @@ function render() {
                 .addEventListener(
                     "click",
                     event => {
-
                         event.stopPropagation();
-
                         openNodeEditor(
                             node.id
                         );
-
                     }
                 );
-
 
             element
                 .querySelector(
@@ -838,13 +843,10 @@ function render() {
                 .addEventListener(
                     "click",
                     event => {
-
                         event.stopPropagation();
-
                         deleteNode(
                             node.id
                         );
-
                     }
                 );
 
@@ -1823,6 +1825,7 @@ were genuinely executed by the system.
         /*
          * Send workflow to FastAPI.
          */
+        window.workflow3DCore?.setState("thinking");
 
         const response =
             await fetch(

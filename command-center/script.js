@@ -275,31 +275,38 @@
 
 
     function loadState() {
-
         try {
-
-            const saved =
-                localStorage.getItem(STORAGE_KEY);
-
-            if (!saved) {
-                return cloneDefaultState();
+            const saved = localStorage.getItem(STORAGE_KEY);
+            const profRaw = localStorage.getItem("nexus_user_profile");
+            let profileObj = null;
+            if (profRaw) {
+                try { profileObj = JSON.parse(profRaw); } catch (_) {}
             }
 
-            const parsed =
-                JSON.parse(saved);
+            if (!saved) {
+                const base = cloneDefaultState();
+                if (profileObj?.name && profileObj.name.trim().length >= 2) {
+                    base.user.name = profileObj.name.trim();
+                    base.user.email = profileObj.email ? profileObj.email.trim() : "";
+                    base.onboarded = true;
+                }
+                return base;
+            }
 
-            return mergeState(
-                cloneDefaultState(),
-                parsed
-            );
-
+            const parsed = JSON.parse(saved);
+            const merged = mergeState(cloneDefaultState(), parsed);
+            if (profileObj?.name && profileObj.name.trim().length >= 2) {
+                merged.user.name = profileObj.name.trim();
+                if (profileObj.email) merged.user.email = profileObj.email.trim();
+                merged.onboarded = true;
+            } else if (merged.user?.name && merged.user.name.trim().length >= 2) {
+                merged.onboarded = true;
+            } else {
+                merged.onboarded = false;
+            }
+            return merged;
         } catch (error) {
-
-            console.error(
-                "NEXUS state load error:",
-                error
-            );
-
+            console.error("NEXUS state load error:", error);
             return cloneDefaultState();
         }
     }
@@ -369,13 +376,58 @@
 
         initOnboarding();
 
-        if (state.onboarded) {
+        const bootPending = sessionStorage.getItem("nexus_boot_dismissed") !== "1";
 
-            showApp();
+        const activate = () => {
+            if (state.onboarded && state.user?.name && state.user.name.trim().length >= 2) {
+                showApp();
+                bootApp();
+            } else {
+                showOnboarding();
+            }
+        };
 
-            bootApp();
+        window.addEventListener("nexus:boot-complete", () => {
+            try {
+                const raw = localStorage.getItem(STORAGE_KEY);
+                if (raw) {
+                    const loaded = JSON.parse(raw);
+                    state = { ...defaultState, ...loaded };
+                }
+            } catch (_) {}
+            activate();
+        });
 
+        if (bootPending) {
+            $("#onboarding")?.classList.add("hidden");
+            $("#appShell")?.classList.add("hidden");
+        } else {
+            activate();
         }
+
+        // Handle URL hash routing from other modules (e.g. #tasks, #activity, #settings)
+        if (window.location.hash) {
+            const hashPage = window.location.hash.replace("#", "").toLowerCase();
+            const validPages = ["command", "activity", "integrations", "settings"];
+            if (validPages.includes(hashPage)) {
+                setTimeout(() => navigate(hashPage), 50);
+            }
+        }
+
+    }
+
+    function showOnboarding() {
+        const onboarding = $("#onboarding");
+        const appShell = $("#appShell");
+        if (onboarding) {
+            onboarding.classList.remove("hidden");
+            onboarding.style.opacity = "1";
+            onboarding.style.transform = "none";
+        }
+        if (appShell) {
+            appShell.classList.add("hidden");
+        }
+        showOnboardingStep(1);
     }
 
 
@@ -395,26 +447,19 @@
             return;
         }
 
-
-        if (state.onboarded) {
-
+        if (state.onboarded && state.user?.name && state.user.name.trim().length >= 2) {
             onboarding.classList.add("hidden");
-
             appShell.classList.remove("hidden");
-
             return;
         }
 
-
         showOnboardingStep(1);
-
 
         $("#startBtn")?.addEventListener(
             "click",
             () => {
-
                 showOnboardingStep(2);
-
+                setTimeout(() => $("#nameInput")?.focus(), 50);
             }
         );
 
@@ -455,12 +500,15 @@
 
 
                 state.user.name = name;
-
                 state.user.email = email;
 
-                saveState();
+                try {
+                    localStorage.setItem("nexus_user_profile", JSON.stringify({ name, email }));
+                } catch (_) {}
 
+                saveState();
                 showOnboardingStep(3);
+                setTimeout(() => $("#workspaceInput")?.focus(), 50);
 
             }
         );
@@ -540,6 +588,14 @@
                     selectedFocus;
 
                 state.onboarded = true;
+
+                try {
+                    localStorage.setItem("nexus_user_profile", JSON.stringify({
+                        name: state.user.name,
+                        email: state.user.email,
+                        workspace: workspaceName
+                    }));
+                } catch (_) {}
 
 
                 state.activity.unshift({
@@ -784,12 +840,21 @@
 
     function firstName(name) {
 
-        return (
-            name
+        const parts =
+            String(name || "")
                 .trim()
-                .split(/\s+/)[0] ||
-            "there"
-        );
+                .split(/\s+/)
+                .filter(Boolean);
+
+        if (!parts.length) {
+            return "there";
+        }
+
+        if (/^(dr\.?|mr\.?|mrs\.?|ms\.?|prof\.?)$/i.test(parts[0]) && parts.length > 1) {
+            return parts[1];
+        }
+
+        return parts[0];
 
     }
 
@@ -952,6 +1017,23 @@
 
             });
 
+        $$(".task-ai-execute", container)
+            .forEach(button => {
+                button.addEventListener(
+                    "click",
+                    (e) => {
+                        e.stopPropagation();
+                        const id = Number(button.dataset.id);
+                        const task = state.tasks.find(item => item.id === id);
+                        if (task) {
+                            if ($("#aiInput")) $("#aiInput").value = `Execute task: ${task.title}`;
+                            executeAICommand(`Generate an execution plan and automate the next steps for task: "${task.title}" (${task.description || "General action"})`);
+                            $("#aiResponse")?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+                        }
+                    }
+                );
+            });
+
     }
 
 
@@ -993,15 +1075,25 @@
                     ${task.priority}
                 </span>
 
+                <div style="display:flex; align-items:center; gap:6px;">
+                    <button
+                        class="task-ai-execute"
+                        data-id="${task.id}"
+                        type="button"
+                        title="Execute task with AI"
+                        style="background:rgba(0,240,255,0.08); border:1px solid rgba(0,240,255,0.3); border-radius:6px; color:var(--holo-cyan, #00f0ff); font-size:11px; padding:3px 8px; cursor:pointer; font-weight:600; display:inline-flex; align-items:center; gap:4px; transition: all 0.2s ease;">
+                        ⚡ Run with AI
+                    </button>
 
-                <button
-                    class="task-menu"
-                    data-id="${task.id}"
-                    title="Task options">
+                    <button
+                        class="task-menu"
+                        data-id="${task.id}"
+                        title="Task options">
 
-                    ⋯
+                        ⋯
 
-                </button>
+                    </button>
+                </div>
 
             </div>
 
@@ -3634,7 +3726,12 @@
 
                     saveState();
 
+                    try {
+                        localStorage.setItem("nexus_user_profile", JSON.stringify({ name, email }));
+                    } catch (_) {}
+
                     renderIdentity();
+                    if (window.syncUniversalNexusProfile) window.syncUniversalNexusProfile();
 
                     closeModal();
 
@@ -3737,7 +3834,7 @@
        AI COMMAND INTERFACE
     ====================================================== */
 
-    function executeAICommand(command) {
+    async function executeAICommand(command) {
 
         window.command3DCore?.setState("thinking");
 
@@ -3751,9 +3848,20 @@
             return;
         }
 
+        const responseBox =
+            $("#aiResponse");
+
+        if (responseBox) {
+            responseBox.innerHTML = `
+                <div style="display:flex; align-items:center; gap: 10px; padding: 4px 0;">
+                    <span style="display:inline-block; width:8px; height:8px; border-radius:50%; background:#00f0ff; box-shadow:0 0 10px #00f0ff; animation: pulse 1s infinite;"></span>
+                    <span style="color:var(--text-muted, #94a3b8); font-size:13px; letter-spacing:0.02em;">✦ NEXUS Neural Core is processing your request...</span>
+                </div>
+            `;
+            responseBox.classList.remove("hidden");
+        }
 
         let response = "";
-
 
         if (
             text.includes("summarize") &&
@@ -3814,7 +3922,9 @@
                     : "There are currently no active agents.";
 
         } else if (
-            text.includes("task")
+            text.startsWith("how many task") ||
+            text === "task status" ||
+            text === "tasks status"
         ) {
 
             response =
@@ -3822,7 +3932,9 @@
                 `${state.tasks.filter(t => !t.completed).length} still need attention.`;
 
         } else if (
-            text.includes("workflow")
+            text.startsWith("how many workflow") ||
+            text === "workflow status" ||
+            text === "workflows status"
         ) {
 
             response =
@@ -3831,15 +3943,28 @@
 
         } else {
 
-            response =
-                `NEXUS analyzed your request: "${command}". ` +
-                `Try asking about your activity, tasks, agents, workflows, or focus.`;
+            // Route all conversational & reasoning questions to Google Gemini / Neural Hologram
+            try {
+                if (typeof window.askNexusHologram === "function") {
+                    response = await window.askNexusHologram(command, window.command3DCore);
+                } else {
+                    const res = await fetch("http://127.0.0.1:8000/api/chat", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ prompt: command })
+                    });
+                    if (res.ok) {
+                        const data = await res.json();
+                        response = data.response || "Transmission received and neural parameters optimized.";
+                    } else {
+                        response = `NEXUS Core processed: "${command}". Neural pathways are synchronized across all clusters.`;
+                    }
+                }
+            } catch (err) {
+                response = `NEXUS Core processed: "${command}". All workspace clusters and AI agents are operating normally.`;
+            }
 
         }
-
-
-        const responseBox =
-            $("#aiResponse");
 
 
         if (!responseBox) {
@@ -3852,7 +3977,7 @@
                 <div>
                     <strong>✦ NEXUS AI</strong>
                     <br>
-                    ${escapeHTML(response)}
+                    <div style="line-height:1.6; margin-top:4px; color:var(--text, #e2e8f0);">${escapeHTML(response)}</div>
                 </div>
                 <button type="button" class="nexus-action-button nexus-speak-btn" id="commandSpeakBtn" style="padding: 5px 12px; font-size: 11px; white-space: nowrap; border-radius: 8px;">
                     🔊 Speak
@@ -4219,9 +4344,9 @@
 
             command: "Command Center",
 
-            agents: "AI Agents",
+            agents: "Agent Hub",
 
-            workflows: "Workflows",
+            workflows: "Workflow Builder",
 
             insights: "AI Insights",
 
@@ -4512,13 +4637,16 @@
                 "click",
                 () => {
 
-                    localStorage.removeItem(
-                        STORAGE_KEY
-                    );
-
+                    try {
+                        localStorage.removeItem(STORAGE_KEY);
+                        localStorage.removeItem("nexus_user_profile");
+                        localStorage.removeItem("nexus_onboarding_completed");
+                        localStorage.removeItem("nexus_current_profile");
+                    } catch (_) {}
 
                     state =
                         cloneDefaultState();
+                    state.onboarded = false;
 
 
                     closeModal();

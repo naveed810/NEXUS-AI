@@ -6,6 +6,38 @@
 
 "use strict";
 
+function syncNexusProfile() {
+    try {
+        let name = "NEXUS User";
+        let email = "user@example.com";
+        const profRaw = localStorage.getItem("nexus_user_profile");
+        if (profRaw) {
+            const prof = JSON.parse(profRaw);
+            if (prof?.name) name = prof.name;
+            if (prof?.email) email = prof.email;
+        } else {
+            const raw = localStorage.getItem("nexus_ai_command_center_v4");
+            if (raw) {
+                const st = JSON.parse(raw);
+                if (st?.user?.name) name = st.user.name;
+                if (st?.user?.email) email = st.user.email;
+            }
+        }
+        const avatar = name.trim().charAt(0).toUpperCase() || "N";
+        document.getElementById("profileName")?.replaceChildren(document.createTextNode(name));
+        document.getElementById("profileEmail")?.replaceChildren(document.createTextNode(email));
+        document.getElementById("profileAvatar")?.replaceChildren(document.createTextNode(avatar));
+    } catch (_) {}
+}
+
+if (typeof document !== "undefined") {
+    if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", syncNexusProfile);
+    } else {
+        syncNexusProfile();
+    }
+}
+
 
 /* =========================================================
    BACKEND / GEMINI CONNECTION
@@ -1113,14 +1145,21 @@ function bindEvents() {
 
     $("#mobileMenuButton")?.addEventListener(
         "click",
-        () => {
-
+        (e) => {
+            e.stopPropagation();
             $("#sidebar")?.classList.toggle(
                 "mobile-open"
             );
-
         }
     );
+
+    document.addEventListener("click", (e) => {
+        const sidebar = $("#sidebar");
+        const btn = $("#mobileMenuButton");
+        if (sidebar?.classList.contains("mobile-open") && !sidebar.contains(e.target) && !btn?.contains(e.target)) {
+            sidebar.classList.remove("mobile-open");
+        }
+    });
 
 
     /* -----------------------------------------------------
@@ -4887,7 +4926,16 @@ function handleNavigation(
             "../workflow-builder/index.html",
 
         insights:
-            "../ai-insights/index.html"
+            "../ai-insights/index.html",
+
+        tasks:
+            "../command-center/index.html#command",
+
+        activity:
+            "../command-center/index.html#activity",
+
+        settings:
+            "../command-center/index.html#settings"
 
     };
 

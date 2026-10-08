@@ -111,10 +111,21 @@
   const $ = (id) => document.getElementById(id);
   function syncNexusProfile() {
     try {
-      const raw = localStorage.getItem("nexus_ai_command_center_v4");
-      const state = raw ? JSON.parse(raw) : {};
-      const name = state?.user?.name || "NEXUS User";
-      const email = state?.user?.email || "user@example.com";
+      let name = "NEXUS User";
+      let email = "user@example.com";
+      const profRaw = localStorage.getItem("nexus_user_profile");
+      if (profRaw) {
+        const prof = JSON.parse(profRaw);
+        if (prof?.name) name = prof.name;
+        if (prof?.email) email = prof.email;
+      } else {
+        const raw = localStorage.getItem("nexus_ai_command_center_v4");
+        if (raw) {
+          const st = JSON.parse(raw);
+          if (st?.user?.name) name = st.user.name;
+          if (st?.user?.email) email = st.user.email;
+        }
+      }
       const avatar = name.trim().charAt(0).toUpperCase() || "N";
       $("profileName")?.replaceChildren(document.createTextNode(name));
       $("profileEmail")?.replaceChildren(document.createTextNode(email));
@@ -1806,18 +1817,18 @@
       window.location.href = "../command-center/index.html#profile";
     });
 
-    $("menuBtn")
-      .addEventListener(
-        "click",
-        () => {
+    $("menuBtn")?.addEventListener("click", (e) => {
+      e.stopPropagation();
+      $("sidebar")?.classList.toggle("open");
+    });
 
-          $("sidebar")
-            .classList.toggle(
-              "open"
-            );
-
-        }
-      );
+    document.addEventListener("click", (e) => {
+      const sidebar = $("sidebar");
+      const btn = $("menuBtn");
+      if (sidebar?.classList.contains("open") && !sidebar.contains(e.target) && !btn?.contains(e.target)) {
+        sidebar.classList.remove("open");
+      }
+    });
 
 
     document
@@ -1829,13 +1840,11 @@
 
           item.addEventListener(
             "click",
-            () => {
-
-              $("sidebar")
-                .classList.remove(
-                  "open"
-                );
-
+            (e) => {
+              $("sidebar")?.classList.remove("open");
+              if (item.classList.contains("active") || item.getAttribute("href") === "index.html") {
+                e.preventDefault();
+              }
             }
           );
 
@@ -1848,6 +1857,17 @@
   loadTheme();
 
   bindEvents();
+
+  /* Initialize 3D Quantum Telemetry Core */
+  if (window.initNexus3DWidget) {
+    const container = document.getElementById("insights3DCore");
+    if (container) {
+      window.insights3DCore = window.initNexus3DWidget(container, {
+        theme: "analysis",
+        showHud: true
+      });
+    }
+  }
 
   renderAll();
 

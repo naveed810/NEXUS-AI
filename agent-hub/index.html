@@ -42,6 +42,15 @@
                 <strong>NEXUS</strong>
                 <span>AI WORKSPACE</span>
             </div>
+
+            <button
+                class="sidebar-dock-toggle"
+                id="dockCollapseBtn"
+                type="button"
+                title="Collapse Sidebar"
+                style="margin-left:auto; background:rgba(255,255,255,0.06); border:1px solid rgba(0,240,255,0.3); border-radius:8px; color:var(--holo-cyan); cursor:pointer; font-size:12px; padding:4px 8px; line-height:1;">
+                ◀
+            </button>
         </div>
 
         <div class="workspace-mini">
@@ -156,6 +165,10 @@
                     aria-label="Open navigation"
                 >
                     ☰
+                </button>
+
+                <button class="btn btn-secondary sidebar-toggle-btn" id="toggleSidebarBtn" type="button" title="Open / Close Sidebar">
+                    <span class="toggle-icon">◀</span> <span class="toggle-text">Sidebar</span>
                 </button>
 
                 <div class="page-heading">
@@ -887,6 +900,10 @@
 ========================== -->
 <div class="toast-container" id="toastContainer"></div>
 
+
+<button class="floating-sidebar-toggle" id="floatingToggleBtn" type="button" title="Open Sidebar">
+    ▶ Open Sidebar
+</button>
 
 <script src="../shared/vendor/three.min.js"></script>
 <script src="../shared/nexus-3d-core.js"></script>

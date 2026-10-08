@@ -753,10 +753,19 @@ body {
         var(--shadow);
 
     user-select: none;
+    touch-action: none;
+    cursor: grab;
 
     transition:
         border-color .16s ease,
         box-shadow .16s ease;
+}
+
+.workflow-node.dragging {
+    cursor: grabbing !important;
+    z-index: 100 !important;
+    box-shadow: 0 0 30px rgba(0, 240, 255, 0.4), var(--shadow) !important;
+    opacity: 0.95;
 }
 
 

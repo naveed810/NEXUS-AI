@@ -267,9 +267,12 @@
                     </div>
 
                     <button
-                        class="icon-button mobile-only"
-                        id="closeSidebar">
-                        ×
+                        class="sidebar-dock-toggle"
+                        id="dockCollapseBtn"
+                        type="button"
+                        title="Collapse Sidebar"
+                        style="background:rgba(255,255,255,0.06); border:1px solid rgba(0,240,255,0.3); border-radius:8px; color:var(--holo-cyan); cursor:pointer; font-size:12px; padding:4px 8px; line-height:1;">
+                        ◀
                     </button>
 
                 </div>
@@ -342,8 +345,8 @@
                         class="nav-item active"
                         data-page="command">
 
-                        <span>⌂</span>
-                        Command Center
+                        <span class="nav-icon">⌂</span>
+                        <span>Command Center</span>
 
                     </button>
 
@@ -352,11 +355,11 @@
                         class="nav-item"
                         data-page="agents">
 
-                        <span>✦</span>
-                        AI Agents
+                        <span class="nav-icon">✦</span>
+                        <span>Agent Hub</span>
 
                         <em id="agentBadge">
-                            0
+                            3
                         </em>
 
                     </button>
@@ -366,8 +369,8 @@
                         class="nav-item"
                         data-page="workflows">
 
-                        <span>⌘</span>
-                        Workflows
+                        <span class="nav-icon">◇</span>
+                        <span>Workflow Builder</span>
 
                     </button>
 
@@ -376,8 +379,8 @@
                         class="nav-item"
                         data-page="insights">
 
-                        <span>◇</span>
-                        AI Insights
+                        <span class="nav-icon">◌</span>
+                        <span>AI Insights</span>
 
                     </button>
 
@@ -505,6 +508,9 @@
 
 
                     <div class="topbar-actions">
+                        <button class="btn btn-secondary sidebar-toggle-btn" id="toggleSidebarBtn" type="button" title="Open / Close Sidebar">
+                            <span class="toggle-icon">◀</span> <span class="toggle-text">Sidebar</span>
+                        </button>
 
                         <button
                             class="icon-button mobile-only"
@@ -595,9 +601,12 @@
 
                             <div>
 
-                                <div class="eyebrow">
-                                    <i class="status-dot"></i>
-                                    NEXUS AI WORKSPACE
+                                <div class="eyebrow" style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+                                    <span><i class="status-dot"></i> NEXUS AI WORKSPACE</span>
+                                    <span class="nexus-telemetry-badge" style="display: inline-flex; align-items: center; gap: 6px; padding: 2px 10px; background: rgba(0, 240, 255, 0.08); border: 1px solid rgba(0, 240, 255, 0.3); border-radius: 20px; font-size: 10px; font-weight: 600; color: var(--holo-cyan, #00f0ff); letter-spacing: 0.05em; text-transform: uppercase;">
+                                        <span style="display:inline-block; width:6px; height:6px; border-radius:50%; background:#10b981; box-shadow:0 0 8px #10b981;"></span>
+                                        FASTAPI 8000 LIVE <span style="opacity:0.35;">|</span> GEMINI 3.5 SYNCED
+                                    </span>
                                 </div>
 
                                 <h1>
@@ -1645,6 +1654,29 @@
                             </div>
 
 
+                            <div class="setting-row">
+
+                                <div>
+                                    <b>
+                                        Cinematic AI Boot
+                                    </b>
+
+                                    <small>
+                                        Replay the 3D holographic neural boot experience.
+                                    </small>
+                                </div>
+
+                                <button
+                                    class="secondary-button"
+                                    id="replayBootBtn"
+                                    type="button"
+                                    onclick="window.replayNexusBoot && window.replayNexusBoot()">
+                                    ✦ Replay Boot
+                                </button>
+
+                            </div>
+
+
                             <div class="setting-row danger">
 
                                 <div>
@@ -1766,8 +1798,13 @@
     </div>
 
 
+    <button class="floating-sidebar-toggle" id="floatingToggleBtn" type="button" title="Open Sidebar">
+        ▶ Open Sidebar
+    </button>
+
     <script src="../shared/vendor/three.min.js"></script>
     <script src="../shared/nexus-3d-core.js"></script>
+    <script src="../shared/nexus-boot.js"></script>
     <script src="script.js"></script>
 
 </body>

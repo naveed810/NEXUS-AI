@@ -234,7 +234,16 @@ def calculate_duration(start_time):
 # ============================================================
 
 def generate_gemini_content(prompt):
-    models_to_try = ["gemini-3.8-flash", "gemini-flash-latest", "gemini-2.5-flash-lite", "gemini-flash-lite-latest"]
+    models_to_try = [
+        "gemini-3.5-flash",
+        "gemini-3.5-flash-lite",
+        "gemini-3.8-flash",
+        "gemini-3.7-flash",
+        "gemini-flash-latest",
+        "gemini-flash-lite-latest",
+        "gemini-2.5-flash",
+        "gemini-2.5-flash-lite"
+    ]
     last_err = None
     for m in models_to_try:
         try:
@@ -373,6 +382,71 @@ def health():
         "database_connected": DATABASE_PATH.exists(),
         "timestamp": current_timestamp()
     }
+
+
+# ============================================================
+# CONVERSATIONAL AI CHAT & 3D HOLOGRAM ASSISTANT (Real AI Agent)
+# ============================================================
+
+@app.post("/api/chat")
+@app.post("/api/hologram/ask")
+def chat_endpoint(payload: dict):
+    prompt = str(
+        payload.get("prompt") or
+        payload.get("message") or
+        payload.get("goal") or
+        payload.get("question") or
+        ""
+    ).strip()
+
+    if not prompt:
+        return {
+            "success": False,
+            "response": "Please provide a question or instruction.",
+            "message": "Empty prompt."
+        }
+
+    if gemini_client is None:
+        return {
+            "success": False,
+            "response": "Gemini AI is currently not initialized. Check GEMINI_API_KEY in backend/.env.",
+            "message": "Gemini offline."
+        }
+
+    system_instruction = (
+        "You are NEXUS AI, an advanced conversational AI assistant and holographic command center AI "
+        "(operating with the intelligence, nuance, and capabilities of ChatGPT and Gemini). "
+        "Answer the user's question directly, accurately, helpfully, and conversationally. "
+        "Always provide a real, tailored answer to whatever the user asks. "
+        "If asked for code, write clean, practical code. "
+        "If asked for explanations, explain clearly with intuition. "
+        "If asked a greeting, greet warmly. "
+        "If asked for analysis or problem solving, think step-by-step. "
+        "Keep the tone professional, futuristic, and friendly. "
+        "Never repeat or echo the prompt back to the user."
+    )
+
+    full_prompt = f"{system_instruction}\n\nUSER QUESTION:\n{prompt}\n\nAI RESPONSE:"
+
+    try:
+        answer = generate_gemini_content(full_prompt)
+        return {
+            "success": True,
+            "response": answer,
+            "message": answer,
+            "prompt": prompt,
+            "model": "gemini",
+            "timestamp": current_timestamp()
+        }
+    except Exception as error:
+        print(f"[NEXUS Chat Error] {error}")
+        return {
+            "success": False,
+            "error": str(error),
+            "response": f"Neural core encountered an issue: {str(error)}",
+            "message": str(error)
+        }
+
 
 
 # ============================================================
