@@ -20,6 +20,7 @@
     >
 
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="../shared/nexus-3d-core.css">
 </head>
 
 <body>
@@ -41,6 +42,15 @@
                 <strong>NEXUS</strong>
                 <span>AI WORKSPACE</span>
             </div>
+
+            <button
+                class="sidebar-dock-toggle"
+                id="dockCollapseBtn"
+                type="button"
+                title="Collapse Sidebar"
+                style="margin-left:auto; background:rgba(255,255,255,0.06); border:1px solid rgba(0,240,255,0.3); border-radius:8px; color:var(--holo-cyan); cursor:pointer; font-size:12px; padding:4px 8px; line-height:1;">
+                ◀
+            </button>
         </div>
 
         <div class="workspace-mini">
@@ -157,6 +167,10 @@
                     ☰
                 </button>
 
+                <button class="btn btn-secondary sidebar-toggle-btn" id="toggleSidebarBtn" type="button" title="Open / Close Sidebar">
+                    <span class="toggle-icon">◀</span> <span class="toggle-text">Sidebar</span>
+                </button>
+
                 <div class="page-heading">
                     <div class="breadcrumb">
                         NEXUS AI <span>/</span> Agent Hub
@@ -263,36 +277,25 @@
                             Run Selected
                         </button>
 
+                        <button
+                            class="secondary-button"
+                            id="heroHoloChamberBtn"
+                            type="button"
+                            onclick="window.openNexusHoloChamber && window.openNexusHoloChamber('default')"
+                        >
+                            <span>✦</span>
+                            3D Hologram Chamber
+                        </button>
+
                     </div>
 
                 </div>
 
-                <div class="hero-visual">
-
-                    <div class="orbital-ring ring-one"></div>
-                    <div class="orbital-ring ring-two"></div>
-
-                    <div class="agent-orb">
-                        <div class="orb-glow"></div>
-                        <strong>AI</strong>
-                        <span>AGENT CORE</span>
+                <div class="hero-visual" id="hero3DVisual">
+                    <div class="nexus-3d-wrapper" id="agentHub3DCore">
+                        <div class="nexus-3d-scanlines"></div>
+                        <div class="nexus-3d-vignette"></div>
                     </div>
-
-                    <div class="floating-node node-one">
-                        <span>R</span>
-                        Research
-                    </div>
-
-                    <div class="floating-node node-two">
-                        <span>D</span>
-                        Data
-                    </div>
-
-                    <div class="floating-node node-three">
-                        <span>T</span>
-                        Tasks
-                    </div>
-
                 </div>
 
             </section>
@@ -898,6 +901,12 @@
 <div class="toast-container" id="toastContainer"></div>
 
 
+<button class="floating-sidebar-toggle" id="floatingToggleBtn" type="button" title="Open Sidebar">
+    ▶ Open Sidebar
+</button>
+
+<script src="../shared/vendor/three.min.js"></script>
+<script src="../shared/nexus-3d-core.js"></script>
 <script src="script.js"></script>
 
 </body>

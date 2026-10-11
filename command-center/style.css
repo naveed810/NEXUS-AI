@@ -3995,3 +3995,40 @@ body.light .topbar {
     }
 
 }
+
+/* =========================================================
+   3D QUANTUM NEURAL CORE INTEGRATION
+========================================================= */
+
+@media (max-width: 960px) {
+    .ai-command-container {
+        grid-template-columns: 1fr !important;
+    }
+    #command3DCore {
+        height: 220px !important;
+    }
+}
+
+.nexus-action-button.nexus-speak-btn {
+    appearance: none;
+    background: rgba(0, 240, 255, 0.12);
+    border: 1px solid rgba(70, 223, 255, 0.4);
+    color: #46dfff;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+.nexus-action-button.nexus-speak-btn:hover {
+    background: rgba(0, 240, 255, 0.22);
+    box-shadow: 0 0 14px rgba(0, 240, 255, 0.35);
+    color: #ffffff;
+}
+
+.nexus-action-button.nexus-speak-btn.speaking {
+    background: rgba(16, 185, 129, 0.2);
+    border-color: #10b981;
+    color: #34d399;
+    box-shadow: 0 0 16px rgba(16, 185, 129, 0.45);
+    animation: nexusHoloFastPulse 0.8s infinite ease-in-out;
+}

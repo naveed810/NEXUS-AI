@@ -719,9 +719,12 @@ body.light-mode .hub-hero {
 
 .hero-visual {
     position: relative;
-    width: 320px;
-    height: 210px;
-    flex: 0 0 320px;
+    width: 360px;
+    height: 235px;
+    flex: 0 0 360px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .agent-orb {
@@ -2189,7 +2192,10 @@ body.light-mode .hub-hero {
     }
 
     .hero-visual {
-        display: none;
+        width: 100%;
+        height: 220px;
+        flex: none;
+        margin-top: 18px;
     }
 
     .hero-copy h2 {
@@ -2312,4 +2318,982 @@ textarea:focus-visible,
 select:focus-visible {
     outline: 2px solid rgba(70, 223, 255, 0.55);
     outline-offset: 2px;
+}
+/* =========================================================
+   NEXUS AI — PREMIUM RESPONSE UI
+   Added for Gemini AI Response Renderer
+========================================================= */
+
+
+/* =========================================================
+   EXECUTION MONITOR
+========================================================= */
+
+.execution-active {
+    width: 100%;
+}
+
+
+.execution-agent-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 24px;
+}
+
+
+.execution-agent-avatar {
+    width: 46px;
+    height: 46px;
+
+    display: grid;
+    place-items: center;
+
+    border-radius: 13px;
+
+    color: #ffffff;
+
+    font-size: 13px;
+    font-weight: 800;
+
+    background:
+        linear-gradient(
+            135deg,
+            #35d6ff,
+            #6c7cff
+        );
+
+    box-shadow:
+        0 8px 25px
+        rgba(53, 214, 255, 0.18);
+}
+
+
+.execution-agent-header h3 {
+    margin: 0;
+
+    color: #ffffff;
+
+    font-size: 15px;
+    font-weight: 700;
+}
+
+
+.execution-agent-header p {
+    margin: 4px 0 0;
+
+    color: #7e8aa8;
+
+    font-size: 10px;
+}
+
+
+/* =========================================================
+   EXECUTION PROGRESS
+========================================================= */
+
+.execution-progress {
+    margin-bottom: 22px;
+}
+
+
+.execution-progress-header {
+    display: flex;
+
+    justify-content: space-between;
+    align-items: center;
+
+    margin-bottom: 8px;
+
+    color: #8190ad;
+
+    font-size: 10px;
+}
+
+
+.execution-progress-header strong {
+    color: #73e5ff;
+
+    font-size: 11px;
+}
+
+
+.big-progress {
+    width: 100%;
+    height: 7px;
+
+    overflow: hidden;
+
+    border-radius: 99px;
+
+    background: #171d2c;
+}
+
+
+.big-progress span {
+    display: block;
+
+    height: 100%;
+
+    border-radius: inherit;
+
+    background:
+        linear-gradient(
+            90deg,
+            #35d6ff,
+            #667cff,
+            #a06cff
+        );
+
+    box-shadow:
+        0 0 16px
+        rgba(74, 214, 255, 0.28);
+
+    transition:
+        width 0.45s ease;
+}
+
+
+/* =========================================================
+   PREMIUM AI RESPONSE CARD
+========================================================= */
+
+.nexus-ai-response-card {
+
+    margin-top: 24px;
+
+    overflow: hidden;
+
+    border: 1px solid
+        rgba(114, 229, 255, 0.15);
+
+    border-radius: 18px;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(20, 28, 48, 0.98),
+            rgba(11, 17, 31, 0.98)
+        );
+
+    box-shadow:
+        0 20px 60px
+        rgba(0, 0, 0, 0.24),
+
+        inset 0 1px 0
+        rgba(255, 255, 255, 0.035);
+}
+
+
+/* =========================================================
+   RESPONSE HEADER
+========================================================= */
+
+.nexus-response-header {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 15px;
+
+    padding: 18px 20px;
+
+    border-bottom: 1px solid
+        rgba(255, 255, 255, 0.055);
+
+    background:
+        rgba(255, 255, 255, 0.018);
+}
+
+
+.nexus-response-brand {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+}
+
+
+.nexus-ai-orb {
+
+    width: 38px;
+    height: 38px;
+
+    display: grid;
+
+    place-items: center;
+
+    border-radius: 12px;
+
+    color: #ffffff;
+
+    font-size: 18px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #35d6ff,
+            #7a70ff
+        );
+
+    box-shadow:
+        0 0 25px
+        rgba(77, 185, 255, 0.25);
+}
+
+
+.nexus-response-eyebrow {
+
+    display: block;
+
+    margin-bottom: 2px;
+
+    color: #5ee5ff;
+
+    font-size: 8px;
+
+    font-weight: 800;
+
+    letter-spacing: 1.5px;
+}
+
+
+.nexus-response-brand h3 {
+
+    margin: 0;
+
+    color: #ffffff;
+
+    font-size: 14px;
+
+    font-weight: 750;
+}
+
+
+.nexus-response-status {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 6px;
+
+    padding: 6px 10px;
+
+    border: 1px solid
+        rgba(74, 222, 128, 0.14);
+
+    border-radius: 999px;
+
+    color: #73e49a;
+
+    background:
+        rgba(74, 222, 128, 0.055);
+
+    font-size: 9px;
+
+    font-weight: 700;
+}
+
+
+.nexus-live-dot {
+
+    width: 6px;
+    height: 6px;
+
+    border-radius: 50%;
+
+    background: #4ade80;
+
+    box-shadow:
+        0 0 9px
+        rgba(74, 222, 128, 0.7);
+
+    animation:
+        nexusPulse 1.8s infinite;
+}
+
+
+@keyframes nexusPulse {
+
+    0%,
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    50% {
+        opacity: 0.45;
+        transform: scale(0.75);
+    }
+
+}
+
+
+/* =========================================================
+   TASK PROMPT
+========================================================= */
+
+.nexus-response-prompt {
+
+    margin: 16px 20px 0;
+
+    padding: 12px 14px;
+
+    border-left: 2px solid #53dcff;
+
+    border-radius: 0 10px 10px 0;
+
+    background:
+        rgba(83, 220, 255, 0.035);
+}
+
+
+.nexus-response-prompt span {
+
+    display: block;
+
+    margin-bottom: 5px;
+
+    color: #64728f;
+
+    font-size: 8px;
+
+    font-weight: 800;
+
+    letter-spacing: 1.3px;
+}
+
+
+.nexus-response-prompt p {
+
+    margin: 0;
+
+    color: #b9c5dc;
+
+    font-size: 11px;
+
+    line-height: 1.6;
+}
+
+
+/* =========================================================
+   AI RESPONSE BODY
+========================================================= */
+
+.nexus-response-body {
+
+    padding: 22px 20px;
+
+    color: #c8d2e5;
+
+    font-size: 12px;
+
+    line-height: 1.75;
+
+    overflow-wrap: anywhere;
+}
+
+
+.markdown-body p {
+
+    margin: 0 0 15px;
+}
+
+
+.markdown-body p:last-child {
+
+    margin-bottom: 0;
+}
+
+
+.markdown-body h2 {
+
+    margin:
+        5px 0 13px;
+
+    color: #ffffff;
+
+    font-size: 18px;
+
+    line-height: 1.3;
+}
+
+
+.markdown-body h3 {
+
+    margin:
+        22px 0 10px;
+
+    color: #ffffff;
+
+    font-size: 15px;
+
+    line-height: 1.35;
+}
+
+
+.markdown-body h4 {
+
+    margin:
+        18px 0 8px;
+
+    color: #73e5ff;
+
+    font-size: 12px;
+
+    font-weight: 750;
+
+    text-transform: none;
+}
+
+
+.markdown-body strong {
+
+    color: #ffffff;
+
+    font-weight: 750;
+}
+
+
+.markdown-body em {
+
+    color: #b7c4ff;
+
+}
+
+
+.markdown-body ul,
+.markdown-body ol {
+
+    margin:
+        8px 0 16px;
+
+    padding-left: 21px;
+}
+
+
+.markdown-body li {
+
+    margin-bottom: 7px;
+
+    padding-left: 3px;
+}
+
+
+.markdown-body li::marker {
+
+    color: #5ddfff;
+
+}
+
+
+.markdown-body a {
+
+    color: #69dcff;
+
+    text-decoration: none;
+
+    border-bottom:
+        1px solid
+        rgba(105, 220, 255, 0.3);
+}
+
+
+.markdown-body a:hover {
+
+    color: #ffffff;
+
+    border-bottom-color:
+        #ffffff;
+}
+
+
+.markdown-body blockquote {
+
+    margin:
+        16px 0;
+
+    padding:
+        12px 15px;
+
+    border-left:
+        3px solid #777cff;
+
+    border-radius:
+        0 10px 10px 0;
+
+    color: #aeb9d0;
+
+    background:
+        rgba(119, 124, 255, 0.055);
+
+    font-style: italic;
+}
+
+
+.markdown-body hr {
+
+    height: 1px;
+
+    margin:
+        20px 0;
+
+    border: 0;
+
+    background:
+        rgba(255, 255, 255, 0.08);
+}
+
+
+/* =========================================================
+   CODE
+========================================================= */
+
+.nexus-inline-code {
+
+    display: inline-block;
+
+    padding:
+        2px 6px;
+
+    border:
+        1px solid
+        rgba(114, 229, 255, 0.12);
+
+    border-radius: 5px;
+
+    color: #79e6ff;
+
+    background:
+        rgba(114, 229, 255, 0.06);
+
+    font-family:
+        "SFMono-Regular",
+        Consolas,
+        monospace;
+
+    font-size: 10px;
+}
+
+
+.nexus-code-block {
+
+    margin:
+        15px 0;
+
+    padding:
+        15px;
+
+    overflow-x: auto;
+
+    border:
+        1px solid
+        rgba(114, 229, 255, 0.11);
+
+    border-radius: 10px;
+
+    background:
+        #080d17;
+
+    box-shadow:
+        inset 0 1px 0
+        rgba(255, 255, 255, 0.025);
+}
+
+
+.nexus-code-block code {
+
+    color: #b8c8e4;
+
+    font-family:
+        "SFMono-Regular",
+        Consolas,
+        "Liberation Mono",
+        monospace;
+
+    font-size: 10px;
+
+    line-height: 1.65;
+
+    white-space: pre;
+}
+
+
+/* =========================================================
+   RESPONSE FOOTER
+========================================================= */
+
+.nexus-response-footer {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 15px;
+
+    padding:
+        13px 20px;
+
+    border-top:
+        1px solid
+        rgba(255, 255, 255, 0.05);
+
+    background:
+        rgba(255, 255, 255, 0.015);
+}
+
+
+.nexus-response-metrics {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+    color: #697894;
+
+    font-size: 9px;
+}
+
+
+.nexus-response-metrics span {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 5px;
+}
+
+
+.nexus-response-metrics span:not(:last-child)::after {
+
+    content: "•";
+
+    margin-left: 5px;
+
+    color: #39445a;
+}
+
+
+.nexus-response-actions {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 6px;
+}
+
+
+.nexus-action-button {
+
+    padding:
+        7px 10px;
+
+    border:
+        1px solid
+        rgba(255, 255, 255, 0.08);
+
+    border-radius: 7px;
+
+    color: #9eabc2;
+
+    background:
+        rgba(255, 255, 255, 0.025);
+
+    font-family: inherit;
+
+    font-size: 9px;
+
+    font-weight: 650;
+
+    cursor: pointer;
+
+    transition:
+        0.2s ease;
+}
+
+
+.nexus-action-button:hover {
+
+    color: #ffffff;
+
+    border-color:
+        rgba(114, 229, 255, 0.25);
+
+    background:
+        rgba(114, 229, 255, 0.07);
+
+    transform:
+        translateY(-1px);
+}
+
+
+/* =========================================================
+   EXECUTION STATS
+========================================================= */
+
+.execution-stats {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, 1fr);
+
+    gap: 10px;
+
+    margin-top: 18px;
+}
+
+
+.execution-stat {
+
+    padding:
+        13px;
+
+    border:
+        1px solid
+        rgba(255, 255, 255, 0.045);
+
+    border-radius: 11px;
+
+    background:
+        rgba(255, 255, 255, 0.025);
+}
+
+
+.execution-stat span {
+
+    display: block;
+
+    margin-bottom: 6px;
+
+    color: #66748f;
+
+    font-size: 8px;
+}
+
+
+.execution-stat strong {
+
+    color: #dce5f5;
+
+    font-size: 13px;
+}
+
+
+/* =========================================================
+   EXECUTION CONTROLS
+========================================================= */
+
+.execution-controls {
+
+    display: flex;
+
+    gap: 8px;
+
+    margin-top: 15px;
+}
+
+
+.execution-controls button {
+
+    min-height: 36px;
+
+    border-radius: 9px;
+
+    font-family: inherit;
+
+    font-size: 10px;
+
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition:
+        0.2s ease;
+}
+
+
+.primary-button {
+
+    padding:
+        0 18px;
+
+    border: 0;
+
+    color: #ffffff;
+
+    background:
+        linear-gradient(
+            135deg,
+            #37d8ff,
+            #7d70ff
+        );
+
+    box-shadow:
+        0 7px 20px
+        rgba(76, 134, 255, 0.18);
+}
+
+
+.primary-button:hover {
+
+    transform:
+        translateY(-1px);
+
+    box-shadow:
+        0 10px 25px
+        rgba(76, 134, 255, 0.28);
+}
+
+
+.secondary-button {
+
+    padding:
+        0 15px;
+
+    border:
+        1px solid
+        rgba(255, 255, 255, 0.08);
+
+    color: #9ba8c0;
+
+    background:
+        rgba(255, 255, 255, 0.025);
+}
+
+
+.secondary-button:hover {
+
+    color: #ffffff;
+
+    border-color:
+        rgba(114, 229, 255, 0.2);
+
+    background:
+        rgba(114, 229, 255, 0.06);
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 900px) {
+
+    .nexus-response-footer {
+
+        align-items: flex-start;
+
+        flex-direction: column;
+
+    }
+
+
+    .nexus-response-actions {
+
+        width: 100%;
+    }
+
+
+    .nexus-action-button {
+
+        flex: 1;
+
+    }
+
+}
+
+
+@media (max-width: 600px) {
+
+    .execution-stats {
+
+        grid-template-columns:
+            1fr;
+
+    }
+
+
+    .execution-controls {
+
+        flex-wrap: wrap;
+
+    }
+
+
+    .execution-controls button {
+
+        flex: 1;
+
+    }
+
+
+    .nexus-response-header {
+
+        align-items: flex-start;
+
+        flex-direction: column;
+
+    }
+
+
+    .nexus-response-body {
+
+        padding:
+            18px 15px;
+
+    }
+
+
+    .nexus-response-footer {
+
+        padding:
+            12px 15px;
+
+    }
+
+
+    .nexus-response-actions {
+
+        flex-wrap: wrap;
+
+    }
+
+}
+
+/* =========================================================
+   3D VOICE / AUDIO ACTION BUTTON
+========================================================= */
+
+.nexus-action-button.nexus-speak-btn {
+    background: rgba(0, 240, 255, 0.12);
+    border-color: rgba(70, 223, 255, 0.4);
+    color: #46dfff;
+    font-weight: 600;
+}
+
+.nexus-action-button.nexus-speak-btn:hover {
+    background: rgba(0, 240, 255, 0.22);
+    box-shadow: 0 0 14px rgba(0, 240, 255, 0.35);
+    color: #ffffff;
+}
+
+.nexus-action-button.nexus-speak-btn.speaking {
+    background: rgba(16, 185, 129, 0.2);
+    border-color: #10b981;
+    color: #34d399;
+    box-shadow: 0 0 16px rgba(16, 185, 129, 0.45);
+    animation: nexusHoloFastPulse 0.8s infinite ease-in-out;
 }

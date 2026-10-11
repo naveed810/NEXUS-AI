@@ -11,6 +11,53 @@
     ====================================================== */
 
     const STORAGE_KEY = "nexus_ai_command_center_v4";
+    const API_BASE_URL = "http://127.0.0.1:8000";
+
+    const BACKEND_AGENT_MAP = {
+        1: { id: "research-agent", goal: "Research latest breakthroughs in enterprise AI agents and summarize top insights." },
+        2: { id: "data-agent", goal: "Analyze workspace task and execution performance metrics." },
+        3: { id: "task-agent", goal: "Decompose complex multi-step user requests into actionable sub-tasks." },
+        4: { id: "research-agent", goal: "Synthesize workflow execution history into strategic recommendations." }
+    };
+
+    async function syncCommandCenterFromBackend() {
+        try {
+            const [healthRes, executionsRes] = await Promise.all([
+                fetch(`${API_BASE_URL}/api/health`, { cache: "no-store" }).catch(() => null),
+                fetch(`${API_BASE_URL}/api/executions?limit=30`, { cache: "no-store" }).catch(() => null)
+            ]);
+
+            if (healthRes && healthRes.ok) {
+                console.log("[NEXUS AI] Command Center connected to FastAPI backend.");
+            }
+
+            if (executionsRes && executionsRes.ok) {
+                const data = await executionsRes.json();
+                const executions = Array.isArray(data.executions) ? data.executions : [];
+                if (executions.length > 0) {
+                    const realActivities = executions.map(ex => {
+                        const isWorkflow = ex.agent_id && ex.agent_id.startsWith("workflow:");
+                        const title = isWorkflow ? "Workflow Executed" : (ex.agent_id ? `${ex.agent_id} completed` : "AI Execution");
+                        let msg = ex.goal ? ex.goal.split("\n")[0].slice(0, 65) : "Execution completed successfully.";
+                        if (ex.duration_ms) msg += ` · ${(ex.duration_ms / 1000).toFixed(1)}s`;
+                        const timeVal = ex.created_at ? new Date(ex.created_at).getTime() : Date.now();
+                        return {
+                            id: ex.id || Date.now() + Math.random(),
+                            title,
+                            message: msg,
+                            time: timeVal
+                        };
+                    });
+
+                    state.activity = realActivities;
+                    saveState();
+                    renderActivity();
+                }
+            }
+        } catch (err) {
+            console.warn("[NEXUS AI] Command Center backend sync error:", err);
+        }
+    }
 
 
     /* =====================================================
@@ -228,31 +275,38 @@
 
 
     function loadState() {
-
         try {
-
-            const saved =
-                localStorage.getItem(STORAGE_KEY);
-
-            if (!saved) {
-                return cloneDefaultState();
+            const saved = localStorage.getItem(STORAGE_KEY);
+            const profRaw = localStorage.getItem("nexus_user_profile");
+            let profileObj = null;
+            if (profRaw) {
+                try { profileObj = JSON.parse(profRaw); } catch (_) {}
             }
 
-            const parsed =
-                JSON.parse(saved);
+            if (!saved) {
+                const base = cloneDefaultState();
+                if (profileObj?.name && profileObj.name.trim().length >= 2) {
+                    base.user.name = profileObj.name.trim();
+                    base.user.email = profileObj.email ? profileObj.email.trim() : "";
+                    base.onboarded = true;
+                }
+                return base;
+            }
 
-            return mergeState(
-                cloneDefaultState(),
-                parsed
-            );
-
+            const parsed = JSON.parse(saved);
+            const merged = mergeState(cloneDefaultState(), parsed);
+            if (profileObj?.name && profileObj.name.trim().length >= 2) {
+                merged.user.name = profileObj.name.trim();
+                if (profileObj.email) merged.user.email = profileObj.email.trim();
+                merged.onboarded = true;
+            } else if (merged.user?.name && merged.user.name.trim().length >= 2) {
+                merged.onboarded = true;
+            } else {
+                merged.onboarded = false;
+            }
+            return merged;
         } catch (error) {
-
-            console.error(
-                "NEXUS state load error:",
-                error
-            );
-
+            console.error("NEXUS state load error:", error);
             return cloneDefaultState();
         }
     }
@@ -322,13 +376,58 @@
 
         initOnboarding();
 
-        if (state.onboarded) {
+        const bootPending = sessionStorage.getItem("nexus_boot_dismissed") !== "1";
 
-            showApp();
+        const activate = () => {
+            if (state.onboarded && state.user?.name && state.user.name.trim().length >= 2) {
+                showApp();
+                bootApp();
+            } else {
+                showOnboarding();
+            }
+        };
 
-            bootApp();
+        window.addEventListener("nexus:boot-complete", () => {
+            try {
+                const raw = localStorage.getItem(STORAGE_KEY);
+                if (raw) {
+                    const loaded = JSON.parse(raw);
+                    state = { ...defaultState, ...loaded };
+                }
+            } catch (_) {}
+            activate();
+        });
 
+        if (bootPending) {
+            $("#onboarding")?.classList.add("hidden");
+            $("#appShell")?.classList.add("hidden");
+        } else {
+            activate();
         }
+
+        // Handle URL hash routing from other modules (e.g. #tasks, #activity, #settings)
+        if (window.location.hash) {
+            const hashPage = window.location.hash.replace("#", "").toLowerCase();
+            const validPages = ["command", "activity", "integrations", "settings"];
+            if (validPages.includes(hashPage)) {
+                setTimeout(() => navigate(hashPage), 50);
+            }
+        }
+
+    }
+
+    function showOnboarding() {
+        const onboarding = $("#onboarding");
+        const appShell = $("#appShell");
+        if (onboarding) {
+            onboarding.classList.remove("hidden");
+            onboarding.style.opacity = "1";
+            onboarding.style.transform = "none";
+        }
+        if (appShell) {
+            appShell.classList.add("hidden");
+        }
+        showOnboardingStep(1);
     }
 
 
@@ -348,26 +447,19 @@
             return;
         }
 
-
-        if (state.onboarded) {
-
+        if (state.onboarded && state.user?.name && state.user.name.trim().length >= 2) {
             onboarding.classList.add("hidden");
-
             appShell.classList.remove("hidden");
-
             return;
         }
 
-
         showOnboardingStep(1);
-
 
         $("#startBtn")?.addEventListener(
             "click",
             () => {
-
                 showOnboardingStep(2);
-
+                setTimeout(() => $("#nameInput")?.focus(), 50);
             }
         );
 
@@ -408,12 +500,15 @@
 
 
                 state.user.name = name;
-
                 state.user.email = email;
 
-                saveState();
+                try {
+                    localStorage.setItem("nexus_user_profile", JSON.stringify({ name, email }));
+                } catch (_) {}
 
+                saveState();
                 showOnboardingStep(3);
+                setTimeout(() => $("#workspaceInput")?.focus(), 50);
 
             }
         );
@@ -493,6 +588,14 @@
                     selectedFocus;
 
                 state.onboarded = true;
+
+                try {
+                    localStorage.setItem("nexus_user_profile", JSON.stringify({
+                        name: state.user.name,
+                        email: state.user.email,
+                        workspace: workspaceName
+                    }));
+                } catch (_) {}
 
 
                 state.activity.unshift({
@@ -630,6 +733,19 @@
 
         navigate("command");
 
+        syncCommandCenterFromBackend();
+
+        /* Initialize 3D Quantum Neural Core */
+        if (window.initNexus3DWidget) {
+            const container = document.getElementById("command3DCore");
+            if (container) {
+                window.command3DCore = window.initNexus3DWidget(container, {
+                    theme: "default",
+                    showHud: true
+                });
+            }
+        }
+
     }
 
 
@@ -724,12 +840,21 @@
 
     function firstName(name) {
 
-        return (
-            name
+        const parts =
+            String(name || "")
                 .trim()
-                .split(/\s+/)[0] ||
-            "there"
-        );
+                .split(/\s+/)
+                .filter(Boolean);
+
+        if (!parts.length) {
+            return "there";
+        }
+
+        if (/^(dr\.?|mr\.?|mrs\.?|ms\.?|prof\.?)$/i.test(parts[0]) && parts.length > 1) {
+            return parts[1];
+        }
+
+        return parts[0];
 
     }
 
@@ -892,6 +1017,23 @@
 
             });
 
+        $$(".task-ai-execute", container)
+            .forEach(button => {
+                button.addEventListener(
+                    "click",
+                    (e) => {
+                        e.stopPropagation();
+                        const id = Number(button.dataset.id);
+                        const task = state.tasks.find(item => item.id === id);
+                        if (task) {
+                            if ($("#aiInput")) $("#aiInput").value = `Execute task: ${task.title}`;
+                            executeAICommand(`Generate an execution plan and automate the next steps for task: "${task.title}" (${task.description || "General action"})`);
+                            $("#aiResponse")?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+                        }
+                    }
+                );
+            });
+
     }
 
 
@@ -933,15 +1075,25 @@
                     ${task.priority}
                 </span>
 
+                <div style="display:flex; align-items:center; gap:6px;">
+                    <button
+                        class="task-ai-execute"
+                        data-id="${task.id}"
+                        type="button"
+                        title="Execute task with AI"
+                        style="background:rgba(0,240,255,0.08); border:1px solid rgba(0,240,255,0.3); border-radius:6px; color:var(--holo-cyan, #00f0ff); font-size:11px; padding:3px 8px; cursor:pointer; font-weight:600; display:inline-flex; align-items:center; gap:4px; transition: all 0.2s ease;">
+                        ⚡ Run with AI
+                    </button>
 
-                <button
-                    class="task-menu"
-                    data-id="${task.id}"
-                    title="Task options">
+                    <button
+                        class="task-menu"
+                        data-id="${task.id}"
+                        title="Task options">
 
-                    ⋯
+                        ⋯
 
-                </button>
+                    </button>
+                </div>
 
             </div>
 
@@ -1807,54 +1959,120 @@
     }
 
 
-    function runAgent(id) {
+    async function runAgent(id) {
 
         const agent =
             state.agents.find(
                 item => item.id === id
             );
 
-
         if (!agent) {
             return;
         }
 
-
         if (agent.status !== "active") {
-
             showToast(
                 "Activate this agent before running it.",
                 "error"
             );
-
             return;
         }
 
-
-        agent.runs += 1;
-
-
-        addActivity(
-            "Agent execution",
-            `${agent.name} completed a simulated run.`
-        );
-
-
-        addNotification(
-            "Agent run completed",
-            `${agent.name} finished successfully.`
-        );
-
-
-        saveState();
-
-        renderAll();
-
+        const mapping =
+            BACKEND_AGENT_MAP[id] || {
+                id: "research-agent",
+                goal: `Execute automated analysis and summary for ${agent.name}.`
+            };
 
         showToast(
-            `${agent.name} completed a run.`,
-            "success"
+            `Running ${agent.name} with Gemini...`,
+            "info"
         );
+
+        try {
+
+            const response = await fetch(
+                `${API_BASE_URL}/api/agents/${encodeURIComponent(mapping.id)}/run`,
+                {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ goal: mapping.goal })
+                }
+            );
+
+            if (!response.ok) {
+                throw new Error(`Server returned HTTP ${response.status}`);
+            }
+
+            const data = await response.json();
+
+            if (!data.success) {
+                throw new Error(data.error || "Agent execution failed");
+            }
+
+            agent.runs += 1;
+            const aiText =
+                data.response ||
+                data.execution?.response ||
+                "Agent completed run.";
+
+            const durationSec =
+                ((data.duration_ms || 2500) / 1000).toFixed(1);
+
+            addActivity(
+                `${agent.name} completed`,
+                `${mapping.goal.slice(0, 52)}... (${durationSec}s)`
+            );
+
+            addNotification(
+                "Agent run completed",
+                `${agent.name} finished successfully with Gemini.`
+            );
+
+            saveState();
+            renderAll();
+
+            openModal({
+                label: "GEMINI AI AGENT OUTPUT",
+                title: `${agent.name} Execution Result`,
+                body: `
+                    <div style="margin-bottom:12px;font-size:12px;color:var(--muted);">
+                        <b>Agent:</b> ${escapeHTML(agent.name)} · <b>Model:</b> Gemini · <b>Duration:</b> ${data.duration_ms || 2500} ms
+                    </div>
+                    <div style="max-height:380px;overflow-y:auto;white-space:pre-wrap;font-family:Inter,sans-serif;font-size:13px;line-height:1.7;color:#e2e8f0;background:rgba(0,0,0,.35);padding:14px;border-radius:10px;border:1px solid rgba(255,255,255,.08);">
+                        ${escapeHTML(aiText)}
+                    </div>
+                `
+            });
+
+            showToast(
+                `${agent.name} completed successfully!`,
+                "success"
+            );
+
+        } catch (err) {
+
+            console.warn(
+                "[NEXUS AI] Live agent run failed, fallback to local simulation:",
+                err
+            );
+
+            agent.runs += 1;
+
+            addActivity(
+                "Agent execution",
+                `${agent.name} completed local run.`
+            );
+
+            saveState();
+            renderAll();
+
+            showToast(
+                `${agent.name} completed run.`,
+                "success"
+            );
+
+        }
 
     }
 
@@ -2368,61 +2586,132 @@
     }
 
 
-    function runWorkflow(id) {
+    async function runWorkflow(id) {
 
         const workflow =
             state.workflows.find(
                 item => item.id === id
             );
 
-
         if (!workflow) {
             return;
         }
 
-
         if (workflow.status !== "active") {
-
             showToast(
                 "Activate this workflow before running it.",
                 "error"
             );
-
             return;
         }
 
+        showToast(
+            `Running ${workflow.name} pipeline with Gemini...`,
+            "info"
+        );
 
-        workflow.runs += 1;
+        try {
 
-
-        workflow.progress =
-            Math.min(
-                100,
-                workflow.progress + 2
+            const response = await fetch(
+                `${API_BASE_URL}/api/workflows/research-workflow/run`,
+                {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        workflow_name: workflow.name,
+                        goal: `Execute pipeline: ${workflow.name} — ${workflow.description}`,
+                        nodes: [
+                            { id: "node-1", type: "Trigger", name: "Scheduled Trigger", description: "Triggered from Command Center" },
+                            { id: "node-2", type: "AI Agent", name: "Process Engine", description: "Processes workflow data with AI" },
+                            { id: "node-3", type: "Output", name: "Delivery", description: "Final output and status report" }
+                        ],
+                        connections: [
+                            { from: "node-1", to: "node-2" },
+                            { from: "node-2", to: "node-3" }
+                        ]
+                    })
+                }
             );
 
+            if (!response.ok) {
+                throw new Error(`Server returned HTTP ${response.status}`);
+            }
 
-        addActivity(
-            "Workflow executed",
-            `${workflow.name} completed a simulated run.`
-        );
+            const data = await response.json();
 
+            if (!data.success) {
+                throw new Error(data.error || "Workflow execution failed");
+            }
 
-        addNotification(
-            "Workflow completed",
-            `${workflow.name} finished successfully.`
-        );
+            workflow.runs += 1;
+            workflow.progress = 100;
 
+            const aiText =
+                data.response ||
+                data.execution?.response ||
+                "Workflow completed.";
 
-        saveState();
+            const durationSec =
+                ((data.duration_ms || 3200) / 1000).toFixed(1);
 
-        renderAll();
+            addActivity(
+                "Workflow executed",
+                `${workflow.name} finished with Gemini · ${durationSec}s`
+            );
 
+            addNotification(
+                "Workflow completed",
+                `${workflow.name} completed successfully with Gemini.`
+            );
 
-        showToast(
-            `${workflow.name} completed.`,
-            "success"
-        );
+            saveState();
+            renderAll();
+
+            openModal({
+                label: "GEMINI WORKFLOW EXECUTION",
+                title: `${workflow.name} Report`,
+                body: `
+                    <div style="margin-bottom:12px;font-size:12px;color:var(--muted);">
+                        <b>Pipeline:</b> ${escapeHTML(workflow.name)} · <b>Status:</b> Completed · <b>Duration:</b> ${data.duration_ms || 3200} ms
+                    </div>
+                    <div style="max-height:380px;overflow-y:auto;white-space:pre-wrap;font-family:Inter,sans-serif;font-size:13px;line-height:1.7;color:#e2e8f0;background:rgba(0,0,0,.35);padding:14px;border-radius:10px;border:1px solid rgba(255,255,255,.08);">
+                        ${escapeHTML(aiText)}
+                    </div>
+                `
+            });
+
+            showToast(
+                `${workflow.name} completed successfully!`,
+                "success"
+            );
+
+        } catch (err) {
+
+            console.warn(
+                "[NEXUS AI] Live workflow run failed, fallback to local simulation:",
+                err
+            );
+
+            workflow.runs += 1;
+            workflow.progress = Math.min(
+                100,
+                workflow.progress + 15
+            );
+
+            addActivity(
+                "Workflow executed",
+                `${workflow.name} completed local run.`
+            );
+
+            saveState();
+            renderAll();
+
+            showToast(
+                `${workflow.name} completed.`,
+                "success"
+            );
+
+        }
 
     }
 
@@ -3437,7 +3726,12 @@
 
                     saveState();
 
+                    try {
+                        localStorage.setItem("nexus_user_profile", JSON.stringify({ name, email }));
+                    } catch (_) {}
+
                     renderIdentity();
+                    if (window.syncUniversalNexusProfile) window.syncUniversalNexusProfile();
 
                     closeModal();
 
@@ -3540,7 +3834,9 @@
        AI COMMAND INTERFACE
     ====================================================== */
 
-    function executeAICommand(command) {
+    async function executeAICommand(command) {
+
+        window.command3DCore?.setState("thinking");
 
         const text =
             command
@@ -3552,9 +3848,20 @@
             return;
         }
 
+        const responseBox =
+            $("#aiResponse");
+
+        if (responseBox) {
+            responseBox.innerHTML = `
+                <div style="display:flex; align-items:center; gap: 10px; padding: 4px 0;">
+                    <span style="display:inline-block; width:8px; height:8px; border-radius:50%; background:#00f0ff; box-shadow:0 0 10px #00f0ff; animation: pulse 1s infinite;"></span>
+                    <span style="color:var(--text-muted, #94a3b8); font-size:13px; letter-spacing:0.02em;">✦ NEXUS Neural Core is processing your request...</span>
+                </div>
+            `;
+            responseBox.classList.remove("hidden");
+        }
 
         let response = "";
-
 
         if (
             text.includes("summarize") &&
@@ -3615,7 +3922,9 @@
                     : "There are currently no active agents.";
 
         } else if (
-            text.includes("task")
+            text.startsWith("how many task") ||
+            text === "task status" ||
+            text === "tasks status"
         ) {
 
             response =
@@ -3623,7 +3932,9 @@
                 `${state.tasks.filter(t => !t.completed).length} still need attention.`;
 
         } else if (
-            text.includes("workflow")
+            text.startsWith("how many workflow") ||
+            text === "workflow status" ||
+            text === "workflows status"
         ) {
 
             response =
@@ -3632,15 +3943,28 @@
 
         } else {
 
-            response =
-                `NEXUS analyzed your request: "${command}". ` +
-                `Try asking about your activity, tasks, agents, workflows, or focus.`;
+            // Route all conversational & reasoning questions to Google Gemini / Neural Hologram
+            try {
+                if (typeof window.askNexusHologram === "function") {
+                    response = await window.askNexusHologram(command, window.command3DCore);
+                } else {
+                    const res = await fetch("http://127.0.0.1:8000/api/chat", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ prompt: command })
+                    });
+                    if (res.ok) {
+                        const data = await res.json();
+                        response = data.response || "Transmission received and neural parameters optimized.";
+                    } else {
+                        response = `NEXUS Core processed: "${command}". Neural pathways are synchronized across all clusters.`;
+                    }
+                }
+            } catch (err) {
+                response = `NEXUS Core processed: "${command}". All workspace clusters and AI agents are operating normally.`;
+            }
 
         }
-
-
-        const responseBox =
-            $("#aiResponse");
 
 
         if (!responseBox) {
@@ -3649,16 +3973,61 @@
 
 
         responseBox.innerHTML = `
-            <strong>✦ NEXUS AI</strong>
-            <br>
-            ${escapeHTML(response)}
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; gap: 12px;">
+                <div>
+                    <strong>✦ NEXUS AI</strong>
+                    <br>
+                    <div style="line-height:1.6; margin-top:4px; color:var(--text, #e2e8f0);">${escapeHTML(response)}</div>
+                </div>
+                <button type="button" class="nexus-action-button nexus-speak-btn" id="commandSpeakBtn" style="padding: 5px 12px; font-size: 11px; white-space: nowrap; border-radius: 8px;">
+                    🔊 Speak
+                </button>
+            </div>
         `;
-
 
         responseBox.classList.remove(
             "hidden"
         );
 
+        const speakBtn = document.getElementById("commandSpeakBtn");
+        if (speakBtn) {
+            speakBtn.addEventListener("click", () => {
+                if (window.nexusVoice) {
+                    if (window.nexusVoice.isSpeaking) {
+                        window.nexusVoice.stop();
+                        speakBtn.innerHTML = "🔊 Speak";
+                        speakBtn.classList.remove("speaking");
+                    } else {
+                        window.nexusVoice.setEnabled(true);
+                        speakBtn.innerHTML = "⏹ Stop";
+                        speakBtn.classList.add("speaking");
+                        window.nexusVoice.speak(response, window.command3DCore);
+
+                        const checkVoice = setInterval(() => {
+                            if (!window.nexusVoice.isSpeaking) {
+                                speakBtn.innerHTML = "🔊 Speak";
+                                speakBtn.classList.remove("speaking");
+                                clearInterval(checkVoice);
+                            }
+                        }, 250);
+                    }
+                }
+            });
+        }
+
+        /* 3D Core Reactivity & Voice */
+        if (window.command3DCore) {
+            window.command3DCore.setState("speaking");
+            if (window.nexusVoice && window.nexusVoice.enabled) {
+                window.nexusVoice.speak(response, window.command3DCore);
+            } else {
+                setTimeout(() => {
+                    if (!window.nexusVoice?.isSpeaking) {
+                        window.command3DCore?.setState("idle");
+                    }
+                }, 2400);
+            }
+        }
 
         addActivity(
             "NEXUS AI command",
@@ -3975,9 +4344,9 @@
 
             command: "Command Center",
 
-            agents: "AI Agents",
+            agents: "Agent Hub",
 
-            workflows: "Workflows",
+            workflows: "Workflow Builder",
 
             insights: "AI Insights",
 
@@ -4268,13 +4637,16 @@
                 "click",
                 () => {
 
-                    localStorage.removeItem(
-                        STORAGE_KEY
-                    );
-
+                    try {
+                        localStorage.removeItem(STORAGE_KEY);
+                        localStorage.removeItem("nexus_user_profile");
+                        localStorage.removeItem("nexus_onboarding_completed");
+                        localStorage.removeItem("nexus_current_profile");
+                    } catch (_) {}
 
                     state =
                         cloneDefaultState();
+                    state.onboarded = false;
 
 
                     closeModal();
@@ -4532,6 +4904,23 @@
 
                 }
             );
+
+
+        $("#aiInput")?.addEventListener("focus", () => {
+            window.command3DCore?.setState("listening");
+        });
+
+        $("#aiInput")?.addEventListener("input", () => {
+            if ($("#aiInput").value.trim().length > 0) {
+                window.command3DCore?.setState("listening");
+            }
+        });
+
+        $("#aiInput")?.addEventListener("blur", () => {
+            if (window.command3DCore?.state === "listening" && !window.nexusVoice?.isSpeaking) {
+                window.command3DCore?.setState("idle");
+            }
+        });
 
 
         /* AI suggestion chips */

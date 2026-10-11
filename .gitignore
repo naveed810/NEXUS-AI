@@ -1,0 +1,35 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Environments
+venv/
+.venv/
+env/
+.env/
+ENV/
+
+# Sensitive environment variables
+.env
+.env.*
+backend/.env
+
+# Databases
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+*.sqlite
+*.sqlite3
+backend/nexus_ai.db
+
+# Logs
+*.log
+logs/
+
+# IDE & Editor
+.idea/
+.DS_Store
+Thumbs.db

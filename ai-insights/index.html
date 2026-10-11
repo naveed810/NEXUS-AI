@@ -6,6 +6,7 @@
   <meta name="description" content="NEXUS AI Insights dashboard" />
   <title>NEXUS AI — AI Insights</title>
   <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="../shared/nexus-3d-core.css" />
 </head>
 
 <body>
@@ -24,6 +25,15 @@
           <strong>NEXUS</strong>
           <span>AI WORKSPACE</span>
         </div>
+
+        <button
+          class="sidebar-dock-toggle"
+          id="dockCollapseBtn"
+          type="button"
+          title="Collapse Sidebar"
+          style="margin-left:auto; background:rgba(255,255,255,0.06); border:1px solid rgba(0,240,255,0.3); border-radius:8px; color:var(--holo-cyan); cursor:pointer; font-size:12px; padding:4px 8px; line-height:1;">
+          ◀
+        </button>
       </div>
 
       <div class="workspace-mini">
@@ -51,7 +61,7 @@
           href="../agent-hub/index.html"
           data-nav="Agent Hub"
         >
-          <span class="nav-icon">◈</span>
+          <span class="nav-icon">✦</span>
           <span>Agent Hub</span>
         </a>
 
@@ -60,7 +70,7 @@
           href="../workflow-builder/index.html"
           data-nav="Workflow Builder"
         >
-          <span class="nav-icon">⌁</span>
+          <span class="nav-icon">◇</span>
           <span>Workflow Builder</span>
         </a>
 
@@ -70,7 +80,7 @@
           data-nav="AI Insights"
           aria-current="page"
         >
-          <span class="nav-icon">✦</span>
+          <span class="nav-icon">◌</span>
           <span>AI Insights</span>
         </a>
 
@@ -111,7 +121,7 @@
       <!-- TOP BAR -->
       <header class="topbar">
 
-        <div class="mobile-brand">
+        <div class="mobile-brand" style="display:flex; align-items:center; gap:8px;">
           <button
             class="icon-button"
             id="menuBtn"
@@ -119,6 +129,10 @@
             aria-label="Open navigation"
           >
             ☰
+          </button>
+
+          <button class="btn btn-secondary sidebar-toggle-btn" id="toggleSidebarBtn" type="button" title="Open / Close Sidebar">
+            <span class="toggle-icon">◀</span> <span class="toggle-text">Sidebar</span>
           </button>
 
           <span>
@@ -176,6 +190,17 @@
             Refresh
           </button>
 
+          <button
+            class="primary-button"
+            id="holoBtn"
+            type="button"
+            onclick="window.openNexusHoloChamber && window.openNexusHoloChamber('analysis')"
+            title="Open 3D Holographic Analytics Chamber"
+          >
+            <span>✦</span>
+            3D Hologram
+          </button>
+
         </div>
 
       </header>
@@ -183,6 +208,24 @@
 
       <!-- CONTENT -->
       <div class="content-wrap">
+
+        <!-- 3D HOLOGRAPHIC TELEMETRY BANNER -->
+        <section class="insights-hero-banner" style="margin-bottom: 24px; display: grid; grid-template-columns: 1fr 280px; gap: 20px; align-items: center; background: rgba(10, 16, 32, 0.78); border: 1px solid rgba(70, 223, 255, 0.28); border-radius: 18px; padding: 22px 26px; backdrop-filter: blur(18px); box-shadow: 0 12px 35px rgba(0,0,0,0.4), 0 0 25px rgba(0,240,255,0.08);">
+          <div>
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+              <span class="status-dot online" style="background:#00f0ff; box-shadow:0 0 10px #00f0ff; width:8px; height:8px; border-radius:50%; display:inline-block;"></span>
+              <span style="font-size: 11px; font-weight: 800; letter-spacing: 0.12em; color: #00f0ff; text-transform: uppercase;">Real-Time Quantum Telemetry</span>
+            </div>
+            <h2 style="font-size: 22px; font-weight: 700; color: #fff; margin: 0 0 8px 0; letter-spacing: -0.02em;">Autonomous Agent Intelligence Matrix</h2>
+            <p style="font-size: 13px; color: #94a3b8; margin: 0; line-height: 1.6; max-width: 620px;">
+              Continuous evaluation of multi-agent inference performance, Google Gemini model latency, and topological workflow execution health synchronized with SQLite.
+            </p>
+          </div>
+          <div class="nexus-3d-wrapper" id="insights3DCore" style="height: 140px; min-height: 140px;">
+            <div class="nexus-3d-scanlines"></div>
+            <div class="nexus-3d-vignette"></div>
+          </div>
+        </section>
 
         <!-- KPI CARDS -->
         <section
@@ -699,6 +742,12 @@
   </dialog>
 
 
+  <button class="floating-sidebar-toggle" id="floatingToggleBtn" type="button" title="Open Sidebar">
+    ▶ Open Sidebar
+  </button>
+
+  <script src="../shared/vendor/three.min.js"></script>
+  <script src="../shared/nexus-3d-core.js"></script>
   <script src="script.js"></script>
 
 </body>

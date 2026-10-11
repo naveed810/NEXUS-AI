@@ -12,6 +12,7 @@
     <title>NEXUS AI — Workflow Builder</title>
 
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="../shared/nexus-3d-core.css">
 </head>
 
 <body>
@@ -24,6 +25,10 @@
 
         <div class="brand-wrap">
             <button class="mobile-menu-btn" id="mobileMenuBtn" type="button" aria-label="Open navigation">☰</button>
+            <button class="btn btn-secondary sidebar-toggle-btn" id="toggleSidebarBtn" type="button" title="Open / Close Sidebar (Toggle)">
+                <span class="toggle-icon">◀</span>
+                <span class="toggle-text">Sidebar</span>
+            </button>
 
             <div class="brand-mark">N</div>
 
@@ -39,6 +44,15 @@
 
 
         <div class="topbar-actions">
+
+            <button
+                class="btn btn-secondary icon-button"
+                id="themeBtn"
+                type="button"
+                title="Toggle theme"
+                style="padding: 8px 12px; font-size: 14px;">
+                ☾
+            </button>
 
             <button
                 class="btn btn-secondary"
@@ -70,19 +84,32 @@
 
             <div class="sidebar-workspace">
                 <div class="workspace-icon">N</div>
-                <div>
+                <div style="flex:1;">
                     <strong>NEXUS Workspace</strong>
                     <span>AI Operations</span>
                 </div>
+                <button class="sidebar-dock-toggle" id="dockCollapseBtn" type="button" title="Collapse Sidebar" style="background:rgba(255,255,255,0.06); border:1px solid rgba(0,240,255,0.3); border-radius:8px; color:var(--holo-cyan); cursor:pointer; font-size:12px; padding:4px 8px; line-height:1;">◀</button>
             </div>
 
-            <div class="module-sidebar-nav" aria-label="NEXUS AI workspace navigation">
+            <nav class="module-sidebar-nav" aria-label="NEXUS AI workspace navigation">
                 <div class="nav-label">WORKSPACE</div>
-                <a href="../command-center/index.html"><span>⌂</span> Command Center</a>
-                <a href="../agent-hub/index.html"><span>✦</span> Agent Hub</a>
-                <a class="active" href="index.html" aria-current="page"><span>◇</span> Workflow Builder</a>
-                <a href="../ai-insights/index.html"><span>◌</span> AI Insights</a>
-            </div>
+                <a href="../command-center/index.html" class="nav-item">
+                    <span class="nav-icon">⌂</span>
+                    <span>Command Center</span>
+                </a>
+                <a href="../agent-hub/index.html" class="nav-item">
+                    <span class="nav-icon">✦</span>
+                    <span>Agent Hub</span>
+                </a>
+                <a class="nav-item active" href="#" aria-current="page" id="currentWorkflowNav">
+                    <span class="nav-icon">◇</span>
+                    <span>Workflow Builder</span>
+                </a>
+                <a href="../ai-insights/index.html" class="nav-item">
+                    <span class="nav-icon">◌</span>
+                    <span>AI Insights</span>
+                </a>
+            </nav>
 
             <div class="sidebar-heading">
 
@@ -311,6 +338,15 @@
                         ＋ New
                     </button>
 
+                    <button
+                        class="btn btn-ghost"
+                        id="holoBtn"
+                        type="button"
+                        onclick="window.openNexusHoloChamber && window.openNexusHoloChamber('automation')"
+                        title="Open 3D Quantum Neural Chamber">
+                        ✦ 3D Hologram
+                    </button>
+
                 </div>
 
             </div>
@@ -374,7 +410,7 @@
                 <div>
 
                     <div class="section-label">
-                        INSPECTOR
+                        INSPECTOR & QUANTUM CORE
                     </div>
 
                     <h2>
@@ -388,6 +424,13 @@
                     id="selectionDot">
                 </span>
 
+            </div>
+
+            <div style="padding: 0 16px 12px 16px;">
+                <div class="nexus-3d-wrapper" id="workflow3DCore" style="height: 150px; min-height: 150px;">
+                    <div class="nexus-3d-scanlines"></div>
+                    <div class="nexus-3d-vignette"></div>
+                </div>
             </div>
 
 
@@ -411,6 +454,10 @@
         </aside>
 
     </div>
+    
+    <button class="floating-sidebar-toggle" id="floatingToggleBtn" type="button" title="Open Sidebar">
+        ▶ Open Sidebar
+    </button>
 
 
 
@@ -482,6 +529,8 @@
 </div>
 
 
+<script src="../shared/vendor/three.min.js"></script>
+<script src="../shared/nexus-3d-core.js"></script>
 <script src="script.js"></script>
 
 </body>
